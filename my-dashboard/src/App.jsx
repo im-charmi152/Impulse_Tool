@@ -265,7 +265,7 @@ function Header({ toggleSidebar }) {
         </button>
         <div className="flex items-center gap-0.5 select-none">
           <span className="text-white font-black text-xl tracking-tight">
-            IN
+            IMPULSE
           </span>
           <span className="text-[#00AEEF] font-black text-xl">‑</span>
           <span className="text-white font-black text-xl tracking-tight">
