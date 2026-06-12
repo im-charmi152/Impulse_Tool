@@ -269,7 +269,7 @@ function Header({ toggleSidebar }) {
           </span>
           <span className="text-[#00AEEF] font-black text-xl">‑</span>
           <span className="text-white font-black text-xl tracking-tight">
-            GRAM
+            SUPPORT
           </span>
           <span className="text-white font-black text-xl ml-0.5">!</span>
         </div>

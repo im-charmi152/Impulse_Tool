@@ -1,0 +1,76 @@
+﻿using System.Data.Odbc;
+using ImpulseSupportTool_Repo;
+
+namespace OrderManagement.API.Repositories
+{
+    public class OrderRepository : IOrderRepository
+    {
+        private readonly IConfiguration _configuration;
+
+        public OrderRepository(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public async Task<OrderResponse> GetOrder(OrderRequest request)
+        {
+            Console.WriteLine($">>> QUERY PARAMS: PoNumber='{request.PoNumber}' CountryCode='{request.CountryCode}'");
+
+            OrderResponse response = null;
+
+            string password = _configuration["DB2:Password"];
+            string connectionString = _configuration.GetConnectionString("DB2Connection");
+            connectionString += $"PWD={password};";
+
+            using OdbcConnection conn = new OdbcConnection(connectionString);
+            await conn.OpenAsync();
+
+            Console.WriteLine($">>> DB2 CONNECTION OPENED OK");
+
+            // ✅ TRIM fixes trailing spaces in CHAR fixed-width columns
+            string query = @"
+                SELECT
+                    PARTNER_ID,
+                    CUST_CO_CD,
+                    CUST_BR,
+                    CUST_NBR,
+                    IMI_ASGD_BR_NBR,
+                    IMI_ASGD_ORDR_NBR
+                FROM Z1.EO_ORDR_HDR_INFO
+                WHERE TRIM(CUST_PO_NBR) = ? AND TRIM(CUST_CO_CD) = ?
+                FETCH FIRST 10 ROWS ONLY";
+
+            using OdbcCommand cmd = new OdbcCommand(query, conn);
+
+            // ✅ Also trim values coming from React just in case
+            cmd.Parameters.Add("?", OdbcType.VarChar).Value = request.PoNumber.Trim();
+            cmd.Parameters.Add("?", OdbcType.VarChar).Value = request.CountryCode.Trim();
+
+            Console.WriteLine($">>> EXECUTING QUERY...");
+
+            using OdbcDataReader reader = (OdbcDataReader)await cmd.ExecuteReaderAsync();
+
+            Console.WriteLine($">>> READER HAS ROWS: {reader.HasRows}");
+
+            if (await reader.ReadAsync())
+            {
+                Console.WriteLine($">>> ROW FOUND - mapping response...");
+                response = new OrderResponse
+                {
+                    PartnerId = reader["PARTNER_ID"]?.ToString()?.Trim(),
+                    PoNumber = request.PoNumber.Trim(),
+                    CountryCode = request.CountryCode.Trim(),
+                    CustCoCd = reader["CUST_CO_CD"]?.ToString()?.Trim(),
+                    CustBr = reader["CUST_BR"]?.ToString()?.Trim(),
+                    CustNbr = reader["CUST_NBR"]?.ToString()?.Trim(),
+                    ImiAsgdBrNbr = reader["IMI_ASGD_BR_NBR"]?.ToString()?.Trim(),
+                    ImiAsgdOrdrNbr = reader["IMI_ASGD_ORDR_NBR"]?.ToString()?.Trim()
+                };
+            }
+
+            Console.WriteLine($">>> RESULT: {(response == null ? "NULL - no data found" : "SUCCESS - data returned")}");
+
+            return response;
+        }
+    }
+}
