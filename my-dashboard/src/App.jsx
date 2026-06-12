@@ -265,11 +265,11 @@ function Header({ toggleSidebar }) {
         </button>
         <div className="flex items-center gap-0.5 select-none">
           <span className="text-white font-black text-xl tracking-tight">
-            IMPULSE
+            UNIFIED IMPULSE
           </span>
           <span className="text-[#00AEEF] font-black text-xl">‑</span>
           <span className="text-white font-black text-xl tracking-tight">
-            GRAM
+            SUPPORT
           </span>
           <span className="text-white font-black text-xl ml-0.5">!</span>
         </div>
