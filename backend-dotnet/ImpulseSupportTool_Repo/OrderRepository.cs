@@ -57,14 +57,23 @@ namespace OrderManagement.API.Repositories
                 Console.WriteLine($">>> ROW FOUND - mapping response...");
                 response = new OrderResponse
                 {
-                    PartnerId = reader["PARTNER_ID"]?.ToString()?.Trim(),
-                    PoNumber = request.PoNumber.Trim(),
-                    CountryCode = request.CountryCode.Trim(),
                     CustCoCd = reader["CUST_CO_CD"]?.ToString()?.Trim(),
                     CustBr = reader["CUST_BR"]?.ToString()?.Trim(),
                     CustNbr = reader["CUST_NBR"]?.ToString()?.Trim(),
+                    CustSfx = reader["CUST_NBR"]?.ToString()?.Trim(),
+                    PoNumber = request.PoNumber.Trim(),
+                    CustPoDt = reader["CUST_PO_DT"]?.ToString()?.Trim(),
+                    TagNbr = reader["TAG_NBR"]?.ToString()?.Trim(),
+                    PartnerId = reader["PARTNER_ID"]?.ToString()?.Trim(),
+                    CmbBtchNbr = reader["CMB_BTCH_NBR"]?.ToString()?.Trim(),
                     ImiAsgdBrNbr = reader["IMI_ASGD_BR_NBR"]?.ToString()?.Trim(),
-                    ImiAsgdOrdrNbr = reader["IMI_ASGD_ORDR_NBR"]?.ToString()?.Trim()
+                    ImiAsgdOrdrNbr = reader["IMI_ASGD_ORDR_NBR"]?.ToString()?.Trim(),
+                    StateCd = reader["STATE_CD"]?.ToString()?.Trim(),
+                    ImiCarCd = reader["IMI_CARR_CODE"]?.ToString()?.Trim(),
+                    OrdShFr = reader["ORD_SHIP_FR_BR"]?.ToString()?.Trim(),
+                    OrdSt = reader["ORDR_STATUS"]?.ToString()?.Trim(),
+                    HoldCd = reader["HOLD_CD"]?.ToString()?.Trim(),
+                    TermId = reader["TERM_ID"]?.ToString()?.Trim(),
                 };
             }
 
