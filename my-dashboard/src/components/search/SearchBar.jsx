@@ -2,12 +2,10 @@ import { useState } from "react";
 import { Search } from "lucide-react";
 
 const FIELDS = [
-  "Order Number",
-  "SKU",
-  "Account Number",
+  "Customer PO Number",
+  "Country",
   "Partner ID",
-  "PO Number",
-  "Transaction ID",
+  "PO Number"
 ];
 
 export default function SearchBar() {
