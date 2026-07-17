@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Download } from "lucide-react";
+import { Download, Layers, Activity, Settings, CheckCircle2, Database, Server } from "lucide-react";
 
 import Header from "./components/layout/Header";
 import Sidebar from "./components/layout/Sidebar";
@@ -16,6 +16,7 @@ import FailureReason from "./components/monitoring/FailureReason";
 import RetryRecovery from "./components/monitoring/RetryRecovery";
 import { LoadingState, EmptyState, ErrorState, IdleState } from "./components/common/StatusStates";
 import RawResponsePanel from "./components/common/RawResponsePanel";
+import NotAvailablePanel from "./components/common/NotAvailablePanel";
 
 import { useOrderSearch } from "./hooks/useOrderSearch";
 
@@ -24,9 +25,6 @@ export default function Dashboard() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data, status, error, search, reset } = useOrderSearch();
 
-  // Derive failure / retry candidates from the flow trace instead of
-  // hardcoding "no failures" — any non-success row across the three flows
-  // surfaces here automatically as new flow types or systems are added.
   const { failures, retryCandidates } = useMemo(() => {
     if (!data) return { failures: [], retryCandidates: [] };
     const allRows = Object.values(data.flowTrace || {}).flat();
@@ -37,6 +35,8 @@ export default function Dashboard() {
       ),
     };
   }, [data]);
+
+  const isAvailable = (section) => data?._meta?.availableSections?.includes(section);
 
   return (
     <div className="min-h-screen bg-gray-100 font-sans">
@@ -52,15 +52,10 @@ export default function Dashboard() {
         className={`pt-14 transition-all duration-300 hidden-mobile-margin ${sidebarCollapsed ? "md:ml-[60px]" : "md:ml-[200px]"}`}
       >
         <div className="p-4 md:p-5 max-w-[1400px]">
-          {/* Page header */}
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h1 className="text-xl font-bold text-gray-800">
-                Order / Transaction Search
-              </h1>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Search and view consolidated transaction details
-              </p>
+              <h1 className="text-xl font-bold text-gray-800">Order / Transaction Search</h1>
+              <p className="text-xs text-gray-400 mt-0.5">Search and view consolidated transaction details</p>
             </div>
             <button className="flex items-center gap-1.5 text-xs font-medium text-blue-600 border border-blue-200 rounded px-3 py-1.5 hover:bg-blue-50 transition-colors whitespace-nowrap">
               <Download size={12} />
@@ -68,7 +63,6 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Search bar */}
           <SearchBar onSearch={search} loading={status === "loading"} />
 
           <div className="mt-4">
@@ -86,19 +80,51 @@ export default function Dashboard() {
 
                 <div className="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)_minmax(0,1.2fr)] gap-4">
                   <OrderHeaderDetails order={data.order} />
-                  <LineItemDetails items={data.lineItems} />
+
+                  {isAvailable("lineItems") ? (
+                    <LineItemDetails items={data.lineItems} />
+                  ) : (
+                    <NotAvailablePanel icon={Layers} title="Line-Item Details" note="Line items aren't returned by GetOrder yet." />
+                  )}
+
                   <div className="flex flex-col gap-4">
-                    <FlowTraceStatus steps={data.processingSteps} flowTrace={data.flowTrace} />
-                    <SetupConfigDetails config={data.setupConfig} />
-                    <SetupValidation validations={data.setupValidation} />
+                    {isAvailable("flowTrace") ? (
+                      <FlowTraceStatus steps={data.processingSteps} flowTrace={data.flowTrace} />
+                    ) : (
+                      <NotAvailablePanel icon={Activity} title="Processing Flow Status" note="No flow-trace data source yet on the backend." />
+                    )}
+                    {isAvailable("setupConfig") ? (
+                      <SetupConfigDetails config={data.setupConfig} />
+                    ) : (
+                      <NotAvailablePanel icon={Settings} title="Setup / Configuration Details" />
+                    )}
+                    {isAvailable("setupValidation") ? (
+                      <SetupValidation validations={data.setupValidation} />
+                    ) : (
+                      <NotAvailablePanel icon={CheckCircle2} title="Setup Validation" />
+                    )}
                   </div>
                 </div>
 
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                  <DatadogPanel logs={data.logs} alerts={data.datadogAlerts} />
-                  <MQQueueStatus queues={data.mqQueues} />
-                  <FailureReason failures={failures} />
-                  <RetryRecovery retryCandidates={retryCandidates} />
+                  {isAvailable("logs") ? (
+                    <DatadogPanel logs={data.logs} alerts={data.datadogAlerts} />
+                  ) : (
+                    <NotAvailablePanel icon={Database} title="Datadog" note="Not connected yet on the backend." />
+                  )}
+                  {isAvailable("mqQueues") ? (
+                    <MQQueueStatus queues={data.mqQueues} />
+                  ) : (
+                    <NotAvailablePanel icon={Server} title="MQ Queue Status" note="No MQ integration yet on the backend." />
+                  )}
+                  {isAvailable("flowTrace") ? (
+                    <>
+                      <FailureReason failures={failures} />
+                      <RetryRecovery retryCandidates={retryCandidates} />
+                    </>
+                  ) : (
+                    <NotAvailablePanel icon={Activity} title="Failure / Retry Analysis" note="Derived from flow-trace data, which isn't available yet." />
+                  )}
                 </div>
 
                 <div className="mt-4">

@@ -1,91 +1,87 @@
 // ─── Maps the real .NET GetOrder response into the shape the UI expects ───
 //
-// I don't yet know your exact response DTO (field names, casing, nesting),
-// so this is written defensively: it tries a few likely shapes/casings and
-// falls back to sensible empty defaults rather than throwing, so a mismatch
-// shows up as an empty section in the UI (visible, debuggable) instead of a
-// crash. The raw response is always attached as `_raw` so you can inspect
-// exactly what the backend returned — see RawResponsePanel.
-//
-// TODO (once you share the real DTO or a sample response): replace the
-// `pick(...)` guesses below with exact field names. That's the only file
-// that needs to change.
-
-function pick(obj, ...keys) {
-  for (const key of keys) {
-    if (obj && obj[key] !== undefined && obj[key] !== null) return obj[key];
-  }
-  return undefined;
-}
-
-function pickArray(obj, ...keys) {
-  const val = pick(obj, ...keys);
-  return Array.isArray(val) ? val : [];
-}
+// Confirmed against OrderResponseModel.cs + OrderRepository.cs — these are
+// the EXACT fields the backend returns, no guessing needed. ASP.NET Core's
+// default JSON serializer camel-cases the C# property names automatically,
+// e.g. C#'s `PoNumber` arrives in the browser as `poNumber`.
 
 export function mapOrderResponse(raw) {
   if (!raw) return null;
 
-  // Some .NET APIs wrap the payload in { data: {...} } or { result: {...} }.
-  const root = pick(raw, "data", "result", "Data", "Result") || raw;
-
-  const orderSource =
-    pick(root, "order", "Order", "orderHeader", "OrderHeader") || root;
-
   const order = {
-    orderNumber: pick(orderSource, "orderNumber", "OrderNumber", "poNumber", "PoNumber") ?? "—",
-    transactionId: pick(orderSource, "transactionId", "TransactionId") ?? "—",
-    poNumber: pick(orderSource, "poNumber", "PoNumber") ?? "—",
-    partnerId: pick(orderSource, "partnerId", "PartnerId") ?? "—",
-    accountNumber: pick(orderSource, "accountNumber", "AccountNumber") ?? "—",
-    orderDate: pick(orderSource, "orderDate", "OrderDate", "createdDate", "CreatedDate") ?? "—",
-    status: pick(orderSource, "status", "Status", "orderStatus", "OrderStatus") ?? "Unknown",
-    lastUpdated: pick(orderSource, "lastUpdated", "LastUpdated", "updatedDate", "UpdatedDate") ?? "—",
-    accountName: pick(orderSource, "accountName", "AccountName") ?? "—",
-    partnerName: pick(orderSource, "partnerName", "PartnerName") ?? "—",
-    orderSource: pick(orderSource, "orderSource", "OrderSource", "source", "Source") ?? "—",
-    countryCode: pick(orderSource, "countryCode", "CountryCode") ?? "—",
-    totalLineItems: pick(orderSource, "totalLineItems", "TotalLineItems"),
-    orderTotal: pick(orderSource, "orderTotal", "OrderTotal") ?? "—",
-    currency: pick(orderSource, "currency", "Currency") ?? "—",
+    poNumber: raw.poNumber ?? "—",
+    countryCode: raw.countryCode ?? "—",
+    partnerId: raw.partnerId ?? "—",
+    custCoCd: raw.custCoCd ?? "—",
+    custBr: raw.custBr ?? "—",
+    custNbr: raw.custNbr ?? "—",
+    imiAsgdBrNbr: raw.imiAsgdBrNbr ?? "—",
+    imiAsgdOrdrNbr: raw.imiAsgdOrdrNbr ?? "—",
+
+    // "Order Number" on screen = the IMI-assigned order number.
+    orderNumber: raw.imiAsgdOrdrNbr ?? "—",
+    orderDate: raw.orderDate ?? null,
+    orderSource: raw.orderSource ?? "—",
+    currency: raw.currency ?? "—",
+    totalLineItems: raw.totalLineItems ?? 0,
+    orderTotal: raw.orderTotal ?? 0,
+    accountNumber: raw.custNbr ?? "—",
+
+    // Not returned by the backend — EO_ORDR_HDR_INFO only stores numeric
+    // IDs (CUST_NBR, PARTNER_ID), not human-readable names. Shown as
+    // "Not available" in the UI rather than left blank, so it's clear
+    // this is a known gap, not a bug.
+    accountName: raw.accountName ?? null,
+    partnerName: raw.partnerName ?? null,
+
+    // Not returned by the backend — this is just "when the browser got a
+    // response," not a DB2 timestamp.
+    retrievedAt: new Date().toISOString(),
   };
 
-  const rawLineItems = pickArray(root, "lineItems", "LineItems", "items", "Items");
-  const lineItems = rawLineItems.map((li, i) => ({
-    line: pick(li, "line", "Line", "lineNumber", "LineNumber") ?? i + 1,
-    sku: pick(li, "sku", "Sku", "SKU") ?? "—",
-    description: pick(li, "description", "Description") ?? "—",
-    qty: pick(li, "qty", "Qty", "quantity", "Quantity") ?? 0,
-    unitPrice: pick(li, "unitPrice", "UnitPrice") ?? "—",
-    totalPrice: pick(li, "totalPrice", "TotalPrice") ?? "—",
-    status: pick(li, "status", "Status") ?? "Unknown",
-  }));
+  const rawLineItems = Array.isArray(raw.lineItems) ? raw.lineItems : [];
+  const lineItems = rawLineItems.map((li, i) => {
+    const qtyOrdered = li.qtyOrdered ?? 0;
+    const qtyBackOrdered = li.qtyBackOrdered ?? 0;
+    const unitPrice = li.unitPrice ?? 0;
 
-  order.totalLineItems = order.totalLineItems ?? lineItems.length;
+    // Status isn't a column — it's derived from reject/hold codes.
+    let status = "Completed";
+    if (li.rejectCode) status = "Rejected";
+    else if (li.holdCode) status = "On Hold";
+    else if (qtyBackOrdered > 0) status = "Backordered";
 
-  const flowTraceRaw = pick(root, "flowTrace", "FlowTrace") || {};
-  const flowTrace =
-    Object.keys(flowTraceRaw).length > 0
-      ? flowTraceRaw
-      : { edi: pickArray(root, "flow", "Flow", "systemTrace", "SystemTrace") };
+    return {
+      line: li.lineNumber ?? i + 1,
+      sku: li.partNumber ?? "—",
+      customerPartNumber: li.customerPartNumber ?? "—",
+      description: li.description ?? "—",
+      qty: qtyOrdered,
+      unitPrice: unitPrice.toFixed ? unitPrice.toFixed(2) : unitPrice,
+      totalPrice: (qtyOrdered * unitPrice).toFixed(2),
+      status,
+      rejectDescription: li.rejectDescription ?? null,
+      eta: li.eta ?? null,
+    };
+  });
 
-  const processingSteps = pickArray(root, "processingSteps", "ProcessingSteps");
-  const setupConfig = pickArray(root, "setupConfig", "SetupConfig");
-  const setupValidation = pickArray(root, "setupValidation", "SetupValidation");
-  const logs = pickArray(root, "logs", "Logs");
-  const datadogAlerts = pickArray(root, "datadogAlerts", "DatadogAlerts", "alerts", "Alerts");
-  const mqQueues = pickArray(root, "mqQueues", "MqQueues", "queues", "Queues");
-
+  // Only these two sections have a real backend data source right now.
+  // Flow Trace, Setup Validation, Datadog, and MQ still show "Not
+  // available yet" placeholders in the UI — add their keys here once
+  // their endpoints exist on the backend.
   return {
     order,
     lineItems,
-    processingSteps,
-    flowTrace,
-    setupConfig,
-    setupValidation,
-    logs,
-    datadogAlerts,
-    mqQueues,
+    processingSteps: [],
+    flowTrace: {},
+    setupConfig: [],
+    setupValidation: [],
+    logs: [],
+    datadogAlerts: [],
+    mqQueues: [],
     _raw: raw,
+    _meta: {
+      availableSections: ["orderHeader", "lineItems"],
+    },
   };
 }

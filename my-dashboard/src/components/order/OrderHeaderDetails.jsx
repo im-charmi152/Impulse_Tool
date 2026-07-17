@@ -1,19 +1,20 @@
 import { AlignLeft } from "lucide-react";
 import SectionCard from "../common/SectionCard";
 import DetailRow from "../common/DetailRow";
+import { formatDateTime, formatCurrency } from "../../utils/format";
 
 function OrderHeaderDetails({ order }) {
   const rows = [
     ["Order Number", order.orderNumber],
-    ["Order Date", order.orderDate],
+    ["Order Date", order.orderDate ? formatDateTime(order.orderDate) : "—"],
     ["Account Number", order.accountNumber],
-    ["Customer PO number", order.accountName],
+    ["Account Name", order.accountName || "Not available"],
     ["Partner ID", order.partnerId],
-    ["Partner Name", order.partnerName],
+    ["Partner Name", order.partnerName || "Not available"],
     ["PO Number", order.poNumber],
     ["Order Source", order.orderSource],
     ["Total Line Items", order.totalLineItems],
-    ["Order Total", order.orderTotal],
+    ["Order Total", formatCurrency(order.orderTotal, order.currency !== "—" ? order.currency : "USD")],
     ["Currency", order.currency],
   ];
 

@@ -1,15 +1,14 @@
 import { FileText, RefreshCw } from "lucide-react";
 import Badge from "../common/Badge";
-import { statusToColor } from "../../utils/format";
+import { formatDateTime } from "../../utils/format";
 
 function OrderSummaryBanner({ order, onRefresh }) {
   const fields = [
     { label: "Order Number", value: order.orderNumber },
-    { label: "Transaction ID", value: order.transactionId },
     { label: "PO Number", value: order.poNumber },
+    { label: "Order Date", value: order.orderDate ? formatDateTime(order.orderDate) : "—" },
+    { label: "Country Code", value: order.countryCode },
     { label: "Partner ID", value: order.partnerId },
-    { label: "Account Number", value: order.accountNumber },
-    { label: "Order Date", value: order.orderDate },
   ];
 
   return (
@@ -20,32 +19,22 @@ function OrderSummaryBanner({ order, onRefresh }) {
             <FileText size={18} className="text-blue-600" />
           </div>
         </div>
-        <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-2">
+        <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-2">
           {fields.map(({ label, value }) => (
             <div key={label}>
-              <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">
-                {label}
-              </div>
-              <div className="text-xs font-semibold text-gray-800 truncate">
-                {value}
-              </div>
+              <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">{label}</div>
+              <div className="text-xs font-semibold text-gray-800 truncate">{value}</div>
             </div>
           ))}
         </div>
         <div className="flex items-center gap-4 flex-shrink-0 flex-wrap">
           <div>
-            <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">
-              Status
-            </div>
-            <Badge color={statusToColor(order.status)}>{order.status}</Badge>
+            <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">Status</div>
+            <Badge color="green">Found</Badge>
           </div>
           <div>
-            <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">
-              Last Updated
-            </div>
-            <div className="text-xs font-semibold text-gray-800">
-              {order.lastUpdated}
-            </div>
+            <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">Retrieved</div>
+            <div className="text-xs font-semibold text-gray-800">{formatDateTime(order.retrievedAt)}</div>
           </div>
           <button
             onClick={onRefresh}
