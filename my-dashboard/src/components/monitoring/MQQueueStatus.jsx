@@ -1,11 +1,9 @@
 import { Server } from "lucide-react";
 import SectionCard from "../common/SectionCard";
 import Badge from "../common/Badge";
-import { MQ_QUEUES } from "../../data/mockData";
+import { statusToColor } from "../../utils/format";
 
-const COLUMNS = ["Queue Name", "Status", "Messages", "Last Updated"];
-
-export default function MQQueueStatus() {
+function MQQueueStatus({ queues }) {
   return (
     <SectionCard
       icon={Server}
@@ -19,7 +17,7 @@ export default function MQQueueStatus() {
       <table className="w-full text-xs">
         <thead>
           <tr className="border-b border-gray-100">
-            {COLUMNS.map((h) => (
+            {["Queue Name", "Status", "Messages", "Last Updated"].map((h) => (
               <th
                 key={h}
                 className="text-left pb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wide"
@@ -30,16 +28,11 @@ export default function MQQueueStatus() {
           </tr>
         </thead>
         <tbody>
-          {MQ_QUEUES.map((q, i) => (
-            <tr
-              key={i}
-              className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50"
-            >
-              <td className="py-1.5 font-medium text-gray-700 text-[11px]">
-                {q.name}
-              </td>
+          {queues.map((q) => (
+            <tr key={q.name} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
+              <td className="py-1.5 font-medium text-gray-700 text-[11px]">{q.name}</td>
               <td className="py-1.5">
-                <Badge color="green">{q.status}</Badge>
+                <Badge color={statusToColor(q.status)}>{q.status}</Badge>
               </td>
               <td className="py-1.5 text-gray-500 text-center">{q.messages}</td>
               <td className="py-1.5 text-gray-400 text-[10px]">{q.updated}</td>
@@ -53,3 +46,5 @@ export default function MQQueueStatus() {
     </SectionCard>
   );
 }
+
+export default MQQueueStatus;

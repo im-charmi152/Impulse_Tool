@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Download } from "lucide-react";
 
 import Header from "./components/layout/Header";
@@ -7,16 +7,36 @@ import SearchBar from "./components/search/SearchBar";
 import OrderSummaryBanner from "./components/order/OrderSummaryBanner";
 import OrderHeaderDetails from "./components/order/OrderHeaderDetails";
 import LineItemDetails from "./components/order/LineItemDetails";
-import ProcessingFlowStatus from "./components/order/ProcessingFlowStatus";
-import SetupConfigDetails from "./components/order/SetupConfigDetails";
-import DatadogLogs from "./components/monitoring/DatadogLogs";
+import FlowTraceStatus from "./components/flow/FlowTraceStatus";
+import SetupConfigDetails from "./components/setup/SetupConfigDetails";
+import SetupValidation from "./components/setup/SetupValidation";
+import DatadogPanel from "./components/monitoring/DatadogPanel";
 import MQQueueStatus from "./components/monitoring/MQQueueStatus";
 import FailureReason from "./components/monitoring/FailureReason";
 import RetryRecovery from "./components/monitoring/RetryRecovery";
+import { LoadingState, EmptyState, ErrorState, IdleState } from "./components/common/StatusStates";
+import RawResponsePanel from "./components/common/RawResponsePanel";
+
+import { useOrderSearch } from "./hooks/useOrderSearch";
 
 export default function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { data, status, error, search, reset } = useOrderSearch();
+
+  // Derive failure / retry candidates from the flow trace instead of
+  // hardcoding "no failures" — any non-success row across the three flows
+  // surfaces here automatically as new flow types or systems are added.
+  const { failures, retryCandidates } = useMemo(() => {
+    if (!data) return { failures: [], retryCandidates: [] };
+    const allRows = Object.values(data.flowTrace || {}).flat();
+    return {
+      failures: allRows.filter((r) => (r.status || "").toLowerCase() === "failed"),
+      retryCandidates: allRows.filter((r) =>
+        ["queue delay", "pending"].includes((r.status || "").toLowerCase())
+      ),
+    };
+  }, [data]);
 
   return (
     <div className="min-h-screen bg-gray-100 font-sans">
@@ -28,7 +48,6 @@ export default function Dashboard() {
         setMobileOpen={setMobileOpen}
       />
 
-      {/* Main content */}
       <main
         className={`pt-14 transition-all duration-300 hidden-mobile-margin ${sidebarCollapsed ? "md:ml-[60px]" : "md:ml-[200px]"}`}
       >
@@ -50,37 +69,45 @@ export default function Dashboard() {
           </div>
 
           {/* Search bar */}
-          <SearchBar />
+          <SearchBar onSearch={search} loading={status === "loading"} />
 
-          {/* Order summary banner */}
           <div className="mt-4">
-            <OrderSummaryBanner />
+            {status === "idle" && <IdleState />}
+            {status === "loading" && <LoadingState />}
+            {status === "empty" && <EmptyState />}
+            {status === "error" && <ErrorState message={error} onRetry={reset} />}
+
+            {status === "success" && data && (
+              <>
+                <OrderSummaryBanner
+                  order={data.order}
+                  onRefresh={() => search({ poNumber: data.order.poNumber, countryCode: data.order.countryCode })}
+                />
+
+                <div className="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)_minmax(0,1.2fr)] gap-4">
+                  <OrderHeaderDetails order={data.order} />
+                  <LineItemDetails items={data.lineItems} />
+                  <div className="flex flex-col gap-4">
+                    <FlowTraceStatus steps={data.processingSteps} flowTrace={data.flowTrace} />
+                    <SetupConfigDetails config={data.setupConfig} />
+                    <SetupValidation validations={data.setupValidation} />
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                  <DatadogPanel logs={data.logs} alerts={data.datadogAlerts} />
+                  <MQQueueStatus queues={data.mqQueues} />
+                  <FailureReason failures={failures} />
+                  <RetryRecovery retryCandidates={retryCandidates} />
+                </div>
+
+                <div className="mt-4">
+                  <RawResponsePanel raw={data._raw} />
+                </div>
+              </>
+            )}
           </div>
 
-          {/* 3-col grid: Header + Line-items + (Flow + Config) */}
-          <div className="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)_minmax(0,1.2fr)] gap-4">
-            {/* Col 1: Order Header */}
-            <OrderHeaderDetails />
-
-            {/* Col 2: Line Items */}
-            <LineItemDetails />
-
-            {/* Col 3: Flow + Config stacked */}
-            <div className="flex flex-col gap-4">
-              <ProcessingFlowStatus />
-              <SetupConfigDetails />
-            </div>
-          </div>
-
-          {/* 4-col bottom grid */}
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            <DatadogLogs />
-            <MQQueueStatus />
-            <FailureReason />
-            <RetryRecovery />
-          </div>
-
-          {/* Footer */}
           <div className="mt-6 pb-4 text-center text-[10px] text-gray-400 flex items-center justify-between">
             <span>© 2024 Ingram Micro Inc. All Rights Reserved.</span>
             <div className="flex gap-4">

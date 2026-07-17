@@ -1,4 +1,4 @@
-export default function SectionCard({ icon: Icon, title, children, actions }) {
+function SectionCard({ icon: Icon, title, children, actions }) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
@@ -12,3 +12,5 @@ export default function SectionCard({ icon: Icon, title, children, actions }) {
     </div>
   );
 }
+
+export default SectionCard;

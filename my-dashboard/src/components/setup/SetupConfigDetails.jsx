@@ -1,12 +1,11 @@
 import { Settings } from "lucide-react";
 import SectionCard from "../common/SectionCard";
-import { SETUP_CONFIG } from "../../data/mockData";
 
-export default function SetupConfigDetails() {
+function SetupConfigDetails({ config }) {
   return (
     <SectionCard icon={Settings} title="Setup / Configuration Details">
       <div className="space-y-1">
-        {SETUP_CONFIG.map((row, i) => (
+        {config.map((row, i) => (
           <div key={i} className="grid grid-cols-2 gap-2">
             {[0, 2].map((j) => (
               <div
@@ -27,3 +26,5 @@ export default function SetupConfigDetails() {
     </SectionCard>
   );
 }
+
+export default SetupConfigDetails;

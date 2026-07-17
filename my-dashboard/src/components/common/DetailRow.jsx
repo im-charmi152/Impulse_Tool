@@ -1,4 +1,6 @@
-export default function DetailRow({ label, value }) {
+import { memo } from "react";
+
+function DetailRow({ label, value }) {
   return (
     <div className="flex justify-between items-start py-1.5 border-b border-gray-50 last:border-0">
       <span className="text-xs text-gray-500 min-w-[130px]">{label}</span>
@@ -8,3 +10,5 @@ export default function DetailRow({ label, value }) {
     </div>
   );
 }
+
+export default memo(DetailRow);

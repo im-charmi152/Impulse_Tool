@@ -1,21 +1,20 @@
 import { AlignLeft } from "lucide-react";
 import SectionCard from "../common/SectionCard";
 import DetailRow from "../common/DetailRow";
-import { ORDER } from "../../data/mockData";
 
-export default function OrderHeaderDetails() {
+function OrderHeaderDetails({ order }) {
   const rows = [
-    ["Order Number", ORDER.orderNumber],
-    ["Order Date", ORDER.orderDate],
-    ["Account Number", ORDER.accountNumber],
-    ["Account Name", ORDER.accountName],
-    ["Partner ID", ORDER.partnerId],
-    ["Partner Name", ORDER.partnerName],
-    ["PO Number", ORDER.poNumber],
-    ["Order Source", ORDER.orderSource],
-    ["Total Line Items", ORDER.totalLineItems],
-    ["Order Total", ORDER.orderTotal],
-    ["Currency", ORDER.currency],
+    ["Order Number", order.orderNumber],
+    ["Order Date", order.orderDate],
+    ["Account Number", order.accountNumber],
+    ["Customer PO number", order.accountName],
+    ["Partner ID", order.partnerId],
+    ["Partner Name", order.partnerName],
+    ["PO Number", order.poNumber],
+    ["Order Source", order.orderSource],
+    ["Total Line Items", order.totalLineItems],
+    ["Order Total", order.orderTotal],
+    ["Currency", order.currency],
   ];
 
   return (
@@ -28,3 +27,5 @@ export default function OrderHeaderDetails() {
     </SectionCard>
   );
 }
+
+export default OrderHeaderDetails;

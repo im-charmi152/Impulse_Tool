@@ -1,18 +1,12 @@
 import { useState } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import { NAV_ITEMS } from "../../data/mockData";
+import { NAV_ITEMS } from "../../data/navigation";
 
-export default function Sidebar({
-  collapsed,
-  setCollapsed,
-  mobileOpen,
-  setMobileOpen,
-}) {
+function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
   const [activeId, setActiveId] = useState("search");
 
   return (
     <>
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-20 bg-black/40 md:hidden"
@@ -77,3 +71,5 @@ export default function Sidebar({
     </>
   );
 }
+
+export default Sidebar;

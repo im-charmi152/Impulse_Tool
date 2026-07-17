@@ -1,15 +1,15 @@
 import { FileText, RefreshCw } from "lucide-react";
 import Badge from "../common/Badge";
-import { ORDER } from "../../data/mockData";
+import { statusToColor } from "../../utils/format";
 
-export default function OrderSummaryBanner() {
+function OrderSummaryBanner({ order, onRefresh }) {
   const fields = [
-    { label: "Order Number", value: ORDER.orderNumber },
-    { label: "Transaction ID", value: ORDER.transactionId },
-    { label: "PO Number", value: ORDER.poNumber },
-    { label: "Partner ID", value: ORDER.partnerId },
-    { label: "Account Number", value: ORDER.accountNumber },
-    { label: "Order Date", value: ORDER.orderDate },
+    { label: "Order Number", value: order.orderNumber },
+    { label: "Transaction ID", value: order.transactionId },
+    { label: "PO Number", value: order.poNumber },
+    { label: "Partner ID", value: order.partnerId },
+    { label: "Account Number", value: order.accountNumber },
+    { label: "Order Date", value: order.orderDate },
   ];
 
   return (
@@ -37,17 +37,21 @@ export default function OrderSummaryBanner() {
             <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">
               Status
             </div>
-            <Badge color="green">{ORDER.status}</Badge>
+            <Badge color={statusToColor(order.status)}>{order.status}</Badge>
           </div>
           <div>
             <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">
               Last Updated
             </div>
             <div className="text-xs font-semibold text-gray-800">
-              {ORDER.lastUpdated}
+              {order.lastUpdated}
             </div>
           </div>
-          <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors">
+          <button
+            onClick={onRefresh}
+            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+            aria-label="Refresh"
+          >
             <RefreshCw size={14} />
           </button>
         </div>
@@ -55,3 +59,5 @@ export default function OrderSummaryBanner() {
     </div>
   );
 }
+
+export default OrderSummaryBanner;

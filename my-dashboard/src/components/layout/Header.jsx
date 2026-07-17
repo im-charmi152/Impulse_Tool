@@ -1,12 +1,13 @@
 import { Bell, HelpCircle, ChevronDown, Menu } from "lucide-react";
 
-export default function Header({ toggleSidebar }) {
+function Header({ toggleSidebar }) {
   return (
     <header className="h-14 bg-[#003087] flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-30 shadow-lg">
       <div className="flex items-center gap-3">
         <button
           onClick={toggleSidebar}
           className="text-white p-1 rounded hover:bg-white/10 md:hidden"
+          aria-label="Toggle navigation"
         >
           <Menu size={20} />
         </button>
@@ -42,3 +43,5 @@ export default function Header({ toggleSidebar }) {
     </header>
   );
 }
+
+export default Header;
