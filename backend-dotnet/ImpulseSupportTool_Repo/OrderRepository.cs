@@ -71,29 +71,17 @@ namespace OrderManagement.API.Repositories
                     CustCoCd = reader["CUST_CO_CD"]?.ToString()?.Trim(),
                     CustBr = reader["CUST_BR"]?.ToString()?.Trim(),
                     CustNbr = reader["CUST_NBR"]?.ToString()?.Trim(),
-<<<<<<< Updated upstream
                     CustSfx = reader["CUST_NBR"]?.ToString()?.Trim(),
-=======
-                    CustSfx = reader["CUST_SFX"]?.ToString()?.Trim(),
->>>>>>> Stashed changes
                     PoNumber = request.PoNumber.Trim(),
                     CustPoDt = reader["CUST_PO_DT"]?.ToString()?.Trim(),
                     TagNbr = reader["TAG_NBR"]?.ToString()?.Trim(),
                     PartnerId = reader["PARTNER_ID"]?.ToString()?.Trim(),
-<<<<<<< Updated upstream
                     CmbBtchNbr = reader["CMB_BTCH_NBR"]?.ToString()?.Trim(),
-=======
-                    CmbBtchNbr = reader["CMB_BATCH_NBR"]?.ToString()?.Trim(),
->>>>>>> Stashed changes
                     ImiAsgdBrNbr = reader["IMI_ASGD_BR_NBR"]?.ToString()?.Trim(),
                     ImiAsgdOrdrNbr = reader["IMI_ASGD_ORDR_NBR"]?.ToString()?.Trim(),
                     StateCd = reader["STATE_CD"]?.ToString()?.Trim(),
                     ImiCarCd = reader["IMI_CARR_CODE"]?.ToString()?.Trim(),
-<<<<<<< Updated upstream
-                    OrdShFr = reader["ORD_SHIP_FR_BR"]?.ToString()?.Trim(),
-=======
                     OrdShFr = reader["ORDR_SHP_FR_BR"]?.ToString()?.Trim(),
->>>>>>> Stashed changes
                     OrdSt = reader["ORDR_STATUS"]?.ToString()?.Trim(),
                     HoldCd = reader["HOLD_CD"]?.ToString()?.Trim(),
                     TermId = reader["TERM_ID"]?.ToString()?.Trim(),
