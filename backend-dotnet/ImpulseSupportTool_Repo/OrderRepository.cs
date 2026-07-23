@@ -76,7 +76,7 @@ namespace OrderManagement.API.Repositories
                     CustPoDt = reader["CUST_PO_DT"]?.ToString()?.Trim(),
                     TagNbr = reader["TAG_NBR"]?.ToString()?.Trim(),
                     PartnerId = reader["PARTNER_ID"]?.ToString()?.Trim(),
-                    CmbBtchNbr = reader["CMB_BTCH_NBR"]?.ToString()?.Trim(),
+                    CmbBtchNbr = reader["CMB_BATCH_NBR"]?.ToString()?.Trim(),
                     ImiAsgdBrNbr = reader["IMI_ASGD_BR_NBR"]?.ToString()?.Trim(),
                     ImiAsgdOrdrNbr = reader["IMI_ASGD_ORDR_NBR"]?.ToString()?.Trim(),
                     StateCd = reader["STATE_CD"]?.ToString()?.Trim(),
