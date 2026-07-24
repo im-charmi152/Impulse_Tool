@@ -21,7 +21,7 @@ function OrderHeaderDetails({ order }) {
     ["STATE_CD",order.stateCd],
     ["IMI_CARR_CODE",order.imiCarCd],
     ["ORDR_SHP_FR_BR",order.ordShFr],
-    ["Order Status",order.ordSt]
+    ["Order Status",order.ordSt],
     ["HOLD_CD",order.holdCode],
   ];
 
