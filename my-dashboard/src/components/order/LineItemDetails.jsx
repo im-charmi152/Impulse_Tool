@@ -8,6 +8,7 @@ import { recordEvent } from "../../utils/auditLog";
 const PAGE_SIZE_OPTIONS = [10, 25];
 
 function LineItemDetails({ items }) {
+  
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const [page, setPage] = useState(1);
 

@@ -17,6 +17,9 @@ export function mapOrderResponse(raw) {
     custNbr: raw.custNbr ?? "—",
     imiAsgdBrNbr: raw.imiAsgdBrNbr ?? "—",
     imiAsgdOrdrNbr: raw.imiAsgdOrdrNbr ?? "—",
+    odShFr: raw.odShFr ?? "error",
+    tag: raw.tagNbr ?? "error",
+    
 
     // "Order Number" on screen = the IMI-assigned order number.
     orderNumber: raw.imiAsgdOrdrNbr ?? "—",
