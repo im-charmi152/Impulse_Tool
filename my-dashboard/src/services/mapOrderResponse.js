@@ -10,15 +10,22 @@ export function mapOrderResponse(raw) {
 
   const order = {
     poNumber: raw.poNumber ?? "—",
-    countryCode: raw.countryCode ?? "—",
+    // countryCode: raw.countryCode ?? "—",
     partnerId: raw.partnerId ?? "—",
     custCoCd: raw.custCoCd ?? "—",
     custBr: raw.custBr ?? "—",
     custNbr: raw.custNbr ?? "—",
     imiAsgdBrNbr: raw.imiAsgdBrNbr ?? "—",
     imiAsgdOrdrNbr: raw.imiAsgdOrdrNbr ?? "—",
-    odShFr: raw.odShFr ?? "error",
+    ordShFr: raw.ordShFr ?? "error",
     tag: raw.tagNbr ?? "error",
+    holdCode: raw.holdCd ?? " ",
+    termId: raw.termId ?? " ",
+    cmbBtchNbr:raw.cmbBtchNbr ?? " ",
+    stateCd: raw.stateCd ?? " ",
+    imiCarCd:raw.imiCarCd ?? " ",
+    ordSt:raw.ordSt ?? " ",
+    
     
 
     // "Order Number" on screen = the IMI-assigned order number.
