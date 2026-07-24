@@ -7,7 +7,7 @@ function OrderSummaryBanner({ order, onRefresh }) {
     { label: "Order Number", value: order.orderNumber },
     { label: "PO Number", value: order.poNumber },
     { label: "Order Date", value: order.orderDate ? formatDateTime(order.orderDate) : "—" },
-    { label: "Country Code", value: order.countryCode },
+    { label: "Country Code", value: order.custCoCd },
     { label: "Partner ID", value: order.partnerId },
   ];
 

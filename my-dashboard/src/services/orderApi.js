@@ -5,7 +5,7 @@ import axios from "axios";
 //   VITE_ORDER_API_BASE_URL=http://localhost:5298/api/order
 const BASE_URL =
   import.meta.env.VITE_ORDER_API_BASE_URL ||
-  "http://10.129.180.117:5000/api/order";
+  "http://localhost:5298/api/order";
 
 const client = axios.create({
   baseURL: BASE_URL,
