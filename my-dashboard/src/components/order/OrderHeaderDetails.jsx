@@ -8,7 +8,7 @@ function OrderHeaderDetails({ order }) {
     // ["Cust PO Number", order.poNumber],
     ["Order Branch", order.imiAsgdBrNbr],
     // ["Order Number", order.imiAsgdOrdrNbr],
-    ["Cust Suffix", order.custSfx],
+    ["Cust Suffix",order.custSfx],
     ["Order Date", order.orderDate ? formatDateTime(order.orderDate) : "—"],
     ["Cust Number", order.accountNumber],
     ["Account Name", order.accountName || "Not available"],
@@ -16,12 +16,13 @@ function OrderHeaderDetails({ order }) {
     ["Partner Name", order.partnerName || "Not available"],
     ["PO Number", order.poNumber],
     ["Order Source", order.termId],
-    ["TAG_NBR", order.tag],
-    ["CMB_BATCH_NBR", order.cmbBtchNbr],
-    ["STATE_CD", order.stateCd],
-    ["IMI_CARR_CODE", order.imiCarCd],
-    ["ORDR_SHP_FR_BR", order.ordShFr],
-    ["Order Status", order.ordSt][("HOLD_CD", order.holdCode)],
+    ["TAG_NBR",order.tag],
+    ["CMB_BATCH_NBR",order.cmbBtchNbr],
+    ["STATE_CD",order.stateCd],
+    ["IMI_CARR_CODE",order.imiCarCd],
+    ["ORDR_SHP_FR_BR",order.ordShFr],
+    ["Order Status",order.ordSt]
+    ["HOLD_CD",order.holdCode],
   ];
 
   return (
