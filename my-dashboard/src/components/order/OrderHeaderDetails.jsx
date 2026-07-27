@@ -5,25 +5,24 @@ import { formatDateTime, formatCurrency } from "../../utils/format";
 
 function OrderHeaderDetails({ order }) {
   const rows = [
-    ["Cust PO Number", order.poNumber],
+    // ["Cust PO Number", order.poNumber],
     ["Order Branch", order.imiAsgdBrNbr],
-    ["Order Number", order.imiAsgdOrdrNbr],
+    // ["Order Number", order.imiAsgdOrdrNbr],
+    ["Cust Suffix",order.custSfx],
     ["Order Date", order.orderDate ? formatDateTime(order.orderDate) : "—"],
     ["Cust Number", order.accountNumber],
     ["Account Name", order.accountName || "Not available"],
     ["Partner ID", order.partnerId],
     ["Partner Name", order.partnerName || "Not available"],
     ["PO Number", order.poNumber],
-    ["Order Source", order.orderSource],
+    ["Order Source", order.termId],
     ["TAG_NBR",order.tag],
-    ["CMB_BATCH_NBR",order.batch],
-    ["STATE_CD",order.stateCode],
-    ["IMI_CARR_CODE",order.carrierCode],
-    ["ORDR_SHP_FR_BR",order.odShFr],
+    ["CMB_BATCH_NBR",order.cmbBtchNbr],
+    ["STATE_CD",order.stateCd],
+    ["IMI_CARR_CODE",order.imiCarCd],
+    ["ORDR_SHP_FR_BR",order.ordShFr],
+    ["Order Status",order.ordSt],
     ["HOLD_CD",order.holdCode],
-    ["Total Line Items", order.totalLineItems],
-    ["Order Total", formatCurrency(order.orderTotal, order.currency !== "—" ? order.currency : "USD")],
-    ["Currency", order.currency],
   ];
 
   return (
