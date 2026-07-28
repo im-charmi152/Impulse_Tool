@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
 import { Download, ChevronLeft, ChevronRight, Layers } from "lucide-react";
 import SectionCard from "../common/SectionCard";
-import Badge from "../common/Badge";
-import { statusToColor } from "../../utils/format";
 import { recordEvent } from "../../utils/auditLog";
 
 const PAGE_SIZE_OPTIONS = [10, 25];
@@ -36,40 +34,40 @@ function LineItemDetails({ items }) {
       }
     >
       <div className="overflow-x-auto -mx-1">
-        <table className="w-full text-xs min-w-[520px]">
+        <table className="w-full text-xs min-w-[760px]">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-100">
-              {["Line #", "SKU", "Description", "Qty", "Unit Price", "Total Price", "Status"].map(
-                (h) => (
-                  <th
-                    key={h}
-                    className="text-left px-2 py-2 font-semibold text-gray-500 text-[10px] uppercase tracking-wide whitespace-nowrap"
-                  >
-                    {h}
-                  </th>
-                )
-              )}
+              {[
+                "CUST_CO_CD",
+                "CUST_BR",
+                "CUST_NBR",
+                "CUST_PO_NBR",
+                "IMI_LINE_NBR",
+                "IMI_PART_NBR",
+                "QTY_ORDERED",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className="text-left px-2 py-2 font-semibold text-gray-500 text-[10px] uppercase tracking-wide whitespace-nowrap"
+                >
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {pageItems.map((item) => (
+            {pageItems.map((item, index) => (
               <tr
-                key={item.line}
+                key={`${item.imiLineNbr ?? "line"}-${index}`}
                 className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors"
               >
-                <td className="px-2 py-2 text-gray-500">{item.line}</td>
-                <td className="px-2 py-2 font-medium text-blue-600">{item.sku}</td>
-                <td className="px-2 py-2 text-gray-700 max-w-[140px] truncate">
-                  {item.description}
-                </td>
-                <td className="px-2 py-2 text-gray-600 text-center">{item.qty}</td>
-                <td className="px-2 py-2 text-gray-600 text-right">{item.unitPrice}</td>
-                <td className="px-2 py-2 font-medium text-gray-800 text-right">
-                  {item.totalPrice}
-                </td>
-                <td className="px-2 py-2">
-                  <Badge color={statusToColor(item.status)}>{item.status}</Badge>
-                </td>
+                <td className="px-2 py-2 text-gray-600">{item.custCoCd ?? "—"}</td>
+                <td className="px-2 py-2 text-gray-600">{item.custBr ?? "—"}</td>
+                <td className="px-2 py-2 text-gray-600">{item.custNbr ?? "—"}</td>
+                <td className="px-2 py-2 text-gray-600">{item.custPoNbr ?? "—"}</td>
+                <td className="px-2 py-2 text-gray-700 font-medium">{item.imiLineNbr ?? "—"}</td>
+                <td className="px-2 py-2 text-gray-700 font-medium">{item.imiPartNbr ?? "—"}</td>
+                <td className="px-2 py-2 text-gray-700">{item.qtyOrdered ?? 0}</td>
               </tr>
             ))}
           </tbody>
