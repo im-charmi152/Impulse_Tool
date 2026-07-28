@@ -15,6 +15,7 @@ export function mapOrderResponse(raw) {
     custCoCd: raw.custCoCd ?? "—",
     custBr: raw.custBr ?? "—",
     custNbr: raw.custNbr ?? "—",
+    custSfx: raw.custSfx ?? "—",
     imiAsgdBrNbr: raw.imiAsgdBrNbr ?? "—",
     imiAsgdOrdrNbr: raw.imiAsgdOrdrNbr ?? "—",
     ordShFr: raw.ordShFr ?? "error",
@@ -31,11 +32,11 @@ export function mapOrderResponse(raw) {
 
     // "Order Number" on screen = the IMI-assigned order number.
     orderNumber: raw.imiAsgdOrdrNbr ?? "—",
-    orderDate: raw.orderDate ?? null,
-    orderSource: raw.orderSource ?? "—",
-    currency: raw.currency ?? "—",
-    totalLineItems: raw.totalLineItems ?? 0,
-    orderTotal: raw.orderTotal ?? 0,
+    orderDate: raw.custPoDt ?? null,
+    orderSource: raw.termId ?? "—",
+    currency: raw.ordrCcyCd ?? "USD",
+    totalLineItems: Array.isArray(raw.lineItems) ? raw.lineItems.length : 0,
+    orderTotal: 0,
     accountNumber: raw.custNbr ?? "—",
 
     // Not returned by the backend — EO_ORDR_HDR_INFO only stores numeric
@@ -51,30 +52,15 @@ export function mapOrderResponse(raw) {
   };
 
   const rawLineItems = Array.isArray(raw.lineItems) ? raw.lineItems : [];
-  const lineItems = rawLineItems.map((li, i) => {
-    const qtyOrdered = li.qtyOrdered ?? 0;
-    const qtyBackOrdered = li.qtyBackOrdered ?? 0;
-    const unitPrice = li.unitPrice ?? 0;
-
-    // Status isn't a column — it's derived from reject/hold codes.
-    let status = "Completed";
-    if (li.rejectCode) status = "Rejected";
-    else if (li.holdCode) status = "On Hold";
-    else if (qtyBackOrdered > 0) status = "Backordered";
-
-    return {
-      line: li.lineNumber ?? i + 1,
-      sku: li.partNumber ?? "—",
-      customerPartNumber: li.customerPartNumber ?? "—",
-      description: li.description ?? "—",
-      qty: qtyOrdered,
-      unitPrice: unitPrice.toFixed ? unitPrice.toFixed(2) : unitPrice,
-      totalPrice: (qtyOrdered * unitPrice).toFixed(2),
-      status,
-      rejectDescription: li.rejectDescription ?? null,
-      eta: li.eta ?? null,
-    };
-  });
+  const lineItems = rawLineItems.map((li, i) => ({
+    custCoCd: li.custCoCd ?? raw.custCoCd ?? "—",
+    custBr: li.custBr ?? raw.custBr ?? "—",
+    custNbr: li.custNbr ?? raw.custNbr ?? "—",
+    custPoNbr: li.custPoNbr ?? raw.custPoNbr ?? raw.poNumber ?? "—",
+    imiLineNbr: li.imiLineNbr ?? li.lineSeqNbr ?? li.line ?? i + 1,
+    imiPartNbr: li.imiPartNbr ?? li.sku ?? "—",
+    qtyOrdered: Number(li.qtyOrdered ?? li.qty ?? 0),
+  }));
 
   // Only these two sections have a real backend data source right now.
   // Flow Trace, Setup Validation, Datadog, and MQ still show "Not
