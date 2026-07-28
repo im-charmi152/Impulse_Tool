@@ -1,96 +1,474 @@
 ﻿using System.Data.Odbc;
 using ImpulseSupportTool_Repo;
-
 namespace OrderManagement.API.Repositories
 {
     public class OrderRepository : IOrderRepository
     {
         private readonly IConfiguration _configuration;
-
         public OrderRepository(IConfiguration configuration)
         {
             _configuration = configuration;
         }
-
         public async Task<OrderResponse> GetOrder(OrderRequest request)
         {
             Console.WriteLine($">>> QUERY PARAMS: PoNumber='{request.PoNumber}' CountryCode='{request.CountryCode}'");
-
             OrderResponse response = null;
-
             string password = _configuration["DB2:Password"];
             string connectionString = _configuration.GetConnectionString("DB2Connection");
             connectionString += $"PWD={password};";
-
             using OdbcConnection conn = new OdbcConnection(connectionString);
             await conn.OpenAsync();
-
             Console.WriteLine($">>> DB2 CONNECTION OPENED OK");
 
             // ✅ TRIM fixes trailing spaces in CHAR fixed-width columns
-            string query = @"
+            string headerQuery = @"
                 SELECT
-                    CUST_CO_CD,
-                    CUST_BR,
-                    CUST_NBR,       
-                    CUST_SFX,
-                    CUST_PO_NBR,
-                    CUST_PO_DT,
-                    TAG_NBR,
-                    PARTNER_ID,
-                    CMB_BATCH_NBR,
-                    IMI_ASGD_BR_NBR,                    
-                    IMI_ASGD_ORDR_NBR,
-                    STATE_CD,
-                    IMI_CARR_CODE,
-                    ORDR_SHP_FR_BR,
-                    ORDR_STATUS,
-                    HOLD_CD,
-                    TERM_ID
+                    CUST_CO_CD, CUST_BR, CUST_NBR, CUST_SFX, CUST_PO_NBR, SDQ_SEQ_NBR,
+                    CUST_PO_DT, CUST_PO_SEQ_NBR, TAG_NBR, RELS_TAG_NBR, PROCESS_UNIT_TS,
+                    APPL_ID, XACT_SET, PARTNER_ID, CMB_BATCH_NBR, IMI_ASGD_BR_NBR,
+                    IMI_ASGD_ORDR_NBR, ORDR_TYPE, ORDR_CCY_CD, SELLR_SALES_NBR,
+                    ORDR_REQ_SHIP_DT, ORDR_REQ_DLVY_DT, ORDR_REQ_CANC_DT, ORIDE_CUST_PO_DT,
+                    ORDR_ETA_DT, RESV_INV_SW, GOVT_PUB_PRIV_SW, GOVT_PGM_TYPE, CNSGN_SW,
+                    SLA_CODE, IS_DELV_FLG, SPEC_LBL_CODE, PO_GOVT_TP, DEPT_NBR, BYR_LOC,
+                    BYR_CNTACT, BYR_PHN_NBR, BYR_VNDR_NBR, XMIT_HASH_TOT, XMIT_TOT_LINES,
+                    CFG_TYPE, CONT_NBR, LAB_TYPE, CONFIG_PO_TYPE, STATE_CD, ORD_ENTRY_DT_TS,
+                    IMI_CARR_CODE, CUST_CARR_CODE, IMI_SHIP_VIA, COD_AMT, COD_FEE_SWTCH,
+                    THRD_PTY_ACT, BO_ORIDE_SWTCH, BR_SEQ_VALU, DISTRB_DEPTH, MAX_XIT_DAYS,
+                    AIR_BR_SEQ_FLG, BR_SEQ_FLG, MULT_BR_SEQ_FLG, EXPT_BR_SEQ_FLG,
+                    SAVE_FRT_FLG, SAVE_DIST_FLG, SINGLE_WHSE, PRNT_ORDR_FLG, BASERATE_FLG,
+                    MULT_DISTRB_FLG, NBR_OF_WHSE, ORDR_SHP_FR_BR, SHIP_FLG, ORDR_STATUS,
+                    ORDR_REJ_FLG, DMD_BR, PROCESS_DT, PROCESS_TM, TERMS, CCY_RATE, DROP_MSG,
+                    ORDR_HAS_ERRS, TAX_FLG, EU_NAME, EU_ATTN, EU_ADDR_1, EU_ADDR_2,
+                    EU_ADDR_3, EU_ADDR_4, EU_CITY, EU_STATE, EU_ZIP, EU_CTRY, EU_TAX,
+                    EU_CNTACT, EU_PHN_NBR, EU_PHN_NBR_EXT, EU_FAX_NBR, EU_EMAIL,
+                    EU_RESALE_RSLR, EU_REF_NBR, ST_NAME, ST_ATTN, ST_ATTN_2, ST_PHONE_NBR,
+                    ST_ADDR_1, ST_ADDR_2, ST_ADDR_3, ST_ADDR_4, ST_CITY, ST_STATE, ST_ZIP,
+                    ST_CTRY, ST_PTNR_STORE_NBR, ST_IMI_ST_SUF, CUST_REF_NBR, CUST_REF_NBR2,
+                    ORD_REF_NBR, ORD_RELS_NBR, BILL_TO_REF_NBR, IMI_REF_NBR,
+                    END_CUST_ACT_NBR, END_CUST_ORD_NBR, END_CUST_PO_NBR, CUST_VDR_NBR,
+                    END_CUST_REF_NBR, VLA_RLSD_FLG, VLA_RLSD_ID, VLA_RLSD_DT_TM,
+                    VLA_ETA_DT, VLA_REJECT_REASON, VLA_EU_NBR, VLA_AUTH_NBR,
+                    FRGHT_OUT_CODE, GOVT_SOLCTN_NBR, SPEC_FORM_SWTCH, ALL_LINES_CONFIG,
+                    DB2_CRT_TS, VLA_TYPE, SPLIT_NAME_1, SPLIT_NAME_2, EO_EDI_CD,
+                    BAD_ADDR_SWTCH, FULFIL_ORDER_FLG, PRE_PROCS_RPT, MAST_VEND_NBR,
+                    RSLR_EMAIL, RSLR_FAX, RSLR_LOTUS_ID, IMI_BT_SUF, BUS_REGN_CD, HOLD_CD,
+                    XDOCK_DIST_CTR, DV_FLG, EDD_FLG, VEND_QOT_NBR, ST_EMAIL,
+                    CUSTIN_LIC_VLID_CD, RECALC_LIC_VLID_CD, CUST_FRT_FWRD_FLG,
+                    IM_FRT_FWRD_FLG, SERVICE_IND, SERVICE_LEVEL, CARRIER_ACCOUNT,
+                    FREIGHT_ORDER_NBR, HERM_PO_NBR, EU_DEP_ID, DEP_ORDR_NBR,
+                    SHIP_TO_ATTN_FLG, CUST_DEL_STUS_FLG, ORDR_CIG_ID, ORDR_CUP_ID,
+                    LN_FULFILL_SW, DPAS_TYPE_CD, DPAS_PGM_ID, VEND_AUTH_NBR,
+                    FUT_ORDR_PROM_DT, PRC_CONCESSION_TXT, PREV_CONT_NBR, CONT_TYPE_CD,
+                    TERM_ID, XEDI_RLSD_IND, QUOTE_NBR, XEDI_ACK_FLG, VMF_HDR_HLD_IND,
+                    HYBRD_ANNTY_ORDR_IND, HYBRD_ANNTY_CNFMTN_ID
                 FROM Z1.EO_ORDR_HDR_INFO
                 WHERE TRIM(CUST_PO_NBR) = ? AND TRIM(CUST_CO_CD) = ?
                 FETCH FIRST 10 ROWS ONLY";
 
-            using OdbcCommand cmd = new OdbcCommand(query, conn);
-
-            // ✅ Also trim values coming from React just in case
-            cmd.Parameters.Add("?", OdbcType.VarChar).Value = request.PoNumber.Trim();
-            cmd.Parameters.Add("?", OdbcType.VarChar).Value = request.CountryCode.Trim();
-
-            Console.WriteLine($">>> EXECUTING QUERY...");
-
-            using OdbcDataReader reader = (OdbcDataReader)await cmd.ExecuteReaderAsync();
-
-            Console.WriteLine($">>> READER HAS ROWS: {reader.HasRows}");
-
-            if (await reader.ReadAsync())
+            using (OdbcCommand cmd = new OdbcCommand(headerQuery, conn))
             {
-                Console.WriteLine($">>> ROW FOUND - mapping response...");
-                response = new OrderResponse
+                cmd.Parameters.Add("?", OdbcType.VarChar).Value = request.PoNumber.Trim();
+                cmd.Parameters.Add("?", OdbcType.VarChar).Value = request.CountryCode.Trim();
+                Console.WriteLine($">>> EXECUTING QUERY...");
+                using OdbcDataReader reader = (OdbcDataReader)await cmd.ExecuteReaderAsync();
+                Console.WriteLine($">>> READER HAS ROWS: {reader.HasRows}");
+                if (await reader.ReadAsync())
                 {
-                    CustCoCd = reader["CUST_CO_CD"]?.ToString()?.Trim(),
-                    CustBr = reader["CUST_BR"]?.ToString()?.Trim(),
-                    CustNbr = reader["CUST_NBR"]?.ToString()?.Trim(),
-                    CustSfx = reader["CUST_NBR"]?.ToString()?.Trim(),
-                    PoNumber = request.PoNumber.Trim(),
-                    CustPoDt = reader["CUST_PO_DT"]?.ToString()?.Trim(),
-                    TagNbr = reader["TAG_NBR"]?.ToString()?.Trim(),
-                    PartnerId = reader["PARTNER_ID"]?.ToString()?.Trim(),
-                    CmbBtchNbr = reader["CMB_BTCH_NBR"]?.ToString()?.Trim(),
-                    ImiAsgdBrNbr = reader["IMI_ASGD_BR_NBR"]?.ToString()?.Trim(),
-                    ImiAsgdOrdrNbr = reader["IMI_ASGD_ORDR_NBR"]?.ToString()?.Trim(),
-                    StateCd = reader["STATE_CD"]?.ToString()?.Trim(),
-                    ImiCarCd = reader["IMI_CARR_CODE"]?.ToString()?.Trim(),
-                    OrdShFr = reader["ORDR_SHP_FR_BR"]?.ToString()?.Trim(),
-                    OrdSt = reader["ORDR_STATUS"]?.ToString()?.Trim(),
-                    HoldCd = reader["HOLD_CD"]?.ToString()?.Trim(),
-                    TermId = reader["TERM_ID"]?.ToString()?.Trim(),
-                };
-            }
+                    Console.WriteLine($">>> ROW FOUND - mapping response...");
+                    response = new OrderResponse
+                    {
+                        CustCoCd = reader["CUST_CO_CD"]?.ToString()?.Trim(),
+                        CustBr = reader["CUST_BR"]?.ToString()?.Trim(),
+                        CustNbr = reader["CUST_NBR"]?.ToString()?.Trim(),
+                        CustSfx = reader["CUST_SFX"]?.ToString()?.Trim(), // fixed bug
+                        CustPoNbr = reader["CUST_PO_NBR"]?.ToString()?.Trim(),
+                        SdqSeqNbr = reader["SDQ_SEQ_NBR"]?.ToString()?.Trim(),
+                        CustPoDt = reader["CUST_PO_DT"]?.ToString()?.Trim(),
+                        CustPoSeqNbr = reader["CUST_PO_SEQ_NBR"]?.ToString()?.Trim(),
+                        TagNbr = reader["TAG_NBR"]?.ToString()?.Trim(),
+                        RelsTagNbr = reader["RELS_TAG_NBR"]?.ToString()?.Trim(),
+                        ProcessUnitTs = reader["PROCESS_UNIT_TS"]?.ToString()?.Trim(),
+                        ApplId = reader["APPL_ID"]?.ToString()?.Trim(),
+                        XactSet = reader["XACT_SET"]?.ToString()?.Trim(),
+                        PartnerId = reader["PARTNER_ID"]?.ToString()?.Trim(),
+                        CmbBtchNbr = reader["CMB_BATCH_NBR"]?.ToString()?.Trim(),
+                        ImiAsgdBrNbr = reader["IMI_ASGD_BR_NBR"]?.ToString()?.Trim(),
+                        ImiAsgdOrdrNbr = reader["IMI_ASGD_ORDR_NBR"]?.ToString()?.Trim(),
+                        OrdrType = reader["ORDR_TYPE"]?.ToString()?.Trim(),
+                        OrdrCcyCd = reader["ORDR_CCY_CD"]?.ToString()?.Trim(),
+                        SellrSalesNbr = reader["SELLR_SALES_NBR"]?.ToString()?.Trim(),
+                        OrdrReqShipDt = reader["ORDR_REQ_SHIP_DT"]?.ToString()?.Trim(),
+                        OrdrReqDlvyDt = reader["ORDR_REQ_DLVY_DT"]?.ToString()?.Trim(),
+                        OrdrReqCancDt = reader["ORDR_REQ_CANC_DT"]?.ToString()?.Trim(),
+                        OrideCustPoDt = reader["ORIDE_CUST_PO_DT"]?.ToString()?.Trim(),
+                        OrdrEtaDt = reader["ORDR_ETA_DT"]?.ToString()?.Trim(),
+                        ResvInvSw = reader["RESV_INV_SW"]?.ToString()?.Trim(),
+                        GovtPubPrivSw = reader["GOVT_PUB_PRIV_SW"]?.ToString()?.Trim(),
+                        GovtPgmType = reader["GOVT_PGM_TYPE"]?.ToString()?.Trim(),
+                        CnsgnSw = reader["CNSGN_SW"]?.ToString()?.Trim(),
+                        SlaCode = reader["SLA_CODE"]?.ToString()?.Trim(),
+                        IsDelvFlg = reader["IS_DELV_FLG"]?.ToString()?.Trim(),
+                        SpecLblCode = reader["SPEC_LBL_CODE"]?.ToString()?.Trim(),
+                        PoGovtTp = reader["PO_GOVT_TP"]?.ToString()?.Trim(),
+                        DeptNbr = reader["DEPT_NBR"]?.ToString()?.Trim(),
+                        ByrLoc = reader["BYR_LOC"]?.ToString()?.Trim(),
+                        ByrCntact = reader["BYR_CNTACT"]?.ToString()?.Trim(),
+                        ByrPhnNbr = reader["BYR_PHN_NBR"]?.ToString()?.Trim(),
+                        ByrVndrNbr = reader["BYR_VNDR_NBR"]?.ToString()?.Trim(),
+                        XmitHashTot = reader["XMIT_HASH_TOT"]?.ToString()?.Trim(),
+                        XmitTotLines = reader["XMIT_TOT_LINES"]?.ToString()?.Trim(),
+                        CfgType = reader["CFG_TYPE"]?.ToString()?.Trim(),
+                        ContNbr = reader["CONT_NBR"]?.ToString()?.Trim(),
+                        LabType = reader["LAB_TYPE"]?.ToString()?.Trim(),
+                        ConfigPoType = reader["CONFIG_PO_TYPE"]?.ToString()?.Trim(),
+                        StateCd = reader["STATE_CD"]?.ToString()?.Trim(),
+                        OrdEntryDtTs = reader["ORD_ENTRY_DT_TS"]?.ToString()?.Trim(),
+                        ImiCarCd = reader["IMI_CARR_CODE"]?.ToString()?.Trim(),
+                        CustCarrCode = reader["CUST_CARR_CODE"]?.ToString()?.Trim(),
+                        ImiShipVia = reader["IMI_SHIP_VIA"]?.ToString()?.Trim(),
+                        CodAmt = ToDecimalSafe(reader["COD_AMT"]),
+                        CodFeeSwtch = reader["COD_FEE_SWTCH"]?.ToString()?.Trim(),
+                        ThrdPtyAct = reader["THRD_PTY_ACT"]?.ToString()?.Trim(),
+                        BoOrideSwtch = reader["BO_ORIDE_SWTCH"]?.ToString()?.Trim(),
+                        BrSeqValu = reader["BR_SEQ_VALU"]?.ToString()?.Trim(),
+                        DistrbDepth = reader["DISTRB_DEPTH"]?.ToString()?.Trim(),
+                        MaxXitDays = reader["MAX_XIT_DAYS"]?.ToString()?.Trim(),
+                        AirBrSeqFlg = reader["AIR_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        BrSeqFlg = reader["BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        MultBrSeqFlg = reader["MULT_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        ExptBrSeqFlg = reader["EXPT_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        SaveFrtFlg = reader["SAVE_FRT_FLG"]?.ToString()?.Trim(),
+                        SaveDistFlg = reader["SAVE_DIST_FLG"]?.ToString()?.Trim(),
+                        SingleWhse = reader["SINGLE_WHSE"]?.ToString()?.Trim(),
+                        PrntOrdrFlg = reader["PRNT_ORDR_FLG"]?.ToString()?.Trim(),
+                        BaserateFlg = reader["BASERATE_FLG"]?.ToString()?.Trim(),
+                        MultDistrbFlg = reader["MULT_DISTRB_FLG"]?.ToString()?.Trim(),
+                        NbrOfWhse = reader["NBR_OF_WHSE"]?.ToString()?.Trim(),
+                        OrdShFr = reader["ORDR_SHP_FR_BR"]?.ToString()?.Trim(),
+                        ShipFlg = reader["SHIP_FLG"]?.ToString()?.Trim(),
+                        OrdSt = reader["ORDR_STATUS"]?.ToString()?.Trim(),
+                        OrdrRejFlg = reader["ORDR_REJ_FLG"]?.ToString()?.Trim(),
+                        DmdBr = reader["DMD_BR"]?.ToString()?.Trim(),
+                        ProcessDt = reader["PROCESS_DT"]?.ToString()?.Trim(),
+                        ProcessTm = reader["PROCESS_TM"]?.ToString()?.Trim(),
+                        Terms = reader["TERMS"]?.ToString()?.Trim(),
+                        CcyRate = ToDecimalSafe(reader["CCY_RATE"]),
+                        DropMsg = reader["DROP_MSG"]?.ToString()?.Trim(),
+                        OrdrHasErrs = reader["ORDR_HAS_ERRS"]?.ToString()?.Trim(),
+                        TaxFlg = reader["TAX_FLG"]?.ToString()?.Trim(),
+                        EuName = reader["EU_NAME"]?.ToString()?.Trim(),
+                        EuAttn = reader["EU_ATTN"]?.ToString()?.Trim(),
+                        EuAddr1 = reader["EU_ADDR_1"]?.ToString()?.Trim(),
+                        EuAddr2 = reader["EU_ADDR_2"]?.ToString()?.Trim(),
+                        EuAddr3 = reader["EU_ADDR_3"]?.ToString()?.Trim(),
+                        EuAddr4 = reader["EU_ADDR_4"]?.ToString()?.Trim(),
+                        EuCity = reader["EU_CITY"]?.ToString()?.Trim(),
+                        EuState = reader["EU_STATE"]?.ToString()?.Trim(),
+                        EuZip = reader["EU_ZIP"]?.ToString()?.Trim(),
+                        EuCtry = reader["EU_CTRY"]?.ToString()?.Trim(),
+                        EuTax = reader["EU_TAX"]?.ToString()?.Trim(),
+                        EuCntact = reader["EU_CNTACT"]?.ToString()?.Trim(),
+                        EuPhnNbr = reader["EU_PHN_NBR"]?.ToString()?.Trim(),
+                        EuPhnNbrExt = reader["EU_PHN_NBR_EXT"]?.ToString()?.Trim(),
+                        EuFaxNbr = reader["EU_FAX_NBR"]?.ToString()?.Trim(),
+                        EuEmail = reader["EU_EMAIL"]?.ToString()?.Trim(),
+                        EuResaleRslr = reader["EU_RESALE_RSLR"]?.ToString()?.Trim(),
+                        EuRefNbr = reader["EU_REF_NBR"]?.ToString()?.Trim(),
+                        StName = reader["ST_NAME"]?.ToString()?.Trim(),
+                        StAttn = reader["ST_ATTN"]?.ToString()?.Trim(),
+                        StAttn2 = reader["ST_ATTN_2"]?.ToString()?.Trim(),
+                        StPhoneNbr = reader["ST_PHONE_NBR"]?.ToString()?.Trim(),
+                        StAddr1 = reader["ST_ADDR_1"]?.ToString()?.Trim(),
+                        StAddr2 = reader["ST_ADDR_2"]?.ToString()?.Trim(),
+                        StAddr3 = reader["ST_ADDR_3"]?.ToString()?.Trim(),
+                        StAddr4 = reader["ST_ADDR_4"]?.ToString()?.Trim(),
+                        StCity = reader["ST_CITY"]?.ToString()?.Trim(),
+                        StState = reader["ST_STATE"]?.ToString()?.Trim(),
+                        StZip = reader["ST_ZIP"]?.ToString()?.Trim(),
+                        StCtry = reader["ST_CTRY"]?.ToString()?.Trim(),
+                        StPtnrStoreNbr = reader["ST_PTNR_STORE_NBR"]?.ToString()?.Trim(),
+                        StImiStSuf = reader["ST_IMI_ST_SUF"]?.ToString()?.Trim(),
+                        CustRefNbr = reader["CUST_REF_NBR"]?.ToString()?.Trim(),
+                        CustRefNbr2 = reader["CUST_REF_NBR2"]?.ToString()?.Trim(),
+                        OrdRefNbr = reader["ORD_REF_NBR"]?.ToString()?.Trim(),
+                        OrdRelsNbr = reader["ORD_RELS_NBR"]?.ToString()?.Trim(),
+                        BillToRefNbr = reader["BILL_TO_REF_NBR"]?.ToString()?.Trim(),
+                        ImiRefNbr = reader["IMI_REF_NBR"]?.ToString()?.Trim(),
+                        EndCustActNbr = reader["END_CUST_ACT_NBR"]?.ToString()?.Trim(),
+                        EndCustOrdNbr = reader["END_CUST_ORD_NBR"]?.ToString()?.Trim(),
+                        EndCustPoNbr = reader["END_CUST_PO_NBR"]?.ToString()?.Trim(),
+                        CustVdrNbr = reader["CUST_VDR_NBR"]?.ToString()?.Trim(),
+                        EndCustRefNbr = reader["END_CUST_REF_NBR"]?.ToString()?.Trim(),
+                        VlaRlsdFlg = reader["VLA_RLSD_FLG"]?.ToString()?.Trim(),
+                        VlaRlsdId = reader["VLA_RLSD_ID"]?.ToString()?.Trim(),
+                        VlaRlsdDtTm = reader["VLA_RLSD_DT_TM"]?.ToString()?.Trim(),
+                        VlaEtaDt = reader["VLA_ETA_DT"]?.ToString()?.Trim(),
+                        VlaRejectReason = reader["VLA_REJECT_REASON"]?.ToString()?.Trim(),
+                        VlaEuNbr = reader["VLA_EU_NBR"]?.ToString()?.Trim(),
+                        VlaAuthNbr = reader["VLA_AUTH_NBR"]?.ToString()?.Trim(),
+                        FrghtOutCode = reader["FRGHT_OUT_CODE"]?.ToString()?.Trim(),
+                        GovtSolctnNbr = reader["GOVT_SOLCTN_NBR"]?.ToString()?.Trim(),
+                        SpecFormSwtch = reader["SPEC_FORM_SWTCH"]?.ToString()?.Trim(),
+                        AllLinesConfig = reader["ALL_LINES_CONFIG"]?.ToString()?.Trim(),
+                        Db2CrtTs = reader["DB2_CRT_TS"]?.ToString()?.Trim(),
+                        VlaType = reader["VLA_TYPE"]?.ToString()?.Trim(),
+                        SplitName1 = reader["SPLIT_NAME_1"]?.ToString()?.Trim(),
+                        SplitName2 = reader["SPLIT_NAME_2"]?.ToString()?.Trim(),
+                        EoEdiCd = reader["EO_EDI_CD"]?.ToString()?.Trim(),
+                        BadAddrSwtch = reader["BAD_ADDR_SWTCH"]?.ToString()?.Trim(),
+                        FulfilOrderFlg = reader["FULFIL_ORDER_FLG"]?.ToString()?.Trim(),
+                        PreProcsRpt = reader["PRE_PROCS_RPT"]?.ToString()?.Trim(),
+                        MastVendNbr = reader["MAST_VEND_NBR"]?.ToString()?.Trim(),
+                        RslrEmail = reader["RSLR_EMAIL"]?.ToString()?.Trim(),
+                        RslrFax = reader["RSLR_FAX"]?.ToString()?.Trim(),
+                        RslrLotusId = reader["RSLR_LOTUS_ID"]?.ToString()?.Trim(),
+                        ImiBtSuf = reader["IMI_BT_SUF"]?.ToString()?.Trim(),
+                        BusRegnCd = reader["BUS_REGN_CD"]?.ToString()?.Trim(),
+                        HoldCd = reader["HOLD_CD"]?.ToString()?.Trim(),
+                        XdockDistCtr = reader["XDOCK_DIST_CTR"]?.ToString()?.Trim(),
+                        DvFlg = reader["DV_FLG"]?.ToString()?.Trim(),
+                        EddFlg = reader["EDD_FLG"]?.ToString()?.Trim(),
+                        VendQotNbr = reader["VEND_QOT_NBR"]?.ToString()?.Trim(),
+                        StEmail = reader["ST_EMAIL"]?.ToString()?.Trim(),
+                        CustinLicVlidCd = reader["CUSTIN_LIC_VLID_CD"]?.ToString()?.Trim(),
+                        RecalcLicVlidCd = reader["RECALC_LIC_VLID_CD"]?.ToString()?.Trim(),
+                        CustFrtFwrdFlg = reader["CUST_FRT_FWRD_FLG"]?.ToString()?.Trim(),
+                        ImFrtFwrdFlg = reader["IM_FRT_FWRD_FLG"]?.ToString()?.Trim(),
+                        ServiceInd = reader["SERVICE_IND"]?.ToString()?.Trim(),
+                        ServiceLevel = reader["SERVICE_LEVEL"]?.ToString()?.Trim(),
+                        CarrierAccount = reader["CARRIER_ACCOUNT"]?.ToString()?.Trim(),
+                        FreightOrderNbr = reader["FREIGHT_ORDER_NBR"]?.ToString()?.Trim(),
+                        HermPoNbr = reader["HERM_PO_NBR"]?.ToString()?.Trim(),
+                        EuDepId = reader["EU_DEP_ID"]?.ToString()?.Trim(),
+                        DepOrdrNbr = reader["DEP_ORDR_NBR"]?.ToString()?.Trim(),
+                        ShipToAttnFlg = reader["SHIP_TO_ATTN_FLG"]?.ToString()?.Trim(),
+                        CustDelStusFlg = reader["CUST_DEL_STUS_FLG"]?.ToString()?.Trim(),
+                        OrdrCigId = reader["ORDR_CIG_ID"]?.ToString()?.Trim(),
+                        OrdrCupId = reader["ORDR_CUP_ID"]?.ToString()?.Trim(),
+                        LnFulfillSw = reader["LN_FULFILL_SW"]?.ToString()?.Trim(),
+                        DpasTypeCd = reader["DPAS_TYPE_CD"]?.ToString()?.Trim(),
+                        DpasPgmId = reader["DPAS_PGM_ID"]?.ToString()?.Trim(),
+                        VendAuthNbr = reader["VEND_AUTH_NBR"]?.ToString()?.Trim(),
+                        FutOrdrPromDt = reader["FUT_ORDR_PROM_DT"]?.ToString()?.Trim(),
+                        PrcConcessionTxt = reader["PRC_CONCESSION_TXT"]?.ToString()?.Trim(),
+                        PrevContNbr = reader["PREV_CONT_NBR"]?.ToString()?.Trim(),
+                        ContTypeCd = reader["CONT_TYPE_CD"]?.ToString()?.Trim(),
+                        TermId = reader["TERM_ID"]?.ToString()?.Trim(),
+                        XediRlsdInd = reader["XEDI_RLSD_IND"]?.ToString()?.Trim(),
+                        QuoteNbr = reader["QUOTE_NBR"]?.ToString()?.Trim(),
+                        XediAckFlg = reader["XEDI_ACK_FLG"]?.ToString()?.Trim(),
+                        VmfHdrHldInd = reader["VMF_HDR_HLD_IND"]?.ToString()?.Trim(),
+                        HybrdAnntyOrdrInd = reader["HYBRD_ANNTY_ORDR_IND"]?.ToString()?.Trim(),
+                        HybrdAnntyCnfmtnId = reader["HYBRD_ANNTY_CNFMTN_ID"]?.ToString()?.Trim(),
+                    };
+                }
+            } // reader/cmd disposed here so we can reuse conn safely
 
             Console.WriteLine($">>> RESULT: {(response == null ? "NULL - no data found" : "SUCCESS - data returned")}");
 
+            if (response == null)
+                return null; // no header = no point querying line items
+
+            // ---- Line item query (new) ----
+            // ---- Line item query (new) ----
+            string lineQuery = @"
+                SELECT
+                    CUST_CO_CD,
+                    CUST_BR,
+                    CUST_NBR,
+                    CUST_SFX,
+                    CUST_PO_NBR,
+                    SDQ_SEQ_NBR,
+                    CUST_PO_DT,
+                    CUST_PO_SEQ_NBR,
+                    LINE_SEQ_NBR,
+                    PRTNR_LINE_NBR,
+                    IMI_LINE_NBR,
+                    IMI_PART_NBR,
+                    CUST_PART_NBR,
+                    MFCTR_PART_NBR,
+                    UPC_PART_NBR,
+                    QTY_ORDERED,
+                    CUST_QOTD_PRC,
+                    CS_PK_QTY,
+                    CUST_PART_DESC_1,
+                    CUST_PART_DESC_2,
+                    RSV_INVTY_FLG,
+                    IMI_PART_DESC_1,
+                    IMI_PART_DESC_2,
+                    PRC_USE_FLG,
+                    LINE_REQ_DLVY_DT,
+                    LINE_REQ_SHIP_DT,
+                    LINE_REQ_CANC_DT,
+                    LINE_BO_FLG,
+                    AGGR_CD,
+                    MISC_CHRG_SKU,
+                    ASSET_TAG_FLG,
+                    OPRT_SYS,
+                    DLVY_MTHD,
+                    LAB_TYPE,
+                    QTY_PER_CONFIG,
+                    CONFIG_QTY,
+                    ITEM_TYPE_IND,
+                    QTY_ALLOC,
+                    END_USER_PRC,
+                    IMI_REJ_CD,
+                    ACPT_REJ_FLG,
+                    MISC_CD,
+                    LINE_TYPE_SW,
+                    QTY_BO,
+                    UNIT_PRC,
+                    RTL_PRC,
+                    FRGN_UNIT_PRC,
+                    SUB_PART_NBR,
+                    ETA,
+                    FREE_ITEM_SW,
+                    VEND_NBR,
+                    LINE_VLA_AUTH_NBR,
+                    EU_ADDR_LOC,
+                    EU_INFO_REQ_FLG,
+                    BUS_REGN_CD,
+                    CUST_SPEC_HNDL_CD,
+                    SERIAL_NBR_FLG,
+                    SVC_AMT,
+                    SVC_QTY,
+                    HT_IMI_REJ_CD,
+                    ETA_SRC_CD,
+                    HT_INIT_REJ_CD,
+                    BID_NBR,
+                    BID_VRSN_NBR,
+                    EXT_VEND_PART_NBR,
+                    ORIG_SPPL_PART_NBR,
+                    HERM_SHIP_FR_BR_NBR,
+                    HERM_UNIT_COST_AMT,
+                    HERM_UNIT_PRC_AMT,
+                    HERM_LINE_TYPE_CD,
+                    HERM_STUS_FLG,
+                    IMI_REJ_CD_DESC,
+                    LINE_VMF_INFO_SW,
+                    FUT_LINE_PROM_DT,
+                    CTO_UNIT_COST_AMT,
+                    CTO_UNIT_PRC_AMT,
+                    LINK_ID,
+                    EU_PP_PRC_AMT,
+                    EU_PP_PUR_DT,
+                    TERM_END_DT,
+                    QUOTE_LINE_IND,
+                    VMF_LNE_HLD_IND,
+                    IMI_HOLD_CD,
+                    LN_DIR_SHP_IND
+                FROM Z1.EO_LINE_INFO
+                WHERE TRIM(CUST_PO_NBR) = ? AND TRIM(CUST_CO_CD) = ?
+                ORDER BY LINE_SEQ_NBR";
+
+            using (OdbcCommand lineCmd = new OdbcCommand(lineQuery, conn))
+            {
+                lineCmd.Parameters.Add("?", OdbcType.VarChar).Value = request.PoNumber.Trim();
+                lineCmd.Parameters.Add("?", OdbcType.VarChar).Value = request.CountryCode.Trim();
+                Console.WriteLine($">>> EXECUTING LINE ITEM QUERY...");
+                using OdbcDataReader lineReader = (OdbcDataReader)await lineCmd.ExecuteReaderAsync();
+                Console.WriteLine($">>> LINE READER HAS ROWS: {lineReader.HasRows}");
+                while (await lineReader.ReadAsync())
+                {
+                    response.LineItems.Add(new OrderLineItem
+                    {
+                        CustCoCd = lineReader["CUST_CO_CD"]?.ToString()?.Trim(),
+                        CustBr = lineReader["CUST_BR"]?.ToString()?.Trim(),
+                        CustNbr = lineReader["CUST_NBR"]?.ToString()?.Trim(),
+                        CustSfx = lineReader["CUST_SFX"]?.ToString()?.Trim(),
+                        CustPoNbr = lineReader["CUST_PO_NBR"]?.ToString()?.Trim(),
+                        SdqSeqNbr = lineReader["SDQ_SEQ_NBR"]?.ToString()?.Trim(),
+                        CustPoDt = lineReader["CUST_PO_DT"]?.ToString()?.Trim(),
+                        CustPoSeqNbr = lineReader["CUST_PO_SEQ_NBR"]?.ToString()?.Trim(),
+                        LineSeqNbr = lineReader["LINE_SEQ_NBR"]?.ToString()?.Trim(),
+                        PrtnrLineNbr = lineReader["PRTNR_LINE_NBR"]?.ToString()?.Trim(),
+                        ImiLineNbr = lineReader["IMI_LINE_NBR"]?.ToString()?.Trim(),
+                        ImiPartNbr = lineReader["IMI_PART_NBR"]?.ToString()?.Trim(),
+                        CustPartNbr = lineReader["CUST_PART_NBR"]?.ToString()?.Trim(),
+                        MfctrPartNbr = lineReader["MFCTR_PART_NBR"]?.ToString()?.Trim(),
+                        UpcPartNbr = lineReader["UPC_PART_NBR"]?.ToString()?.Trim(),
+                        QtyOrdered = ToDecimalSafe(lineReader["QTY_ORDERED"]),
+                        CustQotdPrc = ToDecimalSafe(lineReader["CUST_QOTD_PRC"]),
+                        CsPkQty = ToDecimalSafe(lineReader["CS_PK_QTY"]),
+                        CustPartDesc1 = lineReader["CUST_PART_DESC_1"]?.ToString()?.Trim(),
+                        CustPartDesc2 = lineReader["CUST_PART_DESC_2"]?.ToString()?.Trim(),
+                        RsvInvtyFlg = lineReader["RSV_INVTY_FLG"]?.ToString()?.Trim(),
+                        ImiPartDesc1 = lineReader["IMI_PART_DESC_1"]?.ToString()?.Trim(),
+                        ImiPartDesc2 = lineReader["IMI_PART_DESC_2"]?.ToString()?.Trim(),
+                        PrcUseFlg = lineReader["PRC_USE_FLG"]?.ToString()?.Trim(),
+                        LineReqDlvyDt = lineReader["LINE_REQ_DLVY_DT"]?.ToString()?.Trim(),
+                        LineReqShipDt = lineReader["LINE_REQ_SHIP_DT"]?.ToString()?.Trim(),
+                        LineReqCancDt = lineReader["LINE_REQ_CANC_DT"]?.ToString()?.Trim(),
+                        LineBoFlg = lineReader["LINE_BO_FLG"]?.ToString()?.Trim(),
+                        AggrCd = lineReader["AGGR_CD"]?.ToString()?.Trim(),
+                        MiscChrgSku = lineReader["MISC_CHRG_SKU"]?.ToString()?.Trim(),
+                        AssetTagFlg = lineReader["ASSET_TAG_FLG"]?.ToString()?.Trim(),
+                        OprtSys = lineReader["OPRT_SYS"]?.ToString()?.Trim(),
+                        DlvyMthd = lineReader["DLVY_MTHD"]?.ToString()?.Trim(),
+                        LabType = lineReader["LAB_TYPE"]?.ToString()?.Trim(),
+                        QtyPerConfig = ToDecimalSafe(lineReader["QTY_PER_CONFIG"]),
+                        ConfigQty = ToDecimalSafe(lineReader["CONFIG_QTY"]),
+                        ItemTypeInd = lineReader["ITEM_TYPE_IND"]?.ToString()?.Trim(),
+                        QtyAlloc = ToDecimalSafe(lineReader["QTY_ALLOC"]),
+                        EndUserPrc = ToDecimalSafe(lineReader["END_USER_PRC"]),
+                        ImiRejCd = lineReader["IMI_REJ_CD"]?.ToString()?.Trim(),
+                        AcptRejFlg = lineReader["ACPT_REJ_FLG"]?.ToString()?.Trim(),
+                        MiscCd = lineReader["MISC_CD"]?.ToString()?.Trim(),
+                        LineTypeSw = lineReader["LINE_TYPE_SW"]?.ToString()?.Trim(),
+                        QtyBo = ToDecimalSafe(lineReader["QTY_BO"]),
+                        UnitPrc = ToDecimalSafe(lineReader["UNIT_PRC"]),
+                        RtlPrc = ToDecimalSafe(lineReader["RTL_PRC"]),
+                        FrgnUnitPrc = ToDecimalSafe(lineReader["FRGN_UNIT_PRC"]),
+                        SubPartNbr = lineReader["SUB_PART_NBR"]?.ToString()?.Trim(),
+                        Eta = lineReader["ETA"]?.ToString()?.Trim(),
+                        FreeItemSw = lineReader["FREE_ITEM_SW"]?.ToString()?.Trim(),
+                        VendNbr = lineReader["VEND_NBR"]?.ToString()?.Trim(),
+                        LineVlaAuthNbr = lineReader["LINE_VLA_AUTH_NBR"]?.ToString()?.Trim(),
+                        EuAddrLoc = lineReader["EU_ADDR_LOC"]?.ToString()?.Trim(),
+                        EuInfoReqFlg = lineReader["EU_INFO_REQ_FLG"]?.ToString()?.Trim(),
+                        BusRegnCd = lineReader["BUS_REGN_CD"]?.ToString()?.Trim(),
+                        CustSpecHndlCd = lineReader["CUST_SPEC_HNDL_CD"]?.ToString()?.Trim(),
+                        SerialNbrFlg = lineReader["SERIAL_NBR_FLG"]?.ToString()?.Trim(),
+                        SvcAmt = ToDecimalSafe(lineReader["SVC_AMT"]),
+                        SvcQty = ToDecimalSafe(lineReader["SVC_QTY"]),
+                        HtImiRejCd = lineReader["HT_IMI_REJ_CD"]?.ToString()?.Trim(),
+                        EtaSrcCd = lineReader["ETA_SRC_CD"]?.ToString()?.Trim(),
+                        HtInitRejCd = lineReader["HT_INIT_REJ_CD"]?.ToString()?.Trim(),
+                        BidNbr = lineReader["BID_NBR"]?.ToString()?.Trim(),
+                        BidVrsnNbr = lineReader["BID_VRSN_NBR"]?.ToString()?.Trim(),
+                        ExtVendPartNbr = lineReader["EXT_VEND_PART_NBR"]?.ToString()?.Trim(),
+                        OrigSpplPartNbr = lineReader["ORIG_SPPL_PART_NBR"]?.ToString()?.Trim(),
+                        HermShipFrBrNbr = lineReader["HERM_SHIP_FR_BR_NBR"]?.ToString()?.Trim(),
+                        HermUnitCostAmt = ToDecimalSafe(lineReader["HERM_UNIT_COST_AMT"]),
+                        HermUnitPrcAmt = ToDecimalSafe(lineReader["HERM_UNIT_PRC_AMT"]),
+                        HermLineTypeCd = lineReader["HERM_LINE_TYPE_CD"]?.ToString()?.Trim(),
+                        HermStusFlg = lineReader["HERM_STUS_FLG"]?.ToString()?.Trim(),
+                        ImiRejCdDesc = lineReader["IMI_REJ_CD_DESC"]?.ToString()?.Trim(),
+                        LineVmfInfoSw = lineReader["LINE_VMF_INFO_SW"]?.ToString()?.Trim(),
+                        FutLinePromDt = lineReader["FUT_LINE_PROM_DT"]?.ToString()?.Trim(),
+                        CtoUnitCostAmt = ToDecimalSafe(lineReader["CTO_UNIT_COST_AMT"]),
+                        CtoUnitPrcAmt = ToDecimalSafe(lineReader["CTO_UNIT_PRC_AMT"]),
+                        LinkId = lineReader["LINK_ID"]?.ToString()?.Trim(),
+                        EuPpPrcAmt = ToDecimalSafe(lineReader["EU_PP_PRC_AMT"]),
+                        EuPpPurDt = lineReader["EU_PP_PUR_DT"]?.ToString()?.Trim(),
+                        TermEndDt = lineReader["TERM_END_DT"]?.ToString()?.Trim(),
+                        QuoteLineInd = lineReader["QUOTE_LINE_IND"]?.ToString()?.Trim(),
+                        VmfLneHldInd = lineReader["VMF_LNE_HLD_IND"]?.ToString()?.Trim(),
+                        ImiHoldCd = lineReader["IMI_HOLD_CD"]?.ToString()?.Trim(),
+                        LnDirShpInd = lineReader["LN_DIR_SHP_IND"]?.ToString()?.Trim(),
+                    });
+                }
+            }
+
+            Console.WriteLine($">>> LINE ITEMS FOUND: {response.LineItems.Count}");
             return response;
+        }
+
+        // ✅ Helper: safely converts DB2 numeric columns to decimal, defaulting to 0 if null/DBNull
+        private static decimal ToDecimalSafe(object value)
+        {
+            if (value == null || value == DBNull.Value) return 0;
+            return Convert.ToDecimal(value);
         }
     }
 }
