@@ -25,6 +25,7 @@ export function mapOrderResponse(raw) {
     stateCd: raw.stateCd ?? " ",
     imiCarCd:raw.imiCarCd ?? " ",
     ordSt:raw.ordSt ?? " ",
+    custPoDt: raw.custPoDt ?? " ",
     
     
 
