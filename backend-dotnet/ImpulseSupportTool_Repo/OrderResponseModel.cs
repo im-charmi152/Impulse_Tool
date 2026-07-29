@@ -190,6 +190,7 @@ namespace ImpulseSupportTool_Repo
 
         // Nested list: line items (from EO_LINE_INFO)
         public List<OrderLineItem> LineItems { get; set; } = new();
+        public List<OrderStatusChange> StatusChanges { get; set; } = new();
     }
     public class OrderLineItem
         {
@@ -278,4 +279,32 @@ namespace ImpulseSupportTool_Repo
             public string ImiHoldCd { get; set; }
             public string LnDirShpInd { get; set; }
         }
+   
+        public class OrderStatusChange
+        {
+            public string CoCd { get; set; }
+            public string OrdrBrNbr { get; set; }
+            public string OrdrNbr { get; set; }
+            public string DistNbr { get; set; }
+            public string ShipNbr { get; set; }
+            public string OrdrDt { get; set; }
+            public string StusChgTypCd { get; set; }
+            public string StusChgTs { get; set; }
+            public string OrdrLineNbr { get; set; }
+            public string CustBrNbr { get; set; }
+            public string CustNbr { get; set; }
+            public string WebProcsFlg { get; set; }
+            public string TomcatProcsFlg { get; set; }
+            public string OrdrChgStusCd { get; set; }
+            public string ConfigStusCd { get; set; }
+            public string AggregateId { get; set; }
+            public string PrmsChgDt { get; set; }
+            public string FamilyCd { get; set; }
+            public string LstChgProgNam { get; set; }
+            public string LstChgOperId { get; set; }
+            public string UpdtRsnTxt { get; set; }
+            public string EvntRsnCd { get; set; }
+            public decimal FlrDnlQty { get; set; }
+        }
+
 }
