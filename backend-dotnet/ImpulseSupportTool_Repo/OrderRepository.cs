@@ -1,5 +1,6 @@
 ﻿using System.Data.Odbc;
 using ImpulseSupportTool_Repo;
+using OrderManagement.API.Helpers;
 namespace OrderManagement.API.Repositories
 {
     public class OrderRepository : IOrderRepository
@@ -12,6 +13,11 @@ namespace OrderManagement.API.Repositories
         public async Task<OrderResponse> GetOrder(OrderRequest request)
         {
             Console.WriteLine($">>> QUERY PARAMS: PoNumber='{request.PoNumber}' CountryCode='{request.CountryCode}'");
+
+            // ✅ Resolve DB2 schema zone from country code (Z1/Z2/Z3/Z4)
+            string zone = ZoneMapper.GetZone(request.CountryCode);
+            Console.WriteLine($">>> RESOLVED ZONE: {zone} for CountryCode='{request.CountryCode}'");
+
             OrderResponse response = null;
             string password = _configuration["DB2:Password"];
             string connectionString = _configuration.GetConnectionString("DB2Connection");
@@ -21,7 +27,7 @@ namespace OrderManagement.API.Repositories
             Console.WriteLine($">>> DB2 CONNECTION OPENED OK");
 
             // ✅ TRIM fixes trailing spaces in CHAR fixed-width columns
-            string headerQuery = @"
+            string headerQuery = $@"
                 SELECT
                     CUST_CO_CD, CUST_BR, CUST_NBR, CUST_SFX, CUST_PO_NBR, SDQ_SEQ_NBR,
                     CUST_PO_DT, CUST_PO_SEQ_NBR, TAG_NBR, RELS_TAG_NBR, PROCESS_UNIT_TS,
@@ -61,7 +67,7 @@ namespace OrderManagement.API.Repositories
                     FUT_ORDR_PROM_DT, PRC_CONCESSION_TXT, PREV_CONT_NBR, CONT_TYPE_CD,
                     TERM_ID, XEDI_RLSD_IND, QUOTE_NBR, XEDI_ACK_FLG, VMF_HDR_HLD_IND,
                     HYBRD_ANNTY_ORDR_IND, HYBRD_ANNTY_CNFMTN_ID
-                FROM Z1.EO_ORDR_HDR_INFO
+                FROM {zone}.EO_ORDR_HDR_INFO
                 WHERE TRIM(CUST_PO_NBR) = ? AND TRIM(CUST_CO_CD) = ?
                 FETCH FIRST 10 ROWS ONLY";
 
@@ -267,11 +273,10 @@ namespace OrderManagement.API.Repositories
             Console.WriteLine($">>> RESULT: {(response == null ? "NULL - no data found" : "SUCCESS - data returned")}");
 
             if (response == null)
-                return null; // no header = no point querying line items
+                return null; // no header = no point querying line items or status
 
             // ---- Line item query (new) ----
-            // ---- Line item query (new) ----
-            string lineQuery = @"
+            string lineQuery = $@"
                 SELECT
                     CUST_CO_CD,
                     CUST_BR,
@@ -357,7 +362,7 @@ namespace OrderManagement.API.Repositories
                     VMF_LNE_HLD_IND,
                     IMI_HOLD_CD,
                     LN_DIR_SHP_IND
-                FROM Z1.EO_LINE_INFO
+                FROM {zone}.EO_LINE_INFO
                 WHERE TRIM(CUST_PO_NBR) = ? AND TRIM(CUST_CO_CD) = ?
                 ORDER BY LINE_SEQ_NBR";
 
@@ -461,6 +466,79 @@ namespace OrderManagement.API.Repositories
             }
 
             Console.WriteLine($">>> LINE ITEMS FOUND: {response.LineItems.Count}");
+
+            // ---- Order Status Changes query (new) ----
+            // ⚠️ Keyed by CO_CD + ORDR_BR_NBR + ORDR_NBR — NOT by CUST_PO_NBR — so we
+            // use the values already resolved from the header response instead of the request.
+            string statusQuery = $@"
+                SELECT
+                    CO_CD,
+                    ORDR_BR_NBR,
+                    ORDR_NBR,
+                    DIST_NBR,
+                    SHIP_NBR,
+                    ORDR_DT,
+                    STUS_CHG_TYP_CD,
+                    STUS_CHG_TS,
+                    ORDR_LINE_NBR,
+                    CUST_BR_NBR,
+                    CUST_NBR,
+                    WEB_PROCS_FLG,
+                    TOMCAT_PROCS_FLG,
+                    ORDR_CHG_STUS_CD,
+                    CONFIG_STUS_CD,
+                    AGGREGATE_ID,
+                    PRMS_CHG_DT,
+                    FAMILY_CD,
+                    LST_CHG_PROG_NAM,
+                    LST_CHG_OPER_ID,
+                    UPDT_RSN_TXT,
+                    EVNT_RSN_CD,
+                    FLR_DNL_QTY
+                FROM {zone}.OR_ORDER_STUS_CHGS
+                WHERE TRIM(CO_CD) = ? AND TRIM(ORDR_BR_NBR) = ? AND TRIM(ORDR_NBR) = ?
+                ORDER BY STUS_CHG_TS";
+
+            using (OdbcCommand statusCmd = new OdbcCommand(statusQuery, conn))
+            {
+                statusCmd.Parameters.Add("?", OdbcType.VarChar).Value = response.CustCoCd;
+                statusCmd.Parameters.Add("?", OdbcType.VarChar).Value = response.ImiAsgdBrNbr;
+                statusCmd.Parameters.Add("?", OdbcType.VarChar).Value = response.ImiAsgdOrdrNbr;
+                Console.WriteLine($">>> EXECUTING ORDER STATUS CHANGES QUERY for CoCd={response.CustCoCd}, BrNbr={response.ImiAsgdBrNbr}, OrdrNbr={response.ImiAsgdOrdrNbr}...");
+                using OdbcDataReader statusReader = (OdbcDataReader)await statusCmd.ExecuteReaderAsync();
+                Console.WriteLine($">>> STATUS READER HAS ROWS: {statusReader.HasRows}");
+                while (await statusReader.ReadAsync())
+                {
+                    response.StatusChanges.Add(new OrderStatusChange
+                    {
+                        CoCd = statusReader["CO_CD"]?.ToString()?.Trim(),
+                        OrdrBrNbr = statusReader["ORDR_BR_NBR"]?.ToString()?.Trim(),
+                        OrdrNbr = statusReader["ORDR_NBR"]?.ToString()?.Trim(),
+                        DistNbr = statusReader["DIST_NBR"]?.ToString()?.Trim(),
+                        ShipNbr = statusReader["SHIP_NBR"]?.ToString()?.Trim(),
+                        OrdrDt = statusReader["ORDR_DT"]?.ToString()?.Trim(),
+                        StusChgTypCd = statusReader["STUS_CHG_TYP_CD"]?.ToString()?.Trim(),
+                        StusChgTs = statusReader["STUS_CHG_TS"]?.ToString()?.Trim(),
+                        OrdrLineNbr = statusReader["ORDR_LINE_NBR"]?.ToString()?.Trim(),
+                        CustBrNbr = statusReader["CUST_BR_NBR"]?.ToString()?.Trim(),
+                        CustNbr = statusReader["CUST_NBR"]?.ToString()?.Trim(),
+                        WebProcsFlg = statusReader["WEB_PROCS_FLG"]?.ToString()?.Trim(),
+                        TomcatProcsFlg = statusReader["TOMCAT_PROCS_FLG"]?.ToString()?.Trim(),
+                        OrdrChgStusCd = statusReader["ORDR_CHG_STUS_CD"]?.ToString()?.Trim(),
+                        ConfigStusCd = statusReader["CONFIG_STUS_CD"]?.ToString()?.Trim(),
+                        AggregateId = statusReader["AGGREGATE_ID"]?.ToString()?.Trim(),
+                        PrmsChgDt = statusReader["PRMS_CHG_DT"]?.ToString()?.Trim(),
+                        FamilyCd = statusReader["FAMILY_CD"]?.ToString()?.Trim(),
+                        LstChgProgNam = statusReader["LST_CHG_PROG_NAM"]?.ToString()?.Trim(),
+                        LstChgOperId = statusReader["LST_CHG_OPER_ID"]?.ToString()?.Trim(),
+                        UpdtRsnTxt = statusReader["UPDT_RSN_TXT"]?.ToString()?.Trim(),
+                        EvntRsnCd = statusReader["EVNT_RSN_CD"]?.ToString()?.Trim(),
+                        FlrDnlQty = ToDecimalSafe(statusReader["FLR_DNL_QTY"]),
+                    });
+                }
+            }
+
+            Console.WriteLine($">>> STATUS CHANGES FOUND: {response.StatusChanges.Count}");
             return response;
         }
 
