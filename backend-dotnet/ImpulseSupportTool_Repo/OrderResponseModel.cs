@@ -191,6 +191,7 @@ namespace ImpulseSupportTool_Repo
         // Nested list: line items (from EO_LINE_INFO)
         public List<OrderLineItem> LineItems { get; set; } = new();
         public List<OrderStatusChange>? StatusChanges { get; set; } = new();
+        public List<OrderPartnerSetup> PartnerSetup { get; set; } = new();
     }
     public class OrderLineItem
         {
@@ -306,5 +307,32 @@ namespace ImpulseSupportTool_Repo
             public string EvntRsnCd { get; set; }
             public decimal FlrDnlQty { get; set; }
         }
+    public class OrderPartnerSetup
+    {
+        public string CoCd { get; set; }
+        public string PartnerId { get; set; }
+        public string PartnerTypeCd { get; set; }
+        public string SrceSysId { get; set; }
+        public string SrceSysKeyId { get; set; }
+        public string FormatId { get; set; }
+        public string DirFlgCd { get; set; }
+        public string DocId { get; set; }
+        public string FreqId { get; set; }
+        public string DataStoreMechId { get; set; }
+        public string CommuId { get; set; }
+        public string InternetAddrTxt { get; set; }
+        public string ActvDt { get; set; }
+        public string DeactvDt { get; set; }
+        public string HoldCd { get; set; }
+        public string SetupNotesTxt { get; set; }
+        public string SendThruId { get; set; }
+        public string LstChgTs { get; set; }
+        public string LstChgNam { get; set; }
+        public string PrcsOptnFlg { get; set; }
+        public string CycleIntvl { get; set; }
+        public string CycleLstRunTs { get; set; }
+        public string BatchSplitCnt { get; set; }
+        public string CycStrtTm { get; set; }
+    }
 
 }

@@ -566,6 +566,96 @@ namespace OrderManagement.API.Repositories
             }
 
             Console.WriteLine($">>> STATUS CHANGES FOUND: {response.StatusChanges.Count}");
+
+            // ---- Partner setup query (NEW) ----
+            // Keys reused from the already-mapped header response (NOT from the incoming request):
+            //   response.CustCoCd  -> CO_CD
+            //   response.PartnerId -> PARTNER_ID
+            // No TRIM() on the WHERE columns and Char (not VarChar) parameter binding, same as the
+            // fix applied to the status query above - TRIM(col) = ? blocks index usage on DB2 and
+            // can turn a quick indexed lookup into a full table scan, which is what caused the
+            // earlier SQL30081N/08001 comms-timeout issue on OR_ORDER_STUS_CHGS.
+            string partnerQuery = $@"
+                SELECT
+                    CO_CD,
+                    PARTNER_ID,
+                    PARTNER_TYPE_CD,
+                    SRCE_SYS_ID,
+                    SRCE_SYS_KEY_ID,
+                    FORMAT_ID,
+                    DIR_FLG_CD,
+                    DOC_ID,
+                    FREQ_ID,
+                    DATA_STORE_MECH_ID,
+                    COMMU_ID,
+                    INTERNET_ADDR_TXT,
+                    ACTV_DT,
+                    DEACTV_DT,
+                    HOLD_CD,
+                    SETUP_NOTES_TXT,
+                    SEND_THRU_ID,
+                    LST_CHG_TS,
+                    LST_CHG_NAM,
+                    PRCS_OPTN_FLG,
+                    CYCLE_INTVL,
+                    CYCLE_LST_RUN_TS,
+                    BATCH_SPLIT_CNT,
+                    CYC_STRT_TM
+                FROM {zone}.IE_PARTNER_SETUP
+                WHERE CO_CD = ? AND PARTNER_ID = ?";
+            // NOTE: adjust the Char lengths below (2 / 15) to match the real DDL widths for
+            // CO_CD and PARTNER_ID on this table.
+
+            try
+            {
+                // Dedicated connection, same reasoning as the status query above.
+                using OdbcConnection partnerConn = new OdbcConnection(connectionString);
+                await partnerConn.OpenAsync();
+
+                using OdbcCommand partnerCmd = new OdbcCommand(partnerQuery, partnerConn);
+                partnerCmd.Parameters.Add("?", OdbcType.Char, 2).Value = response.CustCoCd?.Trim();
+                partnerCmd.Parameters.Add("?", OdbcType.Char, 15).Value = response.PartnerId?.Trim();
+                Console.WriteLine($">>> EXECUTING PARTNER SETUP QUERY...");
+                using OdbcDataReader partnerReader = (OdbcDataReader)await partnerCmd.ExecuteReaderAsync();
+                Console.WriteLine($">>> PARTNER READER HAS ROWS: {partnerReader.HasRows}");
+                if (await partnerReader.ReadAsync())
+                {
+                    response.PartnerSetup.Add( new OrderPartnerSetup
+                    {
+                        CoCd = partnerReader["CO_CD"]?.ToString()?.Trim(),
+                        PartnerId = partnerReader["PARTNER_ID"]?.ToString()?.Trim(),
+                        PartnerTypeCd = partnerReader["PARTNER_TYPE_CD"]?.ToString()?.Trim(),
+                        SrceSysId = partnerReader["SRCE_SYS_ID"]?.ToString()?.Trim(),
+                        SrceSysKeyId = partnerReader["SRCE_SYS_KEY_ID"]?.ToString()?.Trim(),
+                        FormatId = partnerReader["FORMAT_ID"]?.ToString()?.Trim(),
+                        DirFlgCd = partnerReader["DIR_FLG_CD"]?.ToString()?.Trim(),
+                        DocId = partnerReader["DOC_ID"]?.ToString()?.Trim(),
+                        FreqId = partnerReader["FREQ_ID"]?.ToString()?.Trim(),
+                        DataStoreMechId = partnerReader["DATA_STORE_MECH_ID"]?.ToString()?.Trim(),
+                        CommuId = partnerReader["COMMU_ID"]?.ToString()?.Trim(),
+                        InternetAddrTxt = partnerReader["INTERNET_ADDR_TXT"]?.ToString()?.Trim(),
+                        ActvDt = partnerReader["ACTV_DT"]?.ToString()?.Trim(),
+                        DeactvDt = partnerReader["DEACTV_DT"]?.ToString()?.Trim(),
+                        HoldCd = partnerReader["HOLD_CD"]?.ToString()?.Trim(),
+                        SetupNotesTxt = partnerReader["SETUP_NOTES_TXT"]?.ToString()?.Trim(),
+                        SendThruId = partnerReader["SEND_THRU_ID"]?.ToString()?.Trim(),
+                        LstChgTs = partnerReader["LST_CHG_TS"]?.ToString()?.Trim(),
+                        LstChgNam = partnerReader["LST_CHG_NAM"]?.ToString()?.Trim(),
+                        PrcsOptnFlg = partnerReader["PRCS_OPTN_FLG"]?.ToString()?.Trim(),
+                        CycleIntvl = partnerReader["CYCLE_INTVL"]?.ToString()?.Trim(),
+                        CycleLstRunTs = partnerReader["CYCLE_LST_RUN_TS"]?.ToString()?.Trim(),
+                        BatchSplitCnt = partnerReader["BATCH_SPLIT_CNT"]?.ToString()?.Trim(),
+                        CycStrtTm = partnerReader["CYC_STRT_TM"]?.ToString()?.Trim(),
+                    });
+                }
+            }
+            catch (OdbcException ex)
+            {
+                // Don't let a partner-setup lookup failure take down the whole GetOrder response.
+                Console.WriteLine($">>> PARTNER SETUP QUERY FAILED: {ex.Message}");
+            }
+
+            Console.WriteLine($">>> PARTNER SETUP FOUND: {(response.PartnerSetup == null ? "NO" : "YES")}");
             return response;
         }
 
