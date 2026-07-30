@@ -14,7 +14,7 @@ namespace OrderManagement.API.Repositories
         {
             Console.WriteLine($">>> QUERY PARAMS: PoNumber='{request.PoNumber}' CountryCode='{request.CountryCode}'");
 
-            // ✅ Resolve DB2 schema zone from country code (Z1/Z2/Z3/Z4)
+            // Resolve DB2 schema zone from country code (Z1/Z2/Z3/Z4)
             string zone = ZoneMapper.GetZone(request.CountryCode);
             Console.WriteLine($">>> RESOLVED ZONE: {zone} for CountryCode='{request.CountryCode}'");
 
@@ -26,7 +26,7 @@ namespace OrderManagement.API.Repositories
             await conn.OpenAsync();
             Console.WriteLine($">>> DB2 CONNECTION OPENED OK");
 
-            // ✅ TRIM fixes trailing spaces in CHAR fixed-width columns
+            // TRIM fixes trailing spaces in CHAR fixed-width columns
             string headerQuery = $@"
                 SELECT
                     CUST_CO_CD, CUST_BR, CUST_NBR, CUST_SFX, CUST_PO_NBR, SDQ_SEQ_NBR,
@@ -86,7 +86,7 @@ namespace OrderManagement.API.Repositories
                         CustCoCd = reader["CUST_CO_CD"]?.ToString()?.Trim(),
                         CustBr = reader["CUST_BR"]?.ToString()?.Trim(),
                         CustNbr = reader["CUST_NBR"]?.ToString()?.Trim(),
-                        CustSfx = reader["CUST_SFX"]?.ToString()?.Trim(), // fixed bug
+                        CustSfx = reader["CUST_SFX"]?.ToString()?.Trim(),
                         CustPoNbr = reader["CUST_PO_NBR"]?.ToString()?.Trim(),
                         SdqSeqNbr = reader["SDQ_SEQ_NBR"]?.ToString()?.Trim(),
                         CustPoDt = reader["CUST_PO_DT"]?.ToString()?.Trim(),
@@ -273,9 +273,9 @@ namespace OrderManagement.API.Repositories
             Console.WriteLine($">>> RESULT: {(response == null ? "NULL - no data found" : "SUCCESS - data returned")}");
 
             if (response == null)
-                return null; // no header = no point querying line items or status
+                return null; // no header = no point querying line items, status changes
 
-            // ---- Line item query (new) ----
+            // ---- Line item query ----
             string lineQuery = $@"
                 SELECT
                     CUST_CO_CD,
@@ -466,10 +466,110 @@ namespace OrderManagement.API.Repositories
             }
 
             Console.WriteLine($">>> LINE ITEMS FOUND: {response.LineItems.Count}");
+
+            // ---- Order status changes query (NEW) ----
+            // Keys reused from the header response we already mapped above (NOT from the incoming request):
+            //   response.CustCoCd       -> CO_CD
+            //   response.ImiAsgdBrNbr   -> ORDR_BR_NBR  (this table also has a separate CUST_BR_NBR, so ORDR_BR_NBR
+            //                                             is the IMI-assigned branch, matching ImiAsgdBrNbr)
+            //   response.ImiAsgdOrdrNbr -> ORDR_NBR      (this table also has a separate CUST_NBR, confirming
+            //                                             ORDR_NBR is the IMI-assigned order number)
+            string statusQuery = $@"
+                SELECT
+                    CO_CD,
+                    ORDR_BR_NBR,
+                    ORDR_NBR,
+                    DIST_NBR,
+                    SHIP_NBR,
+                    ORDR_DT,
+                    STUS_CHG_TYP_CD,
+                    STUS_CHG_TS,
+                    ORDR_LINE_NBR,
+                    CUST_BR_NBR,
+                    CUST_NBR,
+                    WEB_PROCS_FLG,
+                    TOMCAT_PROCS_FLG,
+                    ORDR_CHG_STUS_CD,
+                    CONFIG_STUS_CD,
+                    AGGREGATE_ID,
+                    PRMS_CHG_DT,
+                    FAMILY_CD,
+                    LST_CHG_PROG_NAM,
+                    LST_CHG_OPER_ID,
+                    UPDT_RSN_TXT,
+                    EVNT_RSN_CD,
+                    FLR_DNL_QTY
+                FROM {zone}.OR_ORDER_STUS_CHGS
+                WHERE CO_CD = ? AND ORDR_BR_NBR = ? AND ORDR_NBR = ?
+                ORDER BY STUS_CHG_TS";
+            // NOTE: no TRIM() around the columns here. TRIM(col) = ? prevents DB2 from
+            // using any index on CO_CD/ORDR_BR_NBR/ORDR_NBR, forcing a full table scan
+            // on what looks like a large status-history table. That scan running long
+            // enough is almost certainly what tripped the SQL30081N/08001 "comms error" -
+            // it's a timeout, not an actual dropped connection. CHAR-column comparisons in
+            // DB2 are space-padded automatically, so plain equality against a trimmed C#
+            // string still matches correctly without needing TRIM() in the SQL.
+
+            try
+            {
+                // Use a dedicated connection for this query. If the shared connection
+                // was dropped by a firewall/idle timeout after the earlier queries,
+                // reusing it here would just throw the same comms error again.
+                using OdbcConnection statusConn = new OdbcConnection(connectionString);
+                await statusConn.OpenAsync();
+
+                using OdbcCommand statusCmd = new OdbcCommand(statusQuery, statusConn);
+                // Bound as fixed-width Char (matching the DB2 CHAR column type) rather than
+                // VarChar, to avoid an implicit cast that can also block index usage.
+                // Adjust the lengths below to match the actual column widths.
+                statusCmd.Parameters.Add("?", OdbcType.Char, 2).Value = response.CustCoCd?.Trim();
+                statusCmd.Parameters.Add("?", OdbcType.Char, 4).Value = response.ImiAsgdBrNbr?.Trim();
+                statusCmd.Parameters.Add("?", OdbcType.Char, 10).Value = response.ImiAsgdOrdrNbr?.Trim();
+                Console.WriteLine($">>> EXECUTING STATUS CHANGE QUERY...");
+                using OdbcDataReader statusReader = (OdbcDataReader)await statusCmd.ExecuteReaderAsync();
+                Console.WriteLine($">>> STATUS READER HAS ROWS: {statusReader.HasRows}");
+                while (await statusReader.ReadAsync())
+                {
+                    response.StatusChanges.Add(new OrderStatusChange
+                    {
+                        CoCd = statusReader["CO_CD"]?.ToString()?.Trim(),
+                        OrdrBrNbr = statusReader["ORDR_BR_NBR"]?.ToString()?.Trim(),
+                        OrdrNbr = statusReader["ORDR_NBR"]?.ToString()?.Trim(),
+                        DistNbr = statusReader["DIST_NBR"]?.ToString()?.Trim(),
+                        ShipNbr = statusReader["SHIP_NBR"]?.ToString()?.Trim(),
+                        OrdrDt = statusReader["ORDR_DT"]?.ToString()?.Trim(),
+                        StusChgTypCd = statusReader["STUS_CHG_TYP_CD"]?.ToString()?.Trim(),
+                        StusChgTs = statusReader["STUS_CHG_TS"]?.ToString()?.Trim(),
+                        OrdrLineNbr = statusReader["ORDR_LINE_NBR"]?.ToString()?.Trim(),
+                        CustBrNbr = statusReader["CUST_BR_NBR"]?.ToString()?.Trim(),
+                        CustNbr = statusReader["CUST_NBR"]?.ToString()?.Trim(),
+                        WebProcsFlg = statusReader["WEB_PROCS_FLG"]?.ToString()?.Trim(),
+                        TomcatProcsFlg = statusReader["TOMCAT_PROCS_FLG"]?.ToString()?.Trim(),
+                        OrdrChgStusCd = statusReader["ORDR_CHG_STUS_CD"]?.ToString()?.Trim(),
+                        ConfigStusCd = statusReader["CONFIG_STUS_CD"]?.ToString()?.Trim(),
+                        AggregateId = statusReader["AGGREGATE_ID"]?.ToString()?.Trim(),
+                        PrmsChgDt = statusReader["PRMS_CHG_DT"]?.ToString()?.Trim(),
+                        FamilyCd = statusReader["FAMILY_CD"]?.ToString()?.Trim(),
+                        LstChgProgNam = statusReader["LST_CHG_PROG_NAM"]?.ToString()?.Trim(),
+                        LstChgOperId = statusReader["LST_CHG_OPER_ID"]?.ToString()?.Trim(),
+                        UpdtRsnTxt = statusReader["UPDT_RSN_TXT"]?.ToString()?.Trim(),
+                        EvntRsnCd = statusReader["EVNT_RSN_CD"]?.ToString()?.Trim(),
+                        FlrDnlQty = ToDecimalSafe(statusReader["FLR_DNL_QTY"]),
+                    });
+                }
+            }
+            catch (OdbcException ex)
+            {
+                // Don't let a status-history failure (comms drop, missing grant, etc.)
+                // take down the whole GetOrder response — header + lines are still valid.
+                Console.WriteLine($">>> STATUS CHANGE QUERY FAILED: {ex.Message}");
+            }
+
+            Console.WriteLine($">>> STATUS CHANGES FOUND: {response.StatusChanges.Count}");
             return response;
         }
 
-        // ✅ Helper: safely converts DB2 numeric columns to decimal, defaulting to 0 if null/DBNull
+        // Helper: safely converts DB2 numeric columns to decimal, defaulting to 0 if null/DBNull
         private static decimal ToDecimalSafe(object value)
         {
             if (value == null || value == DBNull.Value) return 0;
