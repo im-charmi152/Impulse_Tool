@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { Download, ChevronLeft, ChevronRight, Layers } from "lucide-react";
 import SectionCard from "../common/SectionCard";
 import { recordEvent } from "../../utils/auditLog";
+import LineItemDrawer from "./lineitem/LineItemDrawer";
 
 const PAGE_SIZE_OPTIONS = [10, 25];
 
@@ -92,9 +93,19 @@ const LINE_ITEM_COLUMNS = [
 ];
 
 function LineItemDetails({ items }) {
-  
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const [page, setPage] = useState(1);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const openDrawer = useCallback((item) => {
+    setSelectedItem(item);
+    setDrawerOpen(true);
+  }, []);
+
+  const closeDrawer = useCallback(() => {
+    setDrawerOpen(false);
+  }, []);
 
   const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
   const pageItems = useMemo(() => {
@@ -106,6 +117,7 @@ function LineItemDetails({ items }) {
   const rangeEnd = Math.min(page * pageSize, items.length);
 
   return (
+    <>
     <SectionCard
       icon={Layers}
       title="Line-Item Details"
@@ -134,10 +146,20 @@ function LineItemDetails({ items }) {
             </tr>
           </thead>
           <tbody>
-            {pageItems.map((item, index) => (
+            {pageItems.map((item, index) => {
+              const isSelected =
+                selectedItem != null &&
+                selectedItem.imiLineNbr === item.imiLineNbr &&
+                selectedItem.custPoNbr === item.custPoNbr;
+              return (
               <tr
                 key={`${item.imiLineNbr ?? "line"}-${index}`}
-                className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors"
+                onClick={() => openDrawer(item)}
+                className={`border-b border-gray-50 transition-colors cursor-pointer ${
+                  isSelected
+                    ? "bg-blue-50 border-l-2 border-l-blue-500"
+                    : "hover:bg-gray-50/50"
+                }`}
               >
                 {LINE_ITEM_COLUMNS.map((column) => (
                   <td
@@ -148,7 +170,8 @@ function LineItemDetails({ items }) {
                   </td>
                 ))}
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -191,6 +214,13 @@ function LineItemDetails({ items }) {
         </div>
       </div>
     </SectionCard>
+
+    <LineItemDrawer
+      open={drawerOpen}
+      onClose={closeDrawer}
+      item={selectedItem}
+    />
+    </>
   );
 }
 
