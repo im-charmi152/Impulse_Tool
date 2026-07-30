@@ -190,7 +190,7 @@ namespace ImpulseSupportTool_Repo
 
         // Nested list: line items (from EO_LINE_INFO)
         public List<OrderLineItem> LineItems { get; set; } = new();
-        public List<OrderStatusChange> StatusChanges { get; set; } = new();
+        public List<OrderStatusChange>? StatusChanges { get; set; } = new();
     }
     public class OrderLineItem
         {
