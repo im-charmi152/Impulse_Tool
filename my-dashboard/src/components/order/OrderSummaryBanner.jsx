@@ -4,7 +4,7 @@ import { formatDateTime } from "../../utils/format";
 
 function OrderSummaryBanner({ order, onRefresh }) {
   const fields = [
-    { label: "Cust PO Number", value: order.poNumber },
+    { label: "Cust PO Number", value: order.custPoNbr },
     { label: "Order Number", value: order.imiAsgdOrdrNbr },
     {
       label: "Cust PO Date",
