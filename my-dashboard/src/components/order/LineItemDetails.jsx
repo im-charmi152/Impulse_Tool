@@ -1,8 +1,8 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState } from "react";
 import { Download, ChevronLeft, ChevronRight, Layers } from "lucide-react";
 import SectionCard from "../common/SectionCard";
 import { recordEvent } from "../../utils/auditLog";
-import LineItemDrawer from "./lineitem/LineItemDrawer";
+import { openLineItemDetailsTab } from "../../utils/detailsNavigation";
 
 const PAGE_SIZE_OPTIONS = [10, 25];
 
@@ -95,17 +95,6 @@ const LINE_ITEM_COLUMNS = [
 function LineItemDetails({ items }) {
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const [page, setPage] = useState(1);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const openDrawer = useCallback((item) => {
-    setSelectedItem(item);
-    setDrawerOpen(true);
-  }, []);
-
-  const closeDrawer = useCallback(() => {
-    setDrawerOpen(false);
-  }, []);
 
   const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
   const pageItems = useMemo(() => {
@@ -147,19 +136,11 @@ function LineItemDetails({ items }) {
           </thead>
           <tbody>
             {pageItems.map((item, index) => {
-              const isSelected =
-                selectedItem != null &&
-                selectedItem.imiLineNbr === item.imiLineNbr &&
-                selectedItem.custPoNbr === item.custPoNbr;
               return (
               <tr
                 key={`${item.imiLineNbr ?? "line"}-${index}`}
-                onClick={() => openDrawer(item)}
-                className={`border-b border-gray-50 transition-colors cursor-pointer ${
-                  isSelected
-                    ? "bg-blue-50 border-l-2 border-l-blue-500"
-                    : "hover:bg-gray-50/50"
-                }`}
+                onClick={() => openLineItemDetailsTab(item)}
+                className="border-b border-gray-50 transition-colors cursor-pointer hover:bg-gray-50/50"
               >
                 {LINE_ITEM_COLUMNS.map((column) => (
                   <td
@@ -214,12 +195,6 @@ function LineItemDetails({ items }) {
         </div>
       </div>
     </SectionCard>
-
-    <LineItemDrawer
-      open={drawerOpen}
-      onClose={closeDrawer}
-      item={selectedItem}
-    />
     </>
   );
 }
