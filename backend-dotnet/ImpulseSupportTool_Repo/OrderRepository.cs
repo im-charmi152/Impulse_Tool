@@ -65,8 +65,7 @@ namespace OrderManagement.API.Repositories
                     SHIP_TO_ATTN_FLG, CUST_DEL_STUS_FLG, ORDR_CIG_ID, ORDR_CUP_ID,
                     LN_FULFILL_SW, DPAS_TYPE_CD, DPAS_PGM_ID, VEND_AUTH_NBR,
                     FUT_ORDR_PROM_DT, PRC_CONCESSION_TXT, PREV_CONT_NBR, CONT_TYPE_CD,
-                    TERM_ID, XEDI_RLSD_IND, QUOTE_NBR, XEDI_ACK_FLG, VMF_HDR_HLD_IND,
-                    HYBRD_ANNTY_ORDR_IND, HYBRD_ANNTY_CNFMTN_ID
+                    TERM_ID, XEDI_RLSD_IND, QUOTE_NBR, XEDI_ACK_FLG, VMF_HDR_HLD_IND
                 FROM {zone}.EO_ORDR_HDR_INFO
                 WHERE TRIM(CUST_PO_NBR) = ? AND TRIM(CUST_CO_CD) = ?
                 FETCH FIRST 10 ROWS ONLY";
@@ -264,8 +263,6 @@ namespace OrderManagement.API.Repositories
                         QuoteNbr = reader["QUOTE_NBR"]?.ToString()?.Trim(),
                         XediAckFlg = reader["XEDI_ACK_FLG"]?.ToString()?.Trim(),
                         VmfHdrHldInd = reader["VMF_HDR_HLD_IND"]?.ToString()?.Trim(),
-                        HybrdAnntyOrdrInd = reader["HYBRD_ANNTY_ORDR_IND"]?.ToString()?.Trim(),
-                        HybrdAnntyCnfmtnId = reader["HYBRD_ANNTY_CNFMTN_ID"]?.ToString()?.Trim(),
                     };
                 }
             } // reader/cmd disposed here so we can reuse conn safely
@@ -360,8 +357,7 @@ namespace OrderManagement.API.Repositories
                     TERM_END_DT,
                     QUOTE_LINE_IND,
                     VMF_LNE_HLD_IND,
-                    IMI_HOLD_CD,
-                    LN_DIR_SHP_IND
+                    IMI_HOLD_CD
                 FROM {zone}.EO_LINE_INFO
                 WHERE TRIM(CUST_PO_NBR) = ? AND TRIM(CUST_CO_CD) = ?
                 ORDER BY LINE_SEQ_NBR";
@@ -460,7 +456,6 @@ namespace OrderManagement.API.Repositories
                         QuoteLineInd = lineReader["QUOTE_LINE_IND"]?.ToString()?.Trim(),
                         VmfLneHldInd = lineReader["VMF_LNE_HLD_IND"]?.ToString()?.Trim(),
                         ImiHoldCd = lineReader["IMI_HOLD_CD"]?.ToString()?.Trim(),
-                        LnDirShpInd = lineReader["LN_DIR_SHP_IND"]?.ToString()?.Trim(),
                     });
                 }
             }
@@ -602,7 +597,7 @@ namespace OrderManagement.API.Repositories
                     BATCH_SPLIT_CNT,
                     CYC_STRT_TM
                 FROM {zone}.IE_PARTNER_SETUP
-                WHERE CO_CD = ? AND PARTNER_ID = ?";
+                WHERE CO_CD = 'US' AND PARTNER_ID = ?";
             // NOTE: adjust the Char lengths below (2 / 15) to match the real DDL widths for
             // CO_CD and PARTNER_ID on this table.
 
@@ -613,14 +608,14 @@ namespace OrderManagement.API.Repositories
                 await partnerConn.OpenAsync();
 
                 using OdbcCommand partnerCmd = new OdbcCommand(partnerQuery, partnerConn);
-                partnerCmd.Parameters.Add("?", OdbcType.Char, 2).Value = response.CustCoCd?.Trim();
+                //partnerCmd.Parameters.Add("?", OdbcType.Char, 2).Value = response.CustCoCd?.Trim();
                 partnerCmd.Parameters.Add("?", OdbcType.Char, 15).Value = response.PartnerId?.Trim();
                 Console.WriteLine($">>> EXECUTING PARTNER SETUP QUERY...");
                 using OdbcDataReader partnerReader = (OdbcDataReader)await partnerCmd.ExecuteReaderAsync();
                 Console.WriteLine($">>> PARTNER READER HAS ROWS: {partnerReader.HasRows}");
                 if (await partnerReader.ReadAsync())
                 {
-                    response.PartnerSetup.Add( new OrderPartnerSetup
+                    response.PartnerSetup.Add(new OrderPartnerSetup
                     {
                         CoCd = partnerReader["CO_CD"]?.ToString()?.Trim(),
                         PartnerId = partnerReader["PARTNER_ID"]?.ToString()?.Trim(),
