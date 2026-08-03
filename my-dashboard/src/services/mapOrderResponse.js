@@ -8,6 +8,35 @@
 export function mapOrderResponse(raw) {
   if (!raw) return null;
 
+  const toPartnerSetupRecord = (entry) => ({
+    coCd: entry.coCd ?? entry.CO_CD ?? "—",
+    partnerId: entry.partnerId ?? entry.PARTNER_ID ?? "—",
+    partnerTypeCd: entry.partnerTypeCd ?? entry.PARTNER_TYPE_CD ?? "—",
+    srceSysId: entry.srceSysId ?? entry.SRCE_SYS_ID ?? "—",
+    srceSysKeyId: entry.srceSysKeyId ?? entry.SRCE_SYS_KEY_ID ?? "—",
+    formatId: entry.formatId ?? entry.FORMAT_ID ?? "—",
+    docId: entry.docId ?? entry.DOC_ID ?? "—",
+    commuId: entry.commuId ?? entry.COMMU_ID ?? "—",
+    internetAddrTxt: entry.internetAddrTxt ?? entry.INTERNET_ADDR_TXT ?? "—",
+    dirFlgCd: entry.dirFlgCd ?? entry.DIR_FLG_CD ?? "—",
+    sendThruId: entry.sendThruId ?? entry.SEND_THRU_ID ?? "—",
+    dataStoreMechId: entry.dataStoreMechId ?? entry.DATA_STORE_MECH_ID ?? "—",
+    prcsOptnFlg: entry.prcsOptnFlg ?? entry.PRCS_OPTN_FLG ?? "—",
+    batchSplitCnt: entry.batchSplitCnt ?? entry.BATCH_SPLIT_CNT ?? "—",
+    ovrdApplBatchId: entry.ovrdApplBatchId ?? entry.OVRD_APPL_BATCH_ID ?? "—",
+    freqId: entry.freqId ?? entry.FREQ_ID ?? "—",
+    cycleIntvl: entry.cycleIntvl ?? entry.CYCLE_INTVL ?? "—",
+    cycStrtTm: entry.cycStrtTm ?? entry.CYC_STRT_TM ?? "—",
+    cycEndTm: entry.cycEndTm ?? entry.CYC_END_TM ?? "—",
+    cycleLstRunTs: entry.cycleLstRunTs ?? entry.CYCLE_LST_RUN_TS ?? "—",
+    actvDt: entry.actvDt ?? entry.ACTV_DT ?? "—",
+    deactvDt: entry.deactvDt ?? entry.DEACTV_DT ?? "—",
+    holdCd: entry.holdCd ?? entry.HOLD_CD ?? "—",
+    lstChgTs: entry.lstChgTs ?? entry.LST_CHG_TS ?? "—",
+    lstChgNam: entry.lstChgNam ?? entry.LST_CHG_NAM ?? "—",
+    setupNotesTxt: entry.setupNotesTxt ?? entry.SETUP_NOTES_TXT ?? "—",
+  });
+
   const order = {
     custCoCd: raw.custCoCd ?? "—",
     custBr: raw.custBr ?? "—",
@@ -321,6 +350,17 @@ export function mapOrderResponse(raw) {
     imiHoldCd: li.imiHoldCd ?? "—",
   }));
 
+  const rawPartnerSetup =
+    raw.partnerSetup ?? raw.partnerSetups ?? raw.partnerSetupDetails ?? raw.setupConfig ?? [];
+  const setupConfig = Array.isArray(rawPartnerSetup)
+    ? rawPartnerSetup.filter((entry) => entry && typeof entry === "object" && !Array.isArray(entry)).map(toPartnerSetupRecord)
+    : rawPartnerSetup && typeof rawPartnerSetup === "object"
+      ? [toPartnerSetupRecord(rawPartnerSetup)]
+      : [];
+
+  const availableSections = ["orderHeader", "lineItems"];
+  if (setupConfig.length > 0) availableSections.push("setupConfig");
+
   // Only these two sections have a real backend data source right now.
   // Flow Trace, Setup Validation, Datadog, and MQ still show "Not
   // available yet" placeholders in the UI — add their keys here once
@@ -330,14 +370,14 @@ export function mapOrderResponse(raw) {
     lineItems,
     processingSteps: [],
     flowTrace: {},
-    setupConfig: [],
+    setupConfig,
     setupValidation: [],
     logs: [],
     datadogAlerts: [],
     mqQueues: [],
     _raw: raw,
     _meta: {
-      availableSections: ["orderHeader", "lineItems"],
+      availableSections,
     },
   };
 }

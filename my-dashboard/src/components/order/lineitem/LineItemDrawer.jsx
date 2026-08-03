@@ -188,7 +188,16 @@ function AccordionGroup({ group, item, searchQuery }) {
 }
 
 // ─── Main Drawer ──────────────────────────────────────────────────────────────
-export default function LineItemDrawer({ open, onClose, item }) {
+export default function LineItemDrawer({
+  open,
+  onClose,
+  item,
+  fieldGroups = LINE_ITEM_FIELD_GROUPS,
+  title = "Line Item Details",
+  subtitle,
+  searchPlaceholder = "Search line item fields…",
+  emptyMessage = "No line item selected.",
+}) {
   const [search, setSearch] = useState("");
   const searchRef = useRef(null);
 
@@ -217,15 +226,16 @@ export default function LineItemDrawer({ open, onClose, item }) {
   const matchCount = useMemo(() => {
     if (!search || !item) return 0;
     const q = search.toLowerCase();
-    return LINE_ITEM_FIELD_GROUPS.flatMap((g) => g.fields).filter(
+    return fieldGroups.flatMap((g) => g.fields).filter(
       (f) => f.label.toLowerCase().includes(q) || String(item?.[f.key] ?? "").toLowerCase().includes(q)
     ).length;
-  }, [search, item]);
+  }, [search, item, fieldGroups]);
 
   if (!open && !item) return null;
 
-  const lineLabel = item ? `Line ${item.imiLineNbr ?? "—"}` : "Line Item";
+  const defaultLineLabel = item ? `Line ${item.imiLineNbr ?? "—"}` : "Line Item";
   const partLabel = item?.imiPartNbr && item.imiPartNbr !== "—" ? ` · ${item.imiPartNbr}` : "";
+  const panelSubtitle = subtitle ?? `${defaultLineLabel}${partLabel}`;
 
   return (
     <>
@@ -241,7 +251,7 @@ export default function LineItemDrawer({ open, onClose, item }) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Line Item Details"
+        aria-label={title}
         className={`fixed top-0 right-0 h-full z-50 w-full max-w-[500px] bg-white shadow-2xl
           flex flex-col transform transition-transform duration-250 ease-out
           ${open ? "translate-x-0" : "translate-x-full"}`}
@@ -251,8 +261,8 @@ export default function LineItemDrawer({ open, onClose, item }) {
           {/* Title bar */}
           <div className="flex items-center justify-between px-5 py-3.5 bg-[#003087]">
             <div>
-              <h2 className="text-sm font-semibold text-white">Line Item Details</h2>
-              <p className="text-[10px] text-blue-200 mt-0.5">{lineLabel}{partLabel}</p>
+              <h2 className="text-sm font-semibold text-white">{title}</h2>
+              <p className="text-[10px] text-blue-200 mt-0.5">{panelSubtitle}</p>
             </div>
             <button
               onClick={onClose}
@@ -272,7 +282,7 @@ export default function LineItemDrawer({ open, onClose, item }) {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search line item fields…"
+                placeholder={searchPlaceholder}
                 className="w-full pl-8 pr-9 py-2 text-xs border border-gray-200 rounded-lg bg-white
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                   placeholder-gray-300"
@@ -305,7 +315,7 @@ export default function LineItemDrawer({ open, onClose, item }) {
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto px-4 py-3">
           {item ? (
-            LINE_ITEM_FIELD_GROUPS.map((group) => (
+            fieldGroups.map((group) => (
               <AccordionGroup
                 key={group.id}
                 group={group}
@@ -314,7 +324,7 @@ export default function LineItemDrawer({ open, onClose, item }) {
               />
             ))
           ) : (
-            <p className="text-xs text-gray-400 text-center py-12">No line item selected.</p>
+            <p className="text-xs text-gray-400 text-center py-12">{emptyMessage}</p>
           )}
         </div>
       </div>
