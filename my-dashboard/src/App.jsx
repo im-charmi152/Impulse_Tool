@@ -96,7 +96,7 @@ export default function Dashboard() {
                     {isAvailable("setupConfig") ? (
                       <SetupConfigDetails config={data.setupConfig} />
                     ) : (
-                      <NotAvailablePanel icon={Settings} title="Setup / Configuration Details" />
+                      <NotAvailablePanel icon={Settings} title="Partner Setup Details" />
                     )}
                     {isAvailable("setupValidation") ? (
                       <SetupValidation validations={data.setupValidation} />
