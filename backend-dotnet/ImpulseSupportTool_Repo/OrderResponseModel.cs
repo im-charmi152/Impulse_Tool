@@ -192,6 +192,7 @@ namespace ImpulseSupportTool_Repo
         public List<OrderLineItem> LineItems { get; set; } = new();
         public List<OrderStatusChange>? StatusChanges { get; set; } = new();
         public List<OrderPartnerSetup> PartnerSetup { get; set; } = new();
+        public List<OrderInPoSw> InPoSw { get; set; } = new();
     }
     public class OrderLineItem
         {
@@ -333,6 +334,73 @@ namespace ImpulseSupportTool_Repo
         public string CycleLstRunTs { get; set; }
         public string BatchSplitCnt { get; set; }
         public string CycStrtTm { get; set; }
+    }
+    public class OrderInPoSw
+    {
+        public string CoCd { get; set; }
+        public string PartnerId { get; set; }
+        public string SkipFrTm { get; set; }
+        public string SkipToTm { get; set; }
+        public string CustPrty { get; set; }
+        public string AckPoFlg { get; set; }
+        public string AckPromoFlg { get; set; }
+        public string BaserateFlg { get; set; }
+        public string AggCdCpblFlg { get; set; }
+        public string PreImHoldFlg { get; set; }
+        public string MultShpToFlg { get; set; }
+        public string SystemPartsFlg { get; set; }
+        public string VoidTaxableFlg { get; set; }
+        public string CasepackMsgFlg { get; set; }
+        public string ChkCustPrcFlg { get; set; }
+        public string DistDepthFlg { get; set; }
+        public string AirBrSeqFlg { get; set; }
+        public string BrSeqOrideFlg { get; set; }
+        public string MultBrSeqFlg { get; set; }
+        public string ExportBrSeqFlg { get; set; }
+        public string HoldOrderFlg { get; set; }
+        public string DfltCustNbr { get; set; }
+        public string PromoCustNbr { get; set; }
+        public string PriceCustNbr { get; set; }
+        public string InstRebatMsgFlg { get; set; }
+        public string VlaFlg { get; set; }
+        public string MultiDistFlg { get; set; }
+        public string SaveFrtFlg { get; set; }
+        public string SaveDistFlg { get; set; }
+        public string BestWhseFlg { get; set; }
+        public string SingleWhseFlg { get; set; }
+        public string PrntOrdrFlg { get; set; }
+        public string MultShpSortSeq { get; set; }
+        public string MaxFutDay { get; set; }
+        public string LstChgTs { get; set; }
+        public string LstChgNam { get; set; }
+        public string ClsXFltrTypCd { get; set; }
+        public string ClsSFltrTypCd { get; set; }
+        public string UpdCustSkuFlg { get; set; }
+        public string SaveCustPrcFlg { get; set; }
+        public string BoBrXferFlg { get; set; }
+        public string RejOrdrHdrFlg { get; set; }
+        public string RejCnsCmpHdrFlg { get; set; }
+        public string AckRptFlg { get; set; }
+        public string SpecPrcFlg { get; set; }
+        public string EuCaptureFlg { get; set; }
+        public string CustomCarrFlg { get; set; }
+        public string CascadeSkuFlg { get; set; }
+        public string AutoPoChgFlg { get; set; }
+        public string ClsXHldFlg { get; set; }
+        public string StStoreOvrRdFlg { get; set; }
+        public string RsrvCustNbr { get; set; }
+        public string RsrvAllowed { get; set; }
+        public string RsrvExpirDays { get; set; }
+        public string ConfigVisibleFlg { get; set; }
+        public string EtaCalcFlg { get; set; }
+        public string EtaDays { get; set; }
+        public string AddrValidFlg { get; set; }
+        public string AutoSplitFlg { get; set; }
+        public string OrdrCancDaysFlg { get; set; }
+        public string OrdrCancDaysNbr { get; set; }
+        public string FutOrdrSw { get; set; }
+        public string AckDelaySw { get; set; }
+        public string AckDelayHrs { get; set; }
     }
 
 }
