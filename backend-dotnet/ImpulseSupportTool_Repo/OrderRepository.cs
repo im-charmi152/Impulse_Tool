@@ -571,48 +571,71 @@ namespace OrderManagement.API.Repositories
             // can turn a quick indexed lookup into a full table scan, which is what caused the
             // earlier SQL30081N/08001 comms-timeout issue on OR_ORDER_STUS_CHGS.
             string partnerQuery = $@"
-                SELECT
-                    CO_CD,
-                    PARTNER_ID,
-                    PARTNER_TYPE_CD,
-                    SRCE_SYS_ID,
-                    SRCE_SYS_KEY_ID,
-                    FORMAT_ID,
-                    DIR_FLG_CD,
-                    DOC_ID,
-                    FREQ_ID,
-                    DATA_STORE_MECH_ID,
-                    COMMU_ID,
-                    INTERNET_ADDR_TXT,
-                    ACTV_DT,
-                    DEACTV_DT,
-                    HOLD_CD,
-                    SETUP_NOTES_TXT,
-                    SEND_THRU_ID,
-                    LST_CHG_TS,
-                    LST_CHG_NAM,
-                    PRCS_OPTN_FLG,
-                    CYCLE_INTVL,
-                    CYCLE_LST_RUN_TS,
-                    BATCH_SPLIT_CNT,
-                    CYC_STRT_TM
-                FROM {zone}.IE_PARTNER_SETUP
-                WHERE CO_CD = 'US' AND PARTNER_ID = ?";
-            // NOTE: adjust the Char lengths below (2 / 15) to match the real DDL widths for
-            // CO_CD and PARTNER_ID on this table.
+        SELECT
+            CO_CD,
+            PARTNER_ID,
+            PARTNER_TYPE_CD,
+            SRCE_SYS_ID,
+            SRCE_SYS_KEY_ID,
+            FORMAT_ID,
+            DIR_FLG_CD,
+            DOC_ID,
+            FREQ_ID,
+            DATA_STORE_MECH_ID,
+            COMMU_ID,
+            INTERNET_ADDR_TXT,
+            ACTV_DT,
+            DEACTV_DT,
+            HOLD_CD,
+            SETUP_NOTES_TXT,
+            SEND_THRU_ID,
+            LST_CHG_TS,
+            LST_CHG_NAM,
+            PRCS_OPTN_FLG,
+            CYCLE_INTVL,
+            CYCLE_LST_RUN_TS,
+            BATCH_SPLIT_CNT,
+            CYC_STRT_TM
+        FROM {zone}.IE_PARTNER_SETUP
+        WHERE CO_CD = ? AND PARTNER_ID = ?";
+
+            // Convert incoming country/company code for Partner Setup lookup
+            string partnerCoCd = response.CustCoCd?.Trim() switch
+            {
+                "MD" => "US",
+                "FT" => "CA",
+                _ => response.CustCoCd?.Trim()
+            };
+
+            Console.WriteLine(
+                $">>> PARTNER SETUP CO_CD: Incoming={response.CustCoCd}, QueryValue={partnerCoCd}"
+            );
 
             try
             {
-                // Dedicated connection, same reasoning as the status query above.
                 using OdbcConnection partnerConn = new OdbcConnection(connectionString);
                 await partnerConn.OpenAsync();
 
                 using OdbcCommand partnerCmd = new OdbcCommand(partnerQuery, partnerConn);
-                //partnerCmd.Parameters.Add("?", OdbcType.Char, 2).Value = response.CustCoCd?.Trim();
-                partnerCmd.Parameters.Add("?", OdbcType.Char, 15).Value = response.PartnerId?.Trim();
+
+                // First ? = CO_CD
+                partnerCmd.Parameters.Add("?", OdbcType.Char, 2).Value = partnerCoCd;
+
+                // Second ? = PARTNER_ID
+                partnerCmd.Parameters.Add("?", OdbcType.Char, 15).Value =
+                    response.PartnerId?.Trim();
+
                 Console.WriteLine($">>> EXECUTING PARTNER SETUP QUERY...");
-                using OdbcDataReader partnerReader = (OdbcDataReader)await partnerCmd.ExecuteReaderAsync();
-                Console.WriteLine($">>> PARTNER READER HAS ROWS: {partnerReader.HasRows}");
+                Console.WriteLine($">>> PARTNER CO_CD PARAMETER: {partnerCoCd}");
+                Console.WriteLine($">>> PARTNER ID PARAMETER: {response.PartnerId?.Trim()}");
+
+                using OdbcDataReader partnerReader =
+                    (OdbcDataReader)await partnerCmd.ExecuteReaderAsync();
+
+                Console.WriteLine(
+                    $">>> PARTNER READER HAS ROWS: {partnerReader.HasRows}"
+                );
+
                 if (await partnerReader.ReadAsync())
                 {
                     response.PartnerSetup.Add(new OrderPartnerSetup
@@ -646,11 +669,15 @@ namespace OrderManagement.API.Repositories
             }
             catch (OdbcException ex)
             {
-                // Don't let a partner-setup lookup failure take down the whole GetOrder response.
-                Console.WriteLine($">>> PARTNER SETUP QUERY FAILED: {ex.Message}");
+                Console.WriteLine(
+                    $">>> PARTNER SETUP QUERY FAILED: {ex.Message}"
+                );
             }
 
-            Console.WriteLine($">>> PARTNER SETUP FOUND: {(response.PartnerSetup == null ? "NO" : "YES")}");
+            Console.WriteLine(
+                $">>> PARTNER SETUP FOUND: {(response.PartnerSetup == null ? "NO" : "YES")}"
+            );
+
             return response;
         }
 
