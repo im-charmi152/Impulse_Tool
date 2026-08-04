@@ -678,6 +678,186 @@ namespace OrderManagement.API.Repositories
                 $">>> PARTNER SETUP FOUND: {(response.PartnerSetup == null ? "NO" : "YES")}"
             );
 
+            // ---- IE_IN_PO_SW query ----
+            // Uses the same CO_CD and PARTNER_ID obtained from EO_ORDR_HDR_INFO.
+            // For MD -> US and FT -> CA, use the same mapped CO_CD as Partner Setup.
+
+            string inPoSwQuery = $@"
+            SELECT
+                CO_CD,
+                PARTNER_ID,
+                SKIP_FR_TM,
+                SKIP_TO_TM,
+                CUST_PRTY,
+                ACK_PO_FLG,
+                ACK_PROMO_FLG,
+                BASERATE_FLG,
+                AGG_CD_CPBL_FLG,
+                PRE_IM_HOLD_FLG,
+                MULT_SHP_TO_FLG,
+                SYSTEM_PARTS_FLG,
+                VOID_TAXABLE_FLG,
+                CASEPACK_MSG_FLG,
+                CHK_CUST_PRC_FLG,
+                DIST_DEPTH_FLG,
+                AIR_BR_SEQ_FLG,
+                BR_SEQ_ORIDE_FLG,
+                MULT_BR_SEQ_FLG,
+                EXPORT_BR_SEQ_FLG,
+                HOLD_ORDER_FLG,
+                DFLT_CUST_NBR,
+                PROMO_CUST_NBR,
+                PRICE_CUST_NBR,
+                INST_REBAT_MSG_FLG,
+                VLA_FLG,
+                MULTI_DIST_FLG,
+                SAVE_FRT_FLG,
+                SAVE_DIST_FLG,
+                BEST_WHSE_FLG,
+                SINGLE_WHSE_FLG,
+                PRNT_ORDR_FLG,
+                MULT_SHP_SORT_SEQ,
+                MAX_FUT_DAY,
+                LST_CHG_TS,
+                LST_CHG_NAM,
+                CLS_X_FLTR_TYP_CD,
+                CLS_S_FLTR_TYP_CD,
+                UPD_CUST_SKU_FLG,
+                SAVE_CUST_PRC_FLG,
+                BO_BR_XFER_FLG,
+                REJ_ORDR_HDR_FLG,
+                REJ_CNSCMP_HDR_FLG,
+                ACK_RPT_FLG,
+                SPEC_PRC_FLG,
+                EU_CAPTURE_FLG,
+                CUSTOM_CARR_FLG,
+                CASCADE_SKU_FLG,
+                AUTO_PO_CHG_FLG,
+                CLS_X_HLD_FLG,
+                ST_STORE_OVRRD_FLG,
+                RSRV_CUST_NBR,
+                RSRV_ALLOWED,
+                RSRV_EXPIR_DAYS,
+                CONFIG_VISIBLE_FLG,
+                ETA_CALC_FLG,
+                ETA_DAYS,
+                ADDR_VALID_FLG,
+                AUTO_SPLIT_FLG,
+                ORDR_CANC_DAYS_FLG,
+                ORDR_CANC_DAYS_NBR,
+                FUT_ORDR_SW,
+                ACK_DELAY_SW,
+                ACK_DELAY_HRS
+            FROM {zone}.IE_IN_PO_SW
+            WHERE CO_CD = ? AND PARTNER_ID = ?";
+
+            try
+            {
+                using OdbcConnection inPoSwConn = new OdbcConnection(connectionString);
+                await inPoSwConn.OpenAsync();
+
+                using OdbcCommand inPoSwCmd = new OdbcCommand(inPoSwQuery, inPoSwConn);
+
+                // First ? = CO_CD
+                inPoSwCmd.Parameters.Add("?", OdbcType.Char, 2).Value = partnerCoCd;
+
+                // Second ? = PARTNER_ID
+                inPoSwCmd.Parameters.Add("?", OdbcType.Char, 15).Value =
+                    response.PartnerId?.Trim();
+
+                Console.WriteLine($">>> EXECUTING IE_IN_PO_SW QUERY...");
+                Console.WriteLine($">>> IE_IN_PO_SW CO_CD: {partnerCoCd}");
+                Console.WriteLine($">>> IE_IN_PO_SW PARTNER_ID: {response.PartnerId?.Trim()}");
+
+                using OdbcDataReader inPoSwReader =
+                    (OdbcDataReader)await inPoSwCmd.ExecuteReaderAsync();
+
+                Console.WriteLine(
+                    $">>> IE_IN_PO_SW READER HAS ROWS: {inPoSwReader.HasRows}"
+                );
+
+                if (await inPoSwReader.ReadAsync())
+                {
+                    response.InPoSw.Add(new OrderInPoSw
+                    {
+                        CoCd = inPoSwReader["CO_CD"]?.ToString()?.Trim(),
+                        PartnerId = inPoSwReader["PARTNER_ID"]?.ToString()?.Trim(),
+                        SkipFrTm = inPoSwReader["SKIP_FR_TM"]?.ToString()?.Trim(),
+                        SkipToTm = inPoSwReader["SKIP_TO_TM"]?.ToString()?.Trim(),
+                        CustPrty = inPoSwReader["CUST_PRTY"]?.ToString()?.Trim(),
+                        AckPoFlg = inPoSwReader["ACK_PO_FLG"]?.ToString()?.Trim(),
+                        AckPromoFlg = inPoSwReader["ACK_PROMO_FLG"]?.ToString()?.Trim(),
+                        BaserateFlg = inPoSwReader["BASERATE_FLG"]?.ToString()?.Trim(),
+                        AggCdCpblFlg = inPoSwReader["AGG_CD_CPBL_FLG"]?.ToString()?.Trim(),
+                        PreImHoldFlg = inPoSwReader["PRE_IM_HOLD_FLG"]?.ToString()?.Trim(),
+                        MultShpToFlg = inPoSwReader["MULT_SHP_TO_FLG"]?.ToString()?.Trim(),
+                        SystemPartsFlg = inPoSwReader["SYSTEM_PARTS_FLG"]?.ToString()?.Trim(),
+                        VoidTaxableFlg = inPoSwReader["VOID_TAXABLE_FLG"]?.ToString()?.Trim(),
+                        CasepackMsgFlg = inPoSwReader["CASEPACK_MSG_FLG"]?.ToString()?.Trim(),
+                        ChkCustPrcFlg = inPoSwReader["CHK_CUST_PRC_FLG"]?.ToString()?.Trim(),
+                        DistDepthFlg = inPoSwReader["DIST_DEPTH_FLG"]?.ToString()?.Trim(),
+                        AirBrSeqFlg = inPoSwReader["AIR_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        BrSeqOrideFlg = inPoSwReader["BR_SEQ_ORIDE_FLG"]?.ToString()?.Trim(),
+                        MultBrSeqFlg = inPoSwReader["MULT_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        ExportBrSeqFlg = inPoSwReader["EXPORT_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        HoldOrderFlg = inPoSwReader["HOLD_ORDER_FLG"]?.ToString()?.Trim(),
+                        DfltCustNbr = inPoSwReader["DFLT_CUST_NBR"]?.ToString()?.Trim(),
+                        PromoCustNbr = inPoSwReader["PROMO_CUST_NBR"]?.ToString()?.Trim(),
+                        PriceCustNbr = inPoSwReader["PRICE_CUST_NBR"]?.ToString()?.Trim(),
+                        InstRebatMsgFlg = inPoSwReader["INST_REBAT_MSG_FLG"]?.ToString()?.Trim(),
+                        VlaFlg = inPoSwReader["VLA_FLG"]?.ToString()?.Trim(),
+                        MultiDistFlg = inPoSwReader["MULTI_DIST_FLG"]?.ToString()?.Trim(),
+                        SaveFrtFlg = inPoSwReader["SAVE_FRT_FLG"]?.ToString()?.Trim(),
+                        SaveDistFlg = inPoSwReader["SAVE_DIST_FLG"]?.ToString()?.Trim(),
+                        BestWhseFlg = inPoSwReader["BEST_WHSE_FLG"]?.ToString()?.Trim(),
+                        SingleWhseFlg = inPoSwReader["SINGLE_WHSE_FLG"]?.ToString()?.Trim(),
+                        PrntOrdrFlg = inPoSwReader["PRNT_ORDR_FLG"]?.ToString()?.Trim(),
+                        MultShpSortSeq = inPoSwReader["MULT_SHP_SORT_SEQ"]?.ToString()?.Trim(),
+                        MaxFutDay = inPoSwReader["MAX_FUT_DAY"]?.ToString()?.Trim(),
+                        LstChgTs = inPoSwReader["LST_CHG_TS"]?.ToString()?.Trim(),
+                        LstChgNam = inPoSwReader["LST_CHG_NAM"]?.ToString()?.Trim(),
+                        ClsXFltrTypCd = inPoSwReader["CLS_X_FLTR_TYP_CD"]?.ToString()?.Trim(),
+                        ClsSFltrTypCd = inPoSwReader["CLS_S_FLTR_TYP_CD"]?.ToString()?.Trim(),
+                        UpdCustSkuFlg = inPoSwReader["UPD_CUST_SKU_FLG"]?.ToString()?.Trim(),
+                        SaveCustPrcFlg = inPoSwReader["SAVE_CUST_PRC_FLG"]?.ToString()?.Trim(),
+                        BoBrXferFlg = inPoSwReader["BO_BR_XFER_FLG"]?.ToString()?.Trim(),
+                        RejOrdrHdrFlg = inPoSwReader["REJ_ORDR_HDR_FLG"]?.ToString()?.Trim(),
+                        RejCnsCmpHdrFlg = inPoSwReader["REJ_CNSCMP_HDR_FLG"]?.ToString()?.Trim(),
+                        AckRptFlg = inPoSwReader["ACK_RPT_FLG"]?.ToString()?.Trim(),
+                        SpecPrcFlg = inPoSwReader["SPEC_PRC_FLG"]?.ToString()?.Trim(),
+                        EuCaptureFlg = inPoSwReader["EU_CAPTURE_FLG"]?.ToString()?.Trim(),
+                        CustomCarrFlg = inPoSwReader["CUSTOM_CARR_FLG"]?.ToString()?.Trim(),
+                        CascadeSkuFlg = inPoSwReader["CASCADE_SKU_FLG"]?.ToString()?.Trim(),
+                        AutoPoChgFlg = inPoSwReader["AUTO_PO_CHG_FLG"]?.ToString()?.Trim(),
+                        ClsXHldFlg = inPoSwReader["CLS_X_HLD_FLG"]?.ToString()?.Trim(),
+                        StStoreOvrRdFlg = inPoSwReader["ST_STORE_OVRRD_FLG"]?.ToString()?.Trim(),
+                        RsrvCustNbr = inPoSwReader["RSRV_CUST_NBR"]?.ToString()?.Trim(),
+                        RsrvAllowed = inPoSwReader["RSRV_ALLOWED"]?.ToString()?.Trim(),
+                        RsrvExpirDays = inPoSwReader["RSRV_EXPIR_DAYS"]?.ToString()?.Trim(),
+                        ConfigVisibleFlg = inPoSwReader["CONFIG_VISIBLE_FLG"]?.ToString()?.Trim(),
+                        EtaCalcFlg = inPoSwReader["ETA_CALC_FLG"]?.ToString()?.Trim(),
+                        EtaDays = inPoSwReader["ETA_DAYS"]?.ToString()?.Trim(),
+                        AddrValidFlg = inPoSwReader["ADDR_VALID_FLG"]?.ToString()?.Trim(),
+                        AutoSplitFlg = inPoSwReader["AUTO_SPLIT_FLG"]?.ToString()?.Trim(),
+                        OrdrCancDaysFlg = inPoSwReader["ORDR_CANC_DAYS_FLG"]?.ToString()?.Trim(),
+                        OrdrCancDaysNbr = inPoSwReader["ORDR_CANC_DAYS_NBR"]?.ToString()?.Trim(),
+                        FutOrdrSw = inPoSwReader["FUT_ORDR_SW"]?.ToString()?.Trim(),
+                        AckDelaySw = inPoSwReader["ACK_DELAY_SW"]?.ToString()?.Trim(),
+                        AckDelayHrs = inPoSwReader["ACK_DELAY_HRS"]?.ToString()?.Trim()
+                    });
+                }
+            }
+            catch (OdbcException ex)
+            {
+                Console.WriteLine(
+                    $">>> IE_IN_PO_SW QUERY FAILED: {ex.Message}"
+                );
+            }
+
+            Console.WriteLine(
+                $">>> IE_IN_PO_SW FOUND: {response.InPoSw.Count}"
+            );
+
             return response;
         }
 
