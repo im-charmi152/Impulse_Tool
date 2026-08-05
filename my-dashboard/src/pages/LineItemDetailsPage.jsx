@@ -1,9 +1,7 @@
-import { ArrowLeft, Layers, Hash, Package, BarChart2, DollarSign, Calendar, AlertCircle, Truck, Cpu } from "lucide-react";
-import SectionCard from "../components/common/SectionCard";
-import Badge from "../components/common/Badge";
+import { ArrowLeft, Layers, Hash, Package, BarChart2, DollarSign, Calendar, AlertCircle, Truck, Cpu, Building2, FileText } from "lucide-react";
 import { LINE_ITEM_FIELD_GROUPS } from "../components/order/lineitem/lineItemFieldConfig";
 import { loadDetailsRecord } from "../utils/detailsNavigation";
-import { formatDateTime } from "../utils/format";
+import { AccordionCard, DetailFieldRow, SummaryTile, formatDetailValue } from "../components/details/DetailsLayout";
 
 const ICON_MAP = {
   Hash,
@@ -14,24 +12,21 @@ const ICON_MAP = {
   AlertCircle,
   Truck,
   Cpu,
+  Building2,
+  FileText,
 };
 
 const SUMMARY_FIELDS = [
-  { key: "custCoCd", label: "Customer Company Code" },
-  { key: "custBr", label: "Customer Branch" },
-  { key: "custNbr", label: "Customer Number" },
-  { key: "custPoNbr", label: "Customer PO Number" },
-  { key: "imiLineNbr", label: "IMI Line Number" },
-  { key: "imiPartNbr", label: "IMI Part Number" },
-  { key: "qtyOrdered", label: "Quantity Ordered" },
+  { key: "custCoCd", label: "Customer Company Code", icon: "Building2" },
+  { key: "custBr", label: "Customer Branch", icon: "Building2" },
+  { key: "custNbr", label: "Customer Number", icon: "Hash" },
+  { key: "custPoNbr", label: "Customer PO Number", icon: "FileText" },
+  { key: "imiLineNbr", label: "IMI Line Number", icon: "Hash" },
+  { key: "imiPartNbr", label: "IMI Part Number", icon: "Package" },
+  { key: "qtyOrdered", label: "Quantity Ordered", icon: "BarChart2" },
 ];
 
 const SUMMARY_KEYS = new Set(SUMMARY_FIELDS.map((field) => field.key));
-
-function normalizeValue(value) {
-  if (value == null || value === "") return "—";
-  return value;
-}
 
 function parseFallbackFromParams(searchParams) {
   return {
@@ -45,40 +40,6 @@ function parseFallbackFromParams(searchParams) {
   };
 }
 
-function renderFieldValue(field, rawValue) {
-  const value = normalizeValue(rawValue);
-
-  if (value === "—") {
-    return <span className="text-xs font-normal text-gray-300">—</span>;
-  }
-
-  if (field.type === "flag") {
-    const asString = String(value).toUpperCase();
-    if (asString === "Y" || asString === "1" || asString === "TRUE") {
-      return <Badge color="green">Enabled</Badge>;
-    }
-    if (asString === "N" || asString === "0" || asString === "FALSE") {
-      return <Badge color="gray">Disabled</Badge>;
-    }
-  }
-
-  const formatted = field.type === "date" ? formatDateTime(value) : String(value);
-  return (
-    <span className={`field-value text-xs ${field.type === "id" ? "font-mono" : ""}`}>
-      {formatted}
-    </span>
-  );
-}
-
-function FieldRow({ field, value }) {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-[minmax(170px,36%)_1fr] gap-2 sm:gap-4 py-2.5 border-b border-[#DBEAFE] last:border-b-0">
-      <span className="field-label text-xs">{field.label}</span>
-      <div>{renderFieldValue(field, value)}</div>
-    </div>
-  );
-}
-
 function resolveLineItem(searchParams) {
   const ref = searchParams.get("ref");
   const stored = loadDetailsRecord(ref, "line-item");
@@ -89,8 +50,15 @@ export default function LineItemDetailsPage({ searchParams }) {
   const item = resolveLineItem(searchParams);
   const detailGroups = LINE_ITEM_FIELD_GROUPS.map((group) => ({
     ...group,
+    iconComponent: ICON_MAP[group.icon] || Layers,
     fields: group.fields.filter((field) => !SUMMARY_KEYS.has(field.key)),
   })).filter((group) => group.fields.length > 0);
+
+  const summaryTiles = SUMMARY_FIELDS.map((field) => ({
+    ...field,
+    icon: ICON_MAP[field.icon] || undefined,
+    value: item[field.key],
+  }));
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans">
@@ -110,25 +78,22 @@ export default function LineItemDetailsPage({ searchParams }) {
           </button>
         </div>
 
-        <SectionCard icon={Layers} title="Summary">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-            {SUMMARY_FIELDS.map((field) => (
-              <FieldRow key={field.key} field={field} value={item[field.key]} />
-            ))}
-          </div>
-        </SectionCard>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {summaryTiles.map((field) => (
+            <SummaryTile key={field.key} label={field.label} value={formatDetailValue(field, field.value)} icon={field.icon} />
+          ))}
+        </div>
 
         <div className="mt-4 grid grid-cols-1 xl:grid-cols-2 gap-4 pb-6">
           {detailGroups.map((group) => {
-            const Icon = ICON_MAP[group.icon] || Layers;
             return (
-              <SectionCard key={group.id} icon={Icon} title={group.label}>
+              <AccordionCard key={group.id} title={group.label} icon={group.iconComponent} defaultOpen={group.defaultOpen}>
                 <div>
                   {group.fields.map((field) => (
-                    <FieldRow key={field.key} field={field} value={item[field.key]} />
+                    <DetailFieldRow key={field.key} label={field.label} value={formatDetailValue(field, item[field.key])} />
                   ))}
                 </div>
-              </SectionCard>
+              </AccordionCard>
             );
           })}
         </div>

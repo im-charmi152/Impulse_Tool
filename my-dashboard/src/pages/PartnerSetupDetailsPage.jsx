@@ -1,20 +1,35 @@
-import { ArrowLeft, Settings } from "lucide-react";
-import SectionCard from "../components/common/SectionCard";
+import { ArrowLeft, Settings, Hash, Package, BarChart2, DollarSign, Calendar, AlertCircle, Truck, Cpu, Building2, Users, FileText, Globe } from "lucide-react";
 import Badge from "../components/common/Badge";
 import { PARTNER_SETUP_FIELD_GROUPS } from "../components/setup/setupFieldConfig";
 import { normalizeSetupRecord, statusColor } from "../components/setup/setupDetailsUtils";
 import { loadDetailsRecord } from "../utils/detailsNavigation";
-import { formatDateTime } from "../utils/format";
+import { AccordionCard, DetailFieldRow, SummaryTile, formatDetailValue } from "../components/details/DetailsLayout";
 
 const SUMMARY_FIELDS = [
-  { key: "coCd", label: "Company Code" },
-  { key: "partnerId", label: "Partner ID" },
-  { key: "partnerTypeCd", label: "Partner Type" },
-  { key: "srceSysId", label: "Source System" },
-  { key: "formatId", label: "Format" },
-  { key: "commuId", label: "Communication ID" },
-  { key: "activeStatus", label: "Status" },
+  { key: "coCd", label: "Company Code", icon: "Building2" },
+  { key: "partnerId", label: "Partner ID", icon: "Users" },
+  { key: "partnerTypeCd", label: "Partner Type", icon: "Settings" },
+  { key: "srceSysId", label: "Source System", icon: "Package" },
+  { key: "formatId", label: "Format", icon: "FileText" },
+  { key: "commuId", label: "Communication ID", icon: "Globe" },
+  { key: "activeStatus", label: "Status", icon: "AlertCircle" },
 ];
+
+const ICON_MAP = {
+  Hash,
+  Package,
+  BarChart2,
+  DollarSign,
+  Calendar,
+  AlertCircle,
+  Truck,
+  Cpu,
+  Building2,
+  Users,
+  FileText,
+  Globe,
+  Settings,
+};
 
 const SUMMARY_KEYS = new Set(SUMMARY_FIELDS.map((field) => field.key));
 
@@ -29,40 +44,6 @@ function toFallbackRecord(searchParams) {
   });
 }
 
-function normalizeValue(value) {
-  if (value == null || value === "") return "—";
-  return value;
-}
-
-function renderFieldValue(field, rawValue, row) {
-  if (field.key === "activeStatus") {
-    return <Badge color={statusColor(row.activeStatus)}>{row.activeStatus}</Badge>;
-  }
-
-  const value = normalizeValue(rawValue);
-  if (value === "—") {
-    return <span className="text-xs font-normal text-gray-300">—</span>;
-  }
-
-  const formatted = field.type === "date" ? formatDateTime(value) : String(value);
-  const className = field.type === "id" ? "font-mono" : "";
-
-  if (field.key === "setupNotesTxt") {
-    return <p className={`field-value text-xs whitespace-pre-wrap ${className}`}>{formatted}</p>;
-  }
-
-  return <span className={`field-value text-xs ${className}`}>{formatted}</span>;
-}
-
-function FieldRow({ field, value, row }) {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-[minmax(170px,36%)_1fr] gap-2 sm:gap-4 py-2.5 border-b border-[#DBEAFE] last:border-b-0">
-      <span className="field-label text-xs">{field.label}</span>
-      <div>{renderFieldValue(field, value, row)}</div>
-    </div>
-  );
-}
-
 function resolveRecord(searchParams) {
   const ref = searchParams.get("ref");
   const stored = loadDetailsRecord(ref, "partner-setup");
@@ -74,8 +55,15 @@ export default function PartnerSetupDetailsPage({ searchParams }) {
   const record = resolveRecord(searchParams);
   const detailGroups = PARTNER_SETUP_FIELD_GROUPS.map((group) => ({
     ...group,
+    iconComponent: ICON_MAP[group.icon] || Settings,
     fields: group.fields.filter((field) => !SUMMARY_KEYS.has(field.key)),
   })).filter((group) => group.fields.length > 0);
+
+  const summaryTiles = SUMMARY_FIELDS.map((field) => ({
+    ...field,
+    icon: ICON_MAP[field.icon] || undefined,
+    value: record[field.key],
+  }));
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans">
@@ -95,23 +83,25 @@ export default function PartnerSetupDetailsPage({ searchParams }) {
           </button>
         </div>
 
-        <SectionCard icon={Settings} title="Summary">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-            {SUMMARY_FIELDS.map((field) => (
-              <FieldRow key={field.key} field={field} value={record[field.key]} row={record} />
-            ))}
-          </div>
-        </SectionCard>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {summaryTiles.map((field) => (
+            <SummaryTile key={field.key} label={field.label} value={field.key === "activeStatus" ? <Badge color={statusColor(record.activeStatus)}>{record.activeStatus}</Badge> : formatDetailValue({ ...field, type: field.key === "activeStatus" ? "status" : "text" }, field.value)} icon={field.icon} />
+          ))}
+        </div>
 
         <div className="mt-4 grid grid-cols-1 xl:grid-cols-2 gap-4 pb-6">
           {detailGroups.map((group) => (
-            <SectionCard key={group.id} icon={Settings} title={group.label}>
+            <AccordionCard key={group.id} title={group.label} icon={group.iconComponent} defaultOpen={group.defaultOpen}>
               <div>
                 {group.fields.map((field) => (
-                  <FieldRow key={field.key} field={field} value={record[field.key]} row={record} />
+                  <DetailFieldRow
+                    key={field.key}
+                    label={field.label}
+                    value={field.key === "activeStatus" ? <Badge color={statusColor(record.activeStatus)}>{record.activeStatus}</Badge> : formatDetailValue(field, record[field.key])}
+                  />
                 ))}
               </div>
-            </SectionCard>
+            </AccordionCard>
           ))}
         </div>
       </main>
