@@ -39,7 +39,7 @@ export default function Dashboard() {
   const isAvailable = (section) => data?._meta?.availableSections?.includes(section);
 
   return (
-    <div className="min-h-screen bg-gray-100 font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#111827] font-sans">
       <Header toggleSidebar={() => setMobileOpen(!mobileOpen)} />
       <Sidebar
         collapsed={sidebarCollapsed}
@@ -54,10 +54,10 @@ export default function Dashboard() {
         <div className="p-4 md:p-5 max-w-[1400px]">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h1 className="text-xl font-bold text-gray-800">Order / Transaction Search</h1>
-              <p className="text-xs text-gray-400 mt-0.5">Search and view consolidated transaction details</p>
+              <h1 className="text-xl font-bold text-[#1D4ED8]">Order / Transaction Search</h1>
+              <p className="text-xs text-[#6B7280] mt-0.5">Search and view consolidated transaction details</p>
             </div>
-            <button className="flex items-center gap-1.5 text-xs font-medium text-blue-600 border border-blue-200 rounded px-3 py-1.5 hover:bg-blue-50 transition-colors whitespace-nowrap">
+            <button className="flex items-center gap-1.5 text-xs font-medium text-[#2563EB] border border-[#DBEAFE] rounded-xl px-3 py-1.5 hover:bg-[#EFF6FF] whitespace-nowrap">
               <Download size={12} />
               Save Search
             </button>
@@ -134,11 +134,11 @@ export default function Dashboard() {
             )}
           </div>
 
-          <div className="mt-6 pb-4 text-center text-[10px] text-gray-400 flex items-center justify-between">
+          <div className="mt-6 pb-4 text-center text-[10px] text-[#6B7280] flex items-center justify-between">
             <span>© 2024 Ingram Micro Inc. All Rights Reserved.</span>
             <div className="flex gap-4">
-              <button className="hover:text-gray-600">Privacy Policy</button>
-              <button className="hover:text-gray-600">Terms of Use</button>
+              <button className="hover:text-[#2563EB]">Privacy Policy</button>
+              <button className="hover:text-[#2563EB]">Terms of Use</button>
             </div>
           </div>
         </div>

@@ -167,14 +167,14 @@ function StatusBadge({ value }) {
   const key = String(value).toLowerCase();
   const cfg = ORDER_STATUS_MAP[key] ?? ORDER_STATUS_MAP[value] ?? null;
   if (!cfg)
-    return <span className="text-xs font-medium text-gray-700">{value}</span>;
+    return <span className="field-value text-xs">{value}</span>;
 
   const styles = {
     green: "bg-green-50 text-green-700 border-green-200",
     blue: "bg-blue-50  text-blue-700  border-blue-200",
     red: "bg-red-50   text-red-700   border-red-200",
     amber: "bg-amber-50 text-amber-700 border-amber-200",
-    gray: "bg-gray-50  text-gray-500  border-gray-200",
+    gray: "bg-[#F8FAFC]  text-[#6B7280]  border-[#DBEAFE]",
   };
   const dots = {
     green: "bg-green-500",
@@ -256,21 +256,21 @@ function SummaryField({ fieldDef, value }) {
     if (fieldDef.type === "hold") return <HoldBadge value={value} />;
     if (fieldDef.type === "date")
       return (
-        <span className="text-xs font-medium text-gray-700 leading-tight">
+          <span className="field-value text-xs leading-tight">
           {formatDateTime(value)}
         </span>
       );
     if (fieldDef.type === "id")
       return (
         <span className="flex items-center gap-1 min-w-0 group/copy">
-          <span className="font-mono text-xs font-medium text-gray-800 truncate">
+          <span className="font-mono text-xs field-value truncate">
             {value}
           </span>
           <CopyButton value={value} />
         </span>
       );
     return (
-      <span className="text-xs font-medium text-gray-800 leading-tight truncate">
+      <span className="field-value text-xs leading-tight truncate">
         {String(value)}
       </span>
     );
@@ -278,14 +278,14 @@ function SummaryField({ fieldDef, value }) {
 
   return (
     <div
-      className="group flex items-start gap-2.5 p-3 rounded-lg bg-white border border-gray-100
-      hover:border-blue-200 hover:shadow-sm transition-all duration-150"
+      className="group flex items-start gap-2.5 p-3 rounded-xl bg-white border border-[#DBEAFE]
+      hover:border-[#BFDBFE] hover:shadow-sm transition-all duration-150"
     >
-      <div className="flex-shrink-0 w-7 h-7 rounded-md bg-blue-50 flex items-center justify-center mt-0.5">
-        <Icon size={13} className="text-blue-600" />
+      <div className="flex-shrink-0 w-7 h-7 rounded-md bg-[#EFF6FF] flex items-center justify-center mt-0.5">
+        <Icon size={13} className="text-[#2563EB]" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[9px] uppercase tracking-wider font-semibold text-gray-400 mb-1">
+        <p className="field-label text-[9px] uppercase tracking-wider mb-1">
           {fieldDef.label}
         </p>
         <div className="flex items-start">{rendered}</div>
@@ -297,8 +297,8 @@ function SummaryField({ fieldDef, value }) {
 // ─── Skeleton loading ─────────────────────────────────────────────────────────
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 bg-gray-50">
+    <div className="enterprise-card p-0 overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#DBEAFE] bg-[#F8FAFC]">
         <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
         <div className="h-7 w-36 bg-gray-200 rounded-lg animate-pulse" />
       </div>
@@ -323,12 +323,12 @@ function SkeletonCard() {
 // ─── Error state ──────────────────────────────────────────────────────────────
 function ErrorCard({ message }) {
   return (
-    <div className="bg-white rounded-xl border border-red-200 shadow-sm p-8 flex flex-col items-center text-center">
+    <div className="enterprise-card border-red-200 p-8 flex flex-col items-center text-center">
       <AlertCircle size={28} className="text-red-400 mb-2" />
       <p className="text-sm font-medium text-red-700 mb-1">
         Failed to load order details
       </p>
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-[#6B7280]">
         {message ?? "An unexpected error occurred."}
       </p>
     </div>
@@ -359,22 +359,22 @@ export default function OrderHeaderDetails({
       {/* ── Summary Card ─────────────────────────────────────────────────── */}
       <section
         aria-label="Order header summary"
-        className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+        className="enterprise-card p-0 overflow-hidden"
       >
         {/* Header bar */}
         <div
-          className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100
-          bg-gradient-to-r from-gray-50 to-white"
+          className="flex items-center justify-between px-5 py-3.5 border-b border-[#DBEAFE]
+          bg-gradient-to-r from-[#F8FAFC] to-white"
         >
           <div className="flex items-center gap-2.5">
-            <div className="p-1.5 bg-[#003087] rounded-md">
+            <div className="p-1.5 bg-[#2563EB] rounded-md">
               <FileText size={13} className="text-white" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-gray-800">
+              <h2 className="text-sm font-semibold text-[#1D4ED8]">
                 Order Header Details
               </h2>
-              <p className="text-[10px] text-gray-400 mt-0.5">
+              <p className="text-[10px] text-[#6B7280] mt-0.5">
                 {totalFields} fields populated
               </p>
             </div>
@@ -384,7 +384,7 @@ export default function OrderHeaderDetails({
             onClick={openDrawer}
             aria-label="Open full header details drawer"
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white
-              bg-[#003087] rounded-lg hover:bg-[#00246b] transition-colors shadow-sm
+              bg-[#2563EB] rounded-xl hover:bg-[#1D4ED8] shadow-sm
               focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
           >
             <ExternalLink size={11} />
@@ -405,13 +405,13 @@ export default function OrderHeaderDetails({
         </div>
 
         {/* Footer hint */}
-        <div className="flex items-center gap-1.5 px-5 py-2.5 border-t border-gray-50 bg-gray-50/60">
-          <Info size={11} className="text-gray-300 flex-shrink-0" />
-          <p className="text-[10px] text-gray-400">
+        <div className="flex items-center gap-1.5 px-5 py-2.5 border-t border-[#DBEAFE] bg-[#F8FAFC]">
+          <Info size={11} className="text-[#6B7280] flex-shrink-0" />
+          <p className="text-[10px] text-[#6B7280]">
             Showing 12 key fields.{" "}
             <button
               onClick={openDrawer}
-              className="text-blue-600 hover:text-blue-800 font-medium focus:outline-none focus:underline"
+              className="text-[#2563EB] hover:text-[#1D4ED8] font-medium focus:outline-none focus:underline"
             >
               View all {totalFields} header fields →
             </button>

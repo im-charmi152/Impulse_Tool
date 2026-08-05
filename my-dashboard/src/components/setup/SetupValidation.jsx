@@ -10,9 +10,9 @@ function SetupValidation({ validations }) {
         {validations.map((v) => (
           <div
             key={v.type}
-            className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0"
+            className="flex justify-between items-center py-1.5 border-b border-[#DBEAFE] last:border-0"
           >
-            <span className="text-xs text-gray-600">{v.type}</span>
+            <span className="field-label text-xs">{v.type}</span>
             <Badge color={statusToColor(v.status)}>{v.status}</Badge>
           </div>
         ))}

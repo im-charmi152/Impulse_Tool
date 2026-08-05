@@ -2,9 +2,9 @@ import { Loader2, SearchX, AlertCircle } from "lucide-react";
 
 export function LoadingState() {
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-lg border border-gray-200 shadow-sm">
-      <Loader2 size={28} className="text-blue-600 animate-spin mb-3" />
-      <div className="text-sm font-medium text-gray-600">
+    <div className="enterprise-card flex flex-col items-center justify-center py-24 text-center">
+      <Loader2 size={28} className="text-[#2563EB] animate-spin mb-3" />
+      <div className="text-sm font-medium text-[#6B7280]">
         Tracing order across DB2, ODS, TBX, MQ and Datadog…
       </div>
     </div>
@@ -13,14 +13,14 @@ export function LoadingState() {
 
 export function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-lg border border-gray-200 shadow-sm">
-      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-        <SearchX size={22} className="text-gray-400" />
+    <div className="enterprise-card flex flex-col items-center justify-center py-24 text-center">
+      <div className="w-12 h-12 bg-[#EFF6FF] rounded-full flex items-center justify-center mb-3">
+        <SearchX size={22} className="text-[#6B7280]" />
       </div>
-      <div className="text-sm font-semibold text-gray-700 mb-1">
+      <div className="text-sm font-semibold text-[#111827] mb-1">
         No matching order found
       </div>
-      <div className="text-xs text-gray-400 max-w-xs">
+      <div className="text-xs text-[#6B7280] max-w-xs">
         Double-check the value and try another identifier — Order Number,
         SKU, Account, Partner ID, PO Number, or Transaction ID.
       </div>
@@ -30,18 +30,18 @@ export function EmptyState() {
 
 export function ErrorState({ message, onRetry }) {
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-lg border border-red-200 shadow-sm">
+    <div className="enterprise-card flex flex-col items-center justify-center py-24 text-center border-red-200">
       <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-3">
         <AlertCircle size={22} className="text-red-500" />
       </div>
-      <div className="text-sm font-semibold text-gray-700 mb-1">
+      <div className="text-sm font-semibold text-[#111827] mb-1">
         Couldn't complete the search
       </div>
-      <div className="text-xs text-gray-400 max-w-xs mb-4">{message}</div>
+      <div className="text-xs text-[#6B7280] max-w-xs mb-4">{message}</div>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="text-xs font-semibold text-white bg-[#003087] rounded px-4 py-1.5 hover:bg-[#002070] transition-colors"
+          className="text-xs font-semibold text-white bg-[#2563EB] rounded-xl px-4 py-1.5 hover:bg-[#1D4ED8]"
         >
           Try Again
         </button>
@@ -52,8 +52,8 @@ export function ErrorState({ message, onRetry }) {
 
 export function IdleState() {
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-lg border border-dashed border-gray-300">
-      <div className="text-sm font-medium text-gray-500">
+    <div className="enterprise-card flex flex-col items-center justify-center py-24 text-center border-dashed">
+      <div className="text-sm font-medium text-[#6B7280]">
         Enter an identifier above and press Search to trace an order.
       </div>
     </div>

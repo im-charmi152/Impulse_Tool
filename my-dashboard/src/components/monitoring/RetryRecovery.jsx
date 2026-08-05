@@ -18,19 +18,19 @@ function RetryRecovery({ retryCandidates }) {
             <CheckCircle2 size={24} className="text-green-500" strokeWidth={2} />
           )}
         </div>
-        <div className="text-sm font-semibold text-gray-700 mb-1">
+        <div className="text-sm font-semibold text-[#111827] mb-1">
           {needsRetry ? "Retry Recommended" : "No Retries"}
         </div>
         {needsRetry ? (
-          <ul className="text-xs text-gray-500 space-y-1">
+          <ul className="text-xs text-[#6B7280] space-y-1">
             {retryCandidates.map((r, i) => (
               <li key={i}>
-                <span className="font-medium text-gray-700">{r.system}:</span> {r.remarks}
+                <span className="font-medium text-[#111827]">{r.system}:</span> {r.remarks}
               </li>
             ))}
           </ul>
         ) : (
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-[#6B7280]">
             No retry attempts were required for this transaction.
           </div>
         )}

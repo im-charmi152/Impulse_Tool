@@ -30,11 +30,11 @@ function SetupConfigDetails({ config }) {
         <div className="overflow-x-auto -mx-1 max-h-[340px] overflow-y-auto">
           <table className="w-full text-xs min-w-[760px]">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
+              <tr className="bg-[#F8FAFC] border-b border-[#DBEAFE]">
                 {SUMMARY_COLUMNS.map((column) => (
                   <th
                     key={column.key}
-                    className="text-left px-2 py-2 font-semibold text-gray-500 text-[10px] uppercase tracking-wide whitespace-nowrap"
+                    className="text-left px-2 py-2 font-semibold text-[#6B7280] text-[10px] uppercase tracking-wide whitespace-nowrap"
                   >
                     {column.label}
                   </th>
@@ -47,12 +47,12 @@ function SetupConfigDetails({ config }) {
                   <tr
                     key={`${row.coCd}-${row.partnerId}-${index}`}
                     onClick={() => openPartnerSetupDetailsTab(row)}
-                    className="border-b border-gray-50 transition-colors cursor-pointer hover:bg-gray-50/50"
+                    className="border-b border-[#DBEAFE] transition-colors cursor-pointer hover:bg-[#EFF6FF]"
                   >
                     {SUMMARY_COLUMNS.map((column) => (
                       <td
                         key={`${row.partnerId}-${column.key}`}
-                        className="px-2 py-2 text-gray-600 whitespace-nowrap"
+                        className="px-2 py-2 text-[#6B7280] whitespace-nowrap"
                       >
                         {column.key === "activeStatus" ? (
                           <Badge color={statusColor(row.activeStatus)}>{row.activeStatus}</Badge>

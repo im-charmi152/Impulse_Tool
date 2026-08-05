@@ -18,19 +18,19 @@ function FailureReason({ failures }) {
             <CheckCircle2 size={24} className="text-green-500" strokeWidth={2} />
           )}
         </div>
-        <div className="text-sm font-semibold text-gray-700 mb-1">
+        <div className="text-sm font-semibold text-[#111827] mb-1">
           {hasFailures ? `${failures.length} Failure${failures.length > 1 ? "s" : ""} Detected` : "No Failures"}
         </div>
         {hasFailures ? (
-          <ul className="text-xs text-gray-500 space-y-1">
+          <ul className="text-xs text-[#6B7280] space-y-1">
             {failures.map((f, i) => (
               <li key={i}>
-                <span className="font-medium text-gray-700">{f.system}:</span> {f.remarks}
+                <span className="font-medium text-[#111827]">{f.system}:</span> {f.remarks}
               </li>
             ))}
           </ul>
         ) : (
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-[#6B7280]">
             This transaction completed successfully with no failures.
           </div>
         )}

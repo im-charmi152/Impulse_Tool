@@ -30,10 +30,10 @@ function FlowTraceStatus({ steps, flowTrace }) {
                   )}
                 </div>
                 <div className="text-center mt-1.5 px-0.5">
-                  <div className="text-[10px] font-semibold text-gray-700 leading-tight whitespace-pre-line">
+                  <div className="text-[10px] font-semibold text-[#111827] leading-tight whitespace-pre-line">
                     {step.label}
                   </div>
-                  <div className="text-[9px] text-gray-400 mt-0.5 leading-tight">
+                  <div className="text-[9px] text-[#6B7280] mt-0.5 leading-tight">
                     {step.time}
                   </div>
                 </div>
@@ -44,7 +44,7 @@ function FlowTraceStatus({ steps, flowTrace }) {
       </div>
 
       {/* Per-flow trace table (System / Status / Timestamp / Remarks) */}
-      <div className="mt-4 pt-4 border-t border-gray-100">
+      <div className="mt-4 pt-4 border-t border-[#DBEAFE]">
         <div className="flex flex-wrap gap-1 mb-3">
           {FLOW_TYPES.map((flow) => (
             <button
@@ -52,8 +52,8 @@ function FlowTraceStatus({ steps, flowTrace }) {
               onClick={() => setFlowId(flow.id)}
               className={`text-[10px] font-medium px-2.5 py-1 rounded-full transition-colors ${
                 flow.id === flowId
-                  ? "bg-[#003087] text-white"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                  ? "bg-[#2563EB] text-white"
+                  : "bg-[#F8FAFC] text-[#6B7280] hover:bg-[#EFF6FF]"
               }`}
             >
               {flow.label}
@@ -63,11 +63,11 @@ function FlowTraceStatus({ steps, flowTrace }) {
         <div className="overflow-x-auto">
           <table className="w-full text-xs min-w-[400px]">
             <thead>
-              <tr className="border-b border-gray-100">
+              <tr className="border-b border-[#DBEAFE]">
                 {["System", "Status", "Timestamp", "Remarks"].map((h) => (
                   <th
                     key={h}
-                    className="text-left pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wide"
+                    className="text-left pb-1.5 text-[10px] font-semibold text-[#6B7280] uppercase tracking-wide"
                   >
                     {h}
                   </th>
@@ -76,19 +76,19 @@ function FlowTraceStatus({ steps, flowTrace }) {
             </thead>
             <tbody>
               {traceRows.map((row) => (
-                <tr key={row.system} className="border-b border-gray-50 last:border-0">
-                  <td className="py-1.5 font-medium text-gray-700">{row.system}</td>
+                <tr key={row.system} className="border-b border-[#DBEAFE] last:border-0">
+                  <td className="py-1.5 font-medium text-[#111827]">{row.system}</td>
                   <td className="py-1.5">
                     <Badge color={statusToColor(row.status)}>{row.status}</Badge>
                   </td>
-                  <td className="py-1.5 text-gray-400 text-[10px]">{row.timestamp}</td>
-                  <td className="py-1.5 text-gray-500">{row.remarks}</td>
+                  <td className="py-1.5 text-[#6B7280] text-[10px]">{row.timestamp}</td>
+                  <td className="py-1.5 text-[#6B7280]">{row.remarks}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div className="text-[9px] text-gray-400 mt-2">
+        <div className="text-[9px] text-[#6B7280] mt-2">
           {activeFlow.systems.join(" → ")}
         </div>
       </div>
