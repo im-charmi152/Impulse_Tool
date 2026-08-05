@@ -1,62 +1,79 @@
-import { FileText, Download } from "lucide-react";
+import { FileText, Hash, CalendarDays, Flag, Users, CircleCheck } from "lucide-react";
 import Badge from "../common/Badge";
-import { formatDateTime, statusToColor } from "../../utils/format";
+import { formatDateTime } from "../../utils/format";
 
-function OrderSummaryBanner({ order, onExport }) {
-  const orderNumber = order?.imiAsgdOrdrNbr || order?.poNumber || order?.orderNumber || "—";
-  const lastUpdated =
-    order?.lastUpdated || order?.retrievedAt || order?.processUnitTs || order?.ordEntryDtTs || "—";
+function OrderSummaryBanner({ order }) {
+  const tiles = [
+    {
+      key: "custPo",
+      label: "Customer PO",
+      value: order?.custPoNbr || order?.poNumber || "—",
+      icon: FileText,
+    },
+    {
+      key: "orderNo",
+      label: "Order Number",
+      value: order?.imiAsgdOrdrNbr || order?.orderNumber || "—",
+      icon: Hash,
+    },
+    {
+      key: "custPoDate",
+      label: "Customer PO Date",
+      value: order?.custPoDt ? formatDateTime(order.custPoDt) : "—",
+      icon: CalendarDays,
+    },
+    {
+      key: "country",
+      label: "Country Code",
+      value: order?.custCoCd || "—",
+      icon: Flag,
+    },
+    {
+      key: "partner",
+      label: "Partner ID",
+      value: order?.partnerId || "—",
+      icon: Users,
+    },
+    {
+      key: "status",
+      label: "Status",
+      value: order?.ordSt || "Found",
+      icon: CircleCheck,
+      isStatus: true,
+    },
+  ];
 
   return (
-    <div className="enterprise-card">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-11 h-11 bg-[#EFF6FF] rounded-xl flex items-center justify-center flex-shrink-0">
-            <FileText size={18} className="text-[#2563EB]" />
-          </div>
-          <div className="min-w-0">
-            <div className="field-label text-[10px] uppercase tracking-wide mb-1">
-              Dashboard Header
-            </div>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-              <div>
-                <div className="field-label text-[10px] uppercase tracking-wide mb-0.5">
-                  Order Number
-                </div>
-                <div className="field-value text-sm font-semibold truncate max-w-[260px]">
-                  {orderNumber}
-                </div>
-              </div>
-              <div>
-                <div className="field-label text-[10px] uppercase tracking-wide mb-0.5">
-                  Status
-                </div>
-                <Badge color={statusToColor(order?.ordSt)}>
-                  {order?.ordSt || "—"}
-                </Badge>
-              </div>
-              <div>
-                <div className="field-label text-[10px] uppercase tracking-wide mb-0.5">
-                  Last Updated
-                </div>
-                <div className="field-value text-xs">
-                  {lastUpdated !== "—" ? formatDateTime(lastUpdated) : "—"}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center">
-          <button
-            onClick={onExport}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-xl px-3.5 py-2"
-            aria-label="Export dashboard"
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+      {tiles.map((tile) => {
+        const Icon = tile.icon;
+        return (
+          <div
+            key={tile.key}
+            className="enterprise-card h-full min-h-[98px] p-3.5 flex items-start gap-2.5"
           >
-            <Download size={13} />
-            Export
-          </button>
-        </div>
-      </div>
+            {Icon && (
+              <div className="w-8 h-8 rounded-lg bg-[#EFF6FF] flex items-center justify-center flex-shrink-0">
+                <Icon size={14} className="text-[#0F6CBD]" />
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="field-label text-[10px] uppercase tracking-wide">
+                {tile.label}
+              </div>
+              <div className="mt-1">
+                {tile.isStatus ? (
+                  <Badge color="green">{tile.value}</Badge>
+                ) : (
+                  <div className="field-value text-base font-semibold leading-tight break-words">
+                    {tile.value}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

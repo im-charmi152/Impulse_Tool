@@ -174,7 +174,7 @@ function StatusBadge({ value }) {
     blue: "bg-blue-50  text-blue-700  border-blue-200",
     red: "bg-red-50   text-red-700   border-red-200",
     amber: "bg-amber-50 text-amber-700 border-amber-200",
-    gray: "bg-[#F8FAFC]  text-[#6B7280]  border-[#DBEAFE]",
+    gray: "bg-[#F8FAFC]  text-[#6B7280]  border-[#D6E4F7]",
   };
   const dots = {
     green: "bg-green-500",
@@ -278,11 +278,11 @@ function SummaryField({ fieldDef, value }) {
 
   return (
     <div
-      className="group flex items-start gap-2.5 p-3 rounded-xl bg-white border border-[#DBEAFE]
+      className="group flex items-start gap-2.5 p-3 rounded-xl bg-white border border-[#D6E4F7]
       hover:border-[#BFDBFE] hover:shadow-sm transition-all duration-150"
     >
       <div className="flex-shrink-0 w-7 h-7 rounded-md bg-[#EFF6FF] flex items-center justify-center mt-0.5">
-        <Icon size={13} className="text-[#2563EB]" />
+        <Icon size={13} className="text-[#0F6CBD]" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="field-label text-[9px] uppercase tracking-wider mb-1">
@@ -298,7 +298,7 @@ function SummaryField({ fieldDef, value }) {
 function SkeletonCard() {
   return (
     <div className="enterprise-card p-0 overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#DBEAFE] bg-[#F8FAFC]">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#D6E4F7] bg-[#F8FAFC]">
         <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
         <div className="h-7 w-36 bg-gray-200 rounded-lg animate-pulse" />
       </div>
@@ -359,19 +359,19 @@ export default function OrderHeaderDetails({
       {/* ── Summary Card ─────────────────────────────────────────────────── */}
       <section
         aria-label="Order header summary"
-        className="enterprise-card p-0 overflow-hidden"
+        className="enterprise-card h-full p-0 overflow-hidden"
       >
         {/* Header bar */}
         <div
-          className="flex items-center justify-between px-5 py-3.5 border-b border-[#DBEAFE]
+          className="flex items-center justify-between px-5 py-3.5 border-b border-[#D6E4F7]
           bg-gradient-to-r from-[#F8FAFC] to-white"
         >
           <div className="flex items-center gap-2.5">
-            <div className="p-1.5 bg-[#2563EB] rounded-md">
+            <div className="p-1.5 bg-[#0F6CBD] rounded-md">
               <FileText size={13} className="text-white" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-[#1D4ED8]">
+              <h2 className="text-sm font-semibold text-[#0F6CBD]">
                 Order Header Details
               </h2>
               <p className="text-[10px] text-[#6B7280] mt-0.5">
@@ -384,7 +384,7 @@ export default function OrderHeaderDetails({
             onClick={openDrawer}
             aria-label="Open full header details drawer"
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white
-              bg-[#2563EB] rounded-xl hover:bg-[#1D4ED8] shadow-sm
+              bg-[#0F6CBD] rounded-xl hover:bg-[#0A5CA6] shadow-sm
               focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
           >
             <ExternalLink size={11} />
@@ -405,13 +405,13 @@ export default function OrderHeaderDetails({
         </div>
 
         {/* Footer hint */}
-        <div className="flex items-center gap-1.5 px-5 py-2.5 border-t border-[#DBEAFE] bg-[#F8FAFC]">
+        <div className="flex items-center gap-1.5 px-5 py-2.5 border-t border-[#D6E4F7] bg-[#F8FAFC]">
           <Info size={11} className="text-[#6B7280] flex-shrink-0" />
           <p className="text-[10px] text-[#6B7280]">
             Showing 12 key fields.{" "}
             <button
               onClick={openDrawer}
-              className="text-[#2563EB] hover:text-[#1D4ED8] font-medium focus:outline-none focus:underline"
+              className="text-[#0F6CBD] hover:text-[#0A5CA6] font-medium focus:outline-none focus:underline"
             >
               View all {totalFields} header fields →
             </button>

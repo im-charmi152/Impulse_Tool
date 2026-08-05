@@ -12,7 +12,7 @@ function DatadogPanel({ logs, alerts }) {
       icon={Database}
       title="Datadog"
       actions={
-        <button className="flex items-center gap-1 text-[10px] text-[#2563EB] hover:underline">
+        <button className="flex items-center gap-1 text-[10px] text-[#0F6CBD] hover:underline">
           Open in Datadog <ExternalLink size={10} />
         </button>
       }
@@ -27,7 +27,7 @@ function DatadogPanel({ logs, alerts }) {
             onClick={() => setTab(t.id)}
             className={`text-[10px] font-medium px-2 py-1 rounded transition-colors ${
               tab === t.id
-                ? "bg-[#2563EB] text-white"
+                ? "bg-[#0F6CBD] text-white"
                 : "bg-[#F8FAFC] text-[#6B7280] hover:bg-[#EFF6FF]"
             }`}
           >
@@ -47,7 +47,7 @@ function DatadogPanel({ logs, alerts }) {
               </div>
             ))}
           </div>
-          <button className="mt-2 text-xs text-[#2563EB] hover:underline font-medium block text-center w-full">
+          <button className="mt-2 text-xs text-[#0F6CBD] hover:underline font-medium block text-center w-full">
             View More Logs
           </button>
         </>
@@ -57,9 +57,9 @@ function DatadogPanel({ logs, alerts }) {
             <div className="text-xs text-[#6B7280] text-center py-4">No active alerts</div>
           )}
           {alerts.map((a, i) => (
-            <div key={i} className="border border-[#DBEAFE] rounded-xl p-2">
+            <div key={i} className="border border-[#D6E4F7] rounded-xl p-2">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-semibold text-[#111827]">{a.alert}</span>
+                <span className="text-xs font-semibold text-[#1F2937]">{a.alert}</span>
                 <Badge color={statusToColor(a.severity)}>{a.severity}</Badge>
               </div>
               <div className="text-[10px] text-[#6B7280]">{a.details}</div>

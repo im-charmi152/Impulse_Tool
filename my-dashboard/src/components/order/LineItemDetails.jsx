@@ -113,7 +113,7 @@ function LineItemDetails({ items }) {
       actions={
         <button
           onClick={() => recordEvent("export", { type: "line-items" })}
-          className="flex items-center gap-1.5 text-xs text-[#2563EB] hover:text-[#1D4ED8] border border-[#DBEAFE] rounded-xl px-2.5 py-1 hover:bg-[#EFF6FF]"
+          className="flex items-center gap-1.5 text-xs text-[#0F6CBD] hover:text-[#0A5CA6] border border-[#D6E4F7] rounded-xl px-2.5 py-1 hover:bg-[#EFF6FF]"
         >
           <Download size={11} />
           Export
@@ -123,7 +123,7 @@ function LineItemDetails({ items }) {
       <div className="overflow-x-auto -mx-1">
         <table className="w-full text-xs min-w-[760px]">
           <thead>
-            <tr className="bg-[#F8FAFC] border-b border-[#DBEAFE]">
+            <tr className="bg-[#F8FAFC] border-b border-[#D6E4F7]">
               {LINE_ITEM_COLUMNS.map((column) => (
                 <th
                   key={column.key}
@@ -140,7 +140,7 @@ function LineItemDetails({ items }) {
               <tr
                 key={`${item.imiLineNbr ?? "line"}-${index}`}
                 onClick={() => openLineItemDetailsTab(item)}
-                className="border-b border-[#DBEAFE] transition-colors cursor-pointer hover:bg-[#EFF6FF]"
+                className="border-b border-[#D6E4F7] transition-colors cursor-pointer hover:bg-[#EFF6FF]"
               >
                 {LINE_ITEM_COLUMNS.map((column) => (
                   <td
@@ -162,17 +162,17 @@ function LineItemDetails({ items }) {
         </span>
         <div className="flex items-center gap-1">
           <button
-            className="p-1 rounded-lg border border-[#DBEAFE] hover:bg-[#EFF6FF] disabled:opacity-40"
+            className="p-1 rounded-lg border border-[#D6E4F7] hover:bg-[#EFF6FF] disabled:opacity-40"
             disabled={page <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
           >
             <ChevronLeft size={11} />
           </button>
-          <button className="w-6 h-6 rounded-lg bg-[#2563EB] text-white text-[10px] font-bold">
+          <button className="w-6 h-6 rounded-lg bg-[#0F6CBD] text-white text-[10px] font-bold">
             {page}
           </button>
           <button
-            className="p-1 rounded-lg border border-[#DBEAFE] hover:bg-[#EFF6FF] disabled:opacity-40"
+            className="p-1 rounded-lg border border-[#D6E4F7] hover:bg-[#EFF6FF] disabled:opacity-40"
             disabled={page >= totalPages}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
           >
@@ -184,7 +184,7 @@ function LineItemDetails({ items }) {
               setPageSize(Number(e.target.value));
               setPage(1);
             }}
-            className="ml-2 border border-[#DBEAFE] rounded-lg px-1.5 py-0.5 text-[10px] focus:outline-none"
+            className="ml-2 border border-[#D6E4F7] rounded-lg px-1.5 py-0.5 text-[10px] focus:outline-none"
           >
             {PAGE_SIZE_OPTIONS.map((n) => (
               <option key={n} value={n}>
