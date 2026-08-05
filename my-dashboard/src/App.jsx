@@ -61,7 +61,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="mt-4">
-                  <FlowTraceStatus steps={data.processingSteps} flowTrace={data.flowTrace} />
+                  <FlowTraceStatus flowTrace={data.flowTrace} />
                 </div>
 
                 <div className="mt-4">
