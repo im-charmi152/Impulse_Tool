@@ -40,7 +40,7 @@ function CopyBtn({ value }) {
       onClick={handle}
       aria-label="Copy to clipboard"
       className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded
-        text-gray-400 hover:text-blue-600 hover:bg-blue-50 focus:opacity-100 focus:outline-none
+        text-[#6B7280] hover:text-[#2563EB] hover:bg-[#EFF6FF] focus:opacity-100 focus:outline-none
         focus:ring-2 focus:ring-blue-400"
     >
       {copied ? <Check size={11} className="text-green-500" /> : <Copy size={11} />}
@@ -60,7 +60,7 @@ function StatusBadge({ value }) {
     blue:  "bg-blue-50  text-blue-700  border-blue-200",
     red:   "bg-red-50   text-red-700   border-red-200",
     amber: "bg-amber-50 text-amber-700 border-amber-200",
-    gray:  "bg-gray-50  text-gray-600  border-gray-200",
+    gray:  "bg-[#F8FAFC]  text-[#6B7280]  border-[#DBEAFE]",
   };
   const dots = { green: "bg-green-500", blue: "bg-blue-500", red: "bg-red-500", amber: "bg-amber-500", gray: "bg-gray-400" };
   const c = cfg.color;
@@ -91,9 +91,9 @@ function FlagBadge({ value }) {
     return <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5"><span className="w-1.5 h-1.5 bg-green-500 rounded-full" />Enabled</span>;
   }
   if (value === "N" || value === false || value === "0") {
-    return <span className="text-[10px] font-medium text-gray-400">Disabled</span>;
+    return <span className="text-[10px] font-medium text-[#6B7280]">Disabled</span>;
   }
-  return <span className="text-xs text-gray-500">{String(value ?? "—")}</span>;
+  return <span className="text-xs text-[#6B7280]">{String(value ?? "—")}</span>;
 }
 
 function FieldValue({ type, value, copyable }) {
@@ -118,7 +118,7 @@ function FieldValue({ type, value, copyable }) {
 
   return (
     <span className="flex items-center gap-1 group">
-      <span className={`text-xs font-medium text-gray-800 ${type === "id" ? "font-mono" : ""}`}>{text}</span>
+      <span className={`text-xs field-value ${type === "id" ? "font-mono" : ""}`}>{text}</span>
       {copyable && <CopyBtn value={text} />}
     </span>
   );
@@ -138,8 +138,8 @@ function DrawerField({ field, value, highlight }) {
     : field.label;
 
   return (
-    <div className="group flex items-start justify-between py-2.5 border-b border-gray-50 last:border-0 gap-3">
-      <span className="text-[11px] text-gray-400 min-w-[140px] leading-tight pt-0.5">{labelEl}</span>
+    <div className="group flex items-start justify-between py-2.5 border-b border-[#DBEAFE] last:border-0 gap-3">
+      <span className="field-label text-[11px] min-w-[140px] leading-tight pt-0.5">{labelEl}</span>
       <div className="flex-1 text-right">
         <FieldValue type={field.type} value={value} copyable={field.copyable} />
       </div>
@@ -170,17 +170,17 @@ function AccordionGroup({ group, order, searchQuery, forceOpen }) {
   const filledCount = group.fields.filter((f) => order[f.key] != null && order[f.key] !== "").length;
 
   return (
-    <div className={`border border-gray-100 rounded-lg overflow-hidden mb-2 ${group.technical ? "border-l-2 border-l-orange-300" : ""}`}>
+    <div className={`border border-[#DBEAFE] rounded-xl overflow-hidden mb-2 ${group.technical ? "border-l-2 border-l-orange-300" : ""}`}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors group"
+        className="w-full flex items-center justify-between px-4 py-3 bg-[#F8FAFC] hover:bg-[#EFF6FF] transition-colors group"
         aria-expanded={shouldOpen}
       >
         <div className="flex items-center gap-2.5">
           <div className={`p-1.5 rounded-md ${group.technical ? "bg-orange-100" : "bg-blue-50"}`}>
             <Icon size={13} className={group.technical ? "text-orange-500" : "text-blue-600"} />
           </div>
-          <span className="text-xs font-semibold text-gray-700">{group.label}</span>
+          <span className="text-xs font-semibold text-[#1D4ED8]">{group.label}</span>
           {group.technical && (
             <span className="text-[9px] uppercase tracking-wide font-bold text-orange-500 bg-orange-50 border border-orange-200 rounded px-1.5 py-0.5">
               Technical
@@ -188,10 +188,10 @@ function AccordionGroup({ group, order, searchQuery, forceOpen }) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-gray-400 tabular-nums">{filledCount} fields</span>
+          <span className="text-[10px] text-[#6B7280] tabular-nums">{filledCount} fields</span>
           {shouldOpen
-            ? <ChevronDown size={14} className="text-gray-400 transition-transform" />
-            : <ChevronRight size={14} className="text-gray-400 transition-transform" />
+            ? <ChevronDown size={14} className="text-[#6B7280] transition-transform" />
+            : <ChevronRight size={14} className="text-[#6B7280] transition-transform" />
           }
         </div>
       </button>
@@ -199,7 +199,7 @@ function AccordionGroup({ group, order, searchQuery, forceOpen }) {
       {shouldOpen && (
         <div className="px-4 bg-white animate-in slide-in-from-top-1 duration-150">
           {visibleFields.length === 0 ? (
-            <p className="py-4 text-xs text-gray-400 text-center">No data available for this section.</p>
+            <p className="py-4 text-xs text-[#6B7280] text-center">No data available for this section.</p>
           ) : (
             visibleFields.map((field) => (
               <DrawerField
@@ -275,9 +275,9 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
           ${open ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* Sticky header */}
-        <div className="flex-shrink-0 border-b border-gray-200">
+        <div className="flex-shrink-0 border-b border-[#DBEAFE]">
           {/* Title bar */}
-          <div className="flex items-center justify-between px-5 py-3.5 bg-[#003087]">
+          <div className="flex items-center justify-between px-5 py-3.5 bg-[#1D4ED8]">
             <div>
               <h2 className="text-sm font-semibold text-white">Order Header Details</h2>
               <p className="text-[10px] text-blue-200 mt-0.5">{totalFields} fields populated</p>
@@ -292,32 +292,32 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
           </div>
 
           {/* Search */}
-          <div className="px-4 py-3 bg-gray-50">
+          <div className="px-4 py-3 bg-[#F8FAFC]">
             <div className="relative">
-              <Search size={13} className="absolute left-3 top-2.5 text-gray-400" />
+              <Search size={13} className="absolute left-3 top-2.5 text-[#6B7280]" />
               <input
                 ref={searchRef}
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search header fields… (e.g. hold, partner, ship)"
-                className="w-full pl-8 pr-9 py-2 text-xs border border-gray-200 rounded-lg bg-white
-                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                  placeholder-gray-300"
+                className="w-full pl-8 pr-9 py-2 text-xs border border-[#DBEAFE] rounded-xl bg-white text-[#111827]
+                  focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent
+                  placeholder-[#6B7280]"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600 p-0.5"
+                  className="absolute right-2.5 top-2 text-[#6B7280] hover:text-[#111827] p-0.5"
                 >
                   <X size={12} />
                 </button>
               )}
             </div>
             {search && (
-              <p className="mt-1.5 text-[10px] text-gray-500">
+              <p className="mt-1.5 text-[10px] text-[#6B7280]">
                 {matchCount > 0
-                  ? <><span className="font-semibold text-blue-600">{matchCount}</span> field{matchCount !== 1 ? "s" : ""} matching <span className="font-medium">"{search}"</span></>
+                  ? <><span className="font-semibold text-[#2563EB]">{matchCount}</span> field{matchCount !== 1 ? "s" : ""} matching <span className="font-medium">"{search}"</span></>
                   : <span className="text-amber-600">No fields match "{search}"</span>
                 }
               </p>
@@ -339,13 +339,13 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
         </div>
 
         {/* Footer */}
-        <div className="flex-shrink-0 border-t border-gray-100 px-5 py-3 bg-gray-50 flex items-center justify-between">
-          <span className="text-[10px] text-gray-400">
+        <div className="flex-shrink-0 border-t border-[#DBEAFE] px-5 py-3 bg-[#F8FAFC] flex items-center justify-between">
+          <span className="text-[10px] text-[#6B7280]">
             Showing all available fields for this order
           </span>
           <button
             onClick={onClose}
-            className="text-xs text-gray-500 hover:text-gray-800 font-medium transition-colors"
+            className="text-xs text-[#6B7280] hover:text-[#111827] font-medium transition-colors"
           >
             Close
           </button>

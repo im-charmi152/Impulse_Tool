@@ -64,7 +64,7 @@ function renderFieldValue(field, rawValue) {
 
   const formatted = field.type === "date" ? formatDateTime(value) : String(value);
   return (
-    <span className={`text-xs font-normal text-gray-800 ${field.type === "id" ? "font-mono" : ""}`}>
+    <span className={`field-value text-xs ${field.type === "id" ? "font-mono" : ""}`}>
       {formatted}
     </span>
   );
@@ -72,8 +72,8 @@ function renderFieldValue(field, rawValue) {
 
 function FieldRow({ field, value }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-[minmax(170px,36%)_1fr] gap-2 sm:gap-4 py-2.5 border-b border-gray-50 last:border-b-0">
-      <span className="text-xs font-semibold text-gray-600">{field.label}</span>
+    <div className="grid grid-cols-1 sm:grid-cols-[minmax(170px,36%)_1fr] gap-2 sm:gap-4 py-2.5 border-b border-[#DBEAFE] last:border-b-0">
+      <span className="field-label text-xs">{field.label}</span>
       <div>{renderFieldValue(field, value)}</div>
     </div>
   );
@@ -93,17 +93,17 @@ export default function LineItemDetailsPage({ searchParams }) {
   })).filter((group) => group.fields.length > 0);
 
   return (
-    <div className="min-h-screen bg-gray-100 font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] font-sans">
       <main className="max-w-[1400px] mx-auto p-4 md:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
-            <h1 className="text-xl font-bold text-gray-800">Line Item Details</h1>
-            <p className="text-xs text-gray-500 mt-0.5">Dedicated detail page for the selected line item</p>
+            <h1 className="text-xl font-bold text-[#1D4ED8]">Line Item Details</h1>
+            <p className="text-xs text-[#6B7280] mt-0.5">Dedicated detail page for the selected line item</p>
           </div>
           <button
             type="button"
             onClick={() => window.close()}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 border border-blue-200 rounded px-3 py-1.5 hover:bg-blue-50 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#2563EB] border border-[#DBEAFE] rounded-xl px-3 py-1.5 hover:bg-[#EFF6FF]"
           >
             <ArrowLeft size={13} />
             Close Tab

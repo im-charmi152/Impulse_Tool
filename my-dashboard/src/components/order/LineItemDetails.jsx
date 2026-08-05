@@ -113,7 +113,7 @@ function LineItemDetails({ items }) {
       actions={
         <button
           onClick={() => recordEvent("export", { type: "line-items" })}
-          className="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 border border-blue-200 rounded px-2.5 py-1 hover:bg-blue-50 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-[#2563EB] hover:text-[#1D4ED8] border border-[#DBEAFE] rounded-xl px-2.5 py-1 hover:bg-[#EFF6FF]"
         >
           <Download size={11} />
           Export
@@ -123,11 +123,11 @@ function LineItemDetails({ items }) {
       <div className="overflow-x-auto -mx-1">
         <table className="w-full text-xs min-w-[760px]">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-100">
+            <tr className="bg-[#F8FAFC] border-b border-[#DBEAFE]">
               {LINE_ITEM_COLUMNS.map((column) => (
                 <th
                   key={column.key}
-                  className="text-left px-2 py-2 font-semibold text-gray-500 text-[10px] uppercase tracking-wide whitespace-nowrap"
+                  className="text-left px-2 py-2 font-semibold text-[#6B7280] text-[10px] uppercase tracking-wide whitespace-nowrap"
                 >
                   {column.label}
                 </th>
@@ -140,12 +140,12 @@ function LineItemDetails({ items }) {
               <tr
                 key={`${item.imiLineNbr ?? "line"}-${index}`}
                 onClick={() => openLineItemDetailsTab(item)}
-                className="border-b border-gray-50 transition-colors cursor-pointer hover:bg-gray-50/50"
+                className="border-b border-[#DBEAFE] transition-colors cursor-pointer hover:bg-[#EFF6FF]"
               >
                 {LINE_ITEM_COLUMNS.map((column) => (
                   <td
                     key={`${item.imiLineNbr ?? index}-${column.key}`}
-                    className="px-2 py-2 text-gray-600 whitespace-nowrap"
+                    className="px-2 py-2 text-[#6B7280] whitespace-nowrap"
                   >
                     {item[column.key] ?? "—"}
                   </td>
@@ -156,23 +156,23 @@ function LineItemDetails({ items }) {
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between mt-3 text-[10px] text-gray-400">
+      <div className="flex items-center justify-between mt-3 text-[10px] text-[#6B7280]">
         <span>
           Showing {rangeStart} to {rangeEnd} of {items.length} items
         </span>
         <div className="flex items-center gap-1">
           <button
-            className="p-1 rounded border border-gray-200 hover:bg-gray-50 disabled:opacity-40"
+            className="p-1 rounded-lg border border-[#DBEAFE] hover:bg-[#EFF6FF] disabled:opacity-40"
             disabled={page <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
           >
             <ChevronLeft size={11} />
           </button>
-          <button className="w-6 h-6 rounded bg-[#003087] text-white text-[10px] font-bold">
+          <button className="w-6 h-6 rounded-lg bg-[#2563EB] text-white text-[10px] font-bold">
             {page}
           </button>
           <button
-            className="p-1 rounded border border-gray-200 hover:bg-gray-50 disabled:opacity-40"
+            className="p-1 rounded-lg border border-[#DBEAFE] hover:bg-[#EFF6FF] disabled:opacity-40"
             disabled={page >= totalPages}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
           >
@@ -184,7 +184,7 @@ function LineItemDetails({ items }) {
               setPageSize(Number(e.target.value));
               setPage(1);
             }}
-            className="ml-2 border border-gray-200 rounded px-1.5 py-0.5 text-[10px] focus:outline-none"
+            className="ml-2 border border-[#DBEAFE] rounded-lg px-1.5 py-0.5 text-[10px] focus:outline-none"
           >
             {PAGE_SIZE_OPTIONS.map((n) => (
               <option key={n} value={n}>

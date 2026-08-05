@@ -15,7 +15,7 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
       )}
       <aside
         className={`
-          fixed top-14 left-0 bottom-0 z-20 bg-white border-r border-gray-200 flex flex-col shadow-sm transition-all duration-300
+          fixed top-14 left-0 bottom-0 z-20 bg-white border-r border-[#DBEAFE] flex flex-col shadow-sm transition-all duration-300
           ${collapsed ? "w-[60px]" : "w-[200px]"}
           ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
@@ -34,25 +34,23 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
                   w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors relative group
                   ${
                     isActive
-                      ? "bg-[#EEF4FF] text-[#003087] font-semibold border-r-[3px] border-[#003087]"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      ? "bg-[#EFF6FF] text-[#1D4ED8] font-semibold border-r-[3px] border-[#2563EB]"
+                      : "text-[#6B7280] hover:bg-[#EFF6FF] hover:text-[#111827]"
                   }
                 `}
               >
                 <Icon
                   size={17}
-                  className={isActive ? "text-[#003087]" : "text-gray-500"}
+                  className={isActive ? "text-[#1D4ED8]" : "text-[#6B7280]"}
                 />
                 {!collapsed && (
                   <>
                     <span className="text-sm flex-1 truncate">{label}</span>
-                    {expandable && (
-                      <ChevronRight size={13} className="text-gray-400" />
-                    )}
+                    {expandable && <ChevronRight size={13} className="text-[#6B7280]" />}
                   </>
                 )}
                 {collapsed && (
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 transition-opacity">
+                  <div className="absolute left-full ml-2 px-2 py-1 bg-[#111827] text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 transition-opacity">
                     {label}
                   </div>
                 )}
@@ -62,7 +60,7 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
         </nav>
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="hidden md:flex items-center gap-2 px-3 py-3 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 border-t border-gray-100 transition-colors"
+          className="hidden md:flex items-center gap-2 px-3 py-3 text-sm text-[#6B7280] hover:bg-[#EFF6FF] hover:text-[#111827] border-t border-[#DBEAFE]"
         >
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
           {!collapsed && <span>Collapse</span>}

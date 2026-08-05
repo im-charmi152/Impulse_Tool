@@ -1,14 +1,14 @@
 function SectionCard({ icon: Icon, title, children, actions }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
+    <div className="enterprise-card overflow-hidden p-0">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#DBEAFE] bg-[#F8FAFC]">
         <div className="flex items-center gap-2">
-          <Icon size={15} className="text-blue-600" />
-          <span className="text-sm font-semibold text-gray-700">{title}</span>
+          <Icon size={15} className="text-[#1D4ED8]" />
+          <span className="enterprise-card-header text-sm font-semibold">{title}</span>
         </div>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
-      <div className="p-4">{children}</div>
+      <div className="p-5">{children}</div>
     </div>
   );
 }

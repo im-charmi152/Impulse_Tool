@@ -17,7 +17,7 @@ function RawResponsePanel({ raw }) {
       actions={
         <button
           onClick={() => setOpen((o) => !o)}
-          className="flex items-center gap-1 text-[10px] text-blue-600 hover:underline"
+          className="flex items-center gap-1 text-[10px] text-[#2563EB] hover:underline"
         >
           {open ? "Hide" : "Show"}
           {open ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
@@ -25,11 +25,11 @@ function RawResponsePanel({ raw }) {
       }
     >
       {open ? (
-        <pre className="text-[10px] font-mono bg-gray-900 text-gray-300 rounded-md p-3 overflow-auto max-h-80">
+        <pre className="text-[10px] font-mono bg-[#111827] text-[#DBEAFE] rounded-xl p-3 overflow-auto max-h-80">
           {JSON.stringify(raw, null, 2)}
         </pre>
       ) : (
-        <div className="text-[11px] text-gray-400">
+        <div className="text-[11px] text-[#6B7280]">
           Click "Show" to inspect the exact JSON the backend returned — useful
           while confirming services/mapOrderResponse.js matches your DTO.
         </div>

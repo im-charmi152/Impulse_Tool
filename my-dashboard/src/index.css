@@ -1,1 +1,59 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
+
+:root {
+	--bg-app: #f8fafc;
+	--bg-card: #ffffff;
+	--accent-primary: #2563eb;
+	--section-header: #1d4ed8;
+	--border-soft: #dbeafe;
+	--text-primary: #111827;
+	--text-secondary: #6b7280;
+	--shadow-soft: 0 8px 24px rgba(37, 99, 235, 0.06);
+}
+
+html,
+body,
+#root {
+	min-height: 100%;
+}
+
+body {
+	font-family: "Inter", sans-serif;
+	background: var(--bg-app);
+	color: var(--text-primary);
+}
+
+.enterprise-card {
+	background: var(--bg-card);
+	border: 1px solid var(--border-soft);
+	border-radius: 16px;
+	box-shadow: var(--shadow-soft);
+	padding: 16px;
+	transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.enterprise-card:hover {
+	border-color: #bfdbfe;
+	box-shadow: 0 12px 30px rgba(37, 99, 235, 0.08);
+}
+
+.enterprise-card-header {
+	color: var(--section-header);
+}
+
+.field-label {
+	color: var(--text-secondary);
+	font-weight: 700;
+}
+
+.field-value {
+	color: var(--text-primary);
+	font-weight: 400;
+}
+
+button,
+a {
+	transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease,
+		box-shadow 180ms ease;
+}
