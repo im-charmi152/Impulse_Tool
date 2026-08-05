@@ -363,21 +363,13 @@ export default function OrderHeaderDetails({
       >
         {/* Header bar */}
         <div
-          className="flex items-center justify-between px-5 py-3.5 border-b border-[#D6E4F7]
-          bg-gradient-to-r from-[#F8FAFC] to-white"
+          className="flex items-center justify-between px-5 py-3.5 border-b border-[#D6E4F7] bg-[#F8FAFC]"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 bg-[#0F6CBD] rounded-md">
-              <FileText size={13} className="text-white" />
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-[#0F6CBD]">
-                Order Header Details
-              </h2>
-              <p className="text-[10px] text-[#6B7280] mt-0.5">
-                {totalFields} fields populated
-              </p>
-            </div>
+          <div className="flex items-center gap-2">
+            <FileText size={15} className="text-[#0F6CBD]" />
+            <span className="enterprise-card-header text-sm font-semibold">
+              Order Header Details
+            </span>
           </div>
 
           <button

@@ -350,6 +350,40 @@ export function mapOrderResponse(raw) {
     imiHoldCd: li.imiHoldCd ?? "—",
   }));
 
+  const toStatusChangeRecord = (entry) => ({
+    coCd: entry.coCd ?? entry.CO_CD ?? "—",
+    ordrBrNbr: entry.ordrBrNbr ?? entry.ORDR_BR_NBR ?? "—",
+    ordrNbr: entry.ordrNbr ?? entry.ORDR_NBR ?? "—",
+    distNbr: entry.distNbr ?? entry.DIST_NBR ?? "—",
+    shipNbr: entry.shipNbr ?? entry.SHIP_NBR ?? "—",
+    ordrDt: entry.ordrDt ?? entry.ORDR_DT ?? "—",
+    stusChgTypCd: entry.stusChgTypCd ?? entry.STUS_CHG_TYP_CD ?? "—",
+    stusChgTs: entry.stusChgTs ?? entry.STUS_CHG_TS ?? "—",
+    ordrLineNbr: entry.ordrLineNbr ?? entry.ORDR_LINE_NBR ?? "—",
+    custBrNbr: entry.custBrNbr ?? entry.CUST_BR_NBR ?? "—",
+    custNbr: entry.custNbr ?? entry.CUST_NBR ?? "—",
+    webProcsFlg: entry.webProcsFlg ?? entry.WEB_PROCS_FLG ?? "—",
+    tomcatProcsFlg: entry.tomcatProcsFlg ?? entry.TOMCAT_PROCS_FLG ?? "—",
+    ordrChgStusCd: entry.ordrChgStusCd ?? entry.ORDR_CHG_STUS_CD ?? "—",
+    configStusCd: entry.configStusCd ?? entry.CONFIG_STUS_CD ?? "—",
+    aggregateId: entry.aggregateId ?? entry.AGGREGATE_ID ?? "—",
+    prmsChgDt: entry.prmsChgDt ?? entry.PRMS_CHG_DT ?? "—",
+    familyCd: entry.familyCd ?? entry.FAMILY_CD ?? "—",
+    lstChgProgNam: entry.lstChgProgNam ?? entry.LST_CHG_PROG_NAM ?? "—",
+    lstChgOperId: entry.lstChgOperId ?? entry.LST_CHG_OPER_ID ?? "—",
+    updtRsnTxt: entry.updtRsnTxt ?? entry.UPDT_RSN_TXT ?? "—",
+    evntRsnCd: entry.evntRsnCd ?? entry.EVNT_RSN_CD ?? "—",
+    flrDnlQty: entry.flrDnlQty ?? entry.FLR_DNL_QTY ?? "—",
+  });
+
+  const rawStatusChanges =
+    raw.statusChanges ?? raw.orderStatusChanges ?? raw.orOrderStusChgs ?? [];
+  const statusChanges = Array.isArray(rawStatusChanges)
+    ? rawStatusChanges
+      .filter((entry) => entry && typeof entry === "object" && !Array.isArray(entry))
+      .map((entry) => toStatusChangeRecord(entry))
+    : [];
+
   const rawPartnerSetup =
     raw.partnerSetup ?? raw.partnerSetups ?? raw.partnerSetupDetails ?? raw.setupConfig ?? [];
   const setupConfig = Array.isArray(rawPartnerSetup)
@@ -359,6 +393,7 @@ export function mapOrderResponse(raw) {
       : [];
 
   const availableSections = ["orderHeader", "lineItems"];
+  if (statusChanges.length > 0) availableSections.push("flowTrace");
   if (setupConfig.length > 0) availableSections.push("setupConfig");
 
   // Only these two sections have a real backend data source right now.
@@ -369,7 +404,7 @@ export function mapOrderResponse(raw) {
     order,
     lineItems,
     processingSteps: [],
-    flowTrace: {},
+    flowTrace: statusChanges,
     setupConfig,
     setupValidation: [],
     logs: [],
