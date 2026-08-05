@@ -1,4 +1,11 @@
-import { FileText, Hash, CalendarDays, Flag, Users, CircleCheck } from "lucide-react";
+import {
+  FileText,
+  Hash,
+  CalendarDays,
+  Flag,
+  Users,
+  CircleCheck,
+} from "lucide-react";
 import Badge from "../common/Badge";
 import { formatDateTime } from "../../utils/format";
 
@@ -44,38 +51,53 @@ function OrderSummaryBanner({ order }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+  <div className="enterprise-card border border-[#D6E4F7] rounded-xl shadow-sm bg-white overflow-hidden">
+    <div className="grid grid-cols-[1.5fr_1.4fr_1.6fr_1fr_1.2fr_1fr] divide-x divide-[#D6E4F7]">
+
       {tiles.map((tile) => {
         const Icon = tile.icon;
+
         return (
           <div
             key={tile.key}
-            className="enterprise-card h-full min-h-[98px] p-3.5 flex items-start gap-2.5"
+            className="flex items-center gap-2 px-3 py-2 min-w-0"
           >
-            {Icon && (
-              <div className="w-8 h-8 rounded-lg bg-[#EFF6FF] flex items-center justify-center flex-shrink-0">
-                <Icon size={14} className="text-[#0F6CBD]" />
-              </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <div className="field-label text-[10px] uppercase tracking-wide">
+            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded bg-[#EEF6FF]">
+              <Icon
+                size={12}
+                strokeWidth={2}
+                className="text-[#0F6CBD]"
+              />
+            </div>
+
+            <div className="flex-1 min-w-0">
+
+              <div className="text-[9px] uppercase font-semibold tracking-wide text-slate-500 leading-none">
                 {tile.label}
               </div>
-              <div className="mt-1">
+
+              <div className="mt-0.5">
                 {tile.isStatus ? (
-                  <Badge color="green">{tile.value}</Badge>
+                  <Badge
+                    color="green"
+                    className="text-[9px] px-2 py-0"
+                  >
+                    {tile.value}
+                  </Badge>
                 ) : (
-                  <div className="field-value text-base font-semibold leading-tight break-words">
+                  <div className="truncate text-[15px] font-semibold text-slate-900">
                     {tile.value}
                   </div>
                 )}
               </div>
+
             </div>
           </div>
         );
       })}
+
     </div>
-  );
-}
+  </div>
+);
 
 export default OrderSummaryBanner;
