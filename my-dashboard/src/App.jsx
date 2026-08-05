@@ -22,7 +22,7 @@ export default function Dashboard() {
   const headerOrder = useMemo(() => data?.order ?? null, [data]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#111827] font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#1F2937] font-sans">
       <Header toggleSidebar={() => setMobileOpen(!mobileOpen)} />
       <Sidebar
         collapsed={sidebarCollapsed}
@@ -45,14 +45,15 @@ export default function Dashboard() {
 
             {status === "success" && data && (
               <>
-                <OrderSummaryBanner
-                  order={headerOrder}
-                  onExport={() => {}}
-                />
+                <OrderSummaryBanner order={headerOrder} />
 
-                <div className="mt-4 grid grid-cols-1 xl:grid-cols-2 gap-4 items-stretch">
-                  <OrderHeaderDetails order={data.order} />
-                  <SetupConfigDetails config={data.setupConfig} />
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+                  <div className="h-full">
+                    <OrderHeaderDetails order={data.order} />
+                  </div>
+                  <div className="h-full">
+                    <SetupConfigDetails config={data.setupConfig} />
+                  </div>
                 </div>
 
                 <div className="mt-4">
@@ -77,8 +78,8 @@ export default function Dashboard() {
           <div className="mt-6 pb-4 text-center text-[10px] text-[#6B7280] flex items-center justify-between">
             <span>© 2024 Ingram Micro Inc. All Rights Reserved.</span>
             <div className="flex gap-4">
-              <button className="hover:text-[#2563EB]">Privacy Policy</button>
-              <button className="hover:text-[#2563EB]">Terms of Use</button>
+              <button className="hover:text-[#0F6CBD]">Privacy Policy</button>
+              <button className="hover:text-[#0F6CBD]">Terms of Use</button>
             </div>
           </div>
         </div>

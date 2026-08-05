@@ -35,7 +35,7 @@ function PoSwitchSection({ order }) {
           return (
             <div
               key={field.key}
-              className="flex items-center justify-between gap-3 rounded-xl border border-[#DBEAFE] bg-[#F8FAFC] px-3 py-2.5"
+              className="flex items-center justify-between gap-3 rounded-xl border border-[#D6E4F7] bg-[#F8FAFC] px-3 py-2.5"
             >
               <span className="field-label text-xs leading-snug">{field.label}</span>
               <Badge color={state.color}>{state.text}</Badge>

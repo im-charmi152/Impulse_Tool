@@ -36,12 +36,12 @@ function SearchBar({ onSearch, loading }) {
                 value={values[param] || ""}
                 onChange={(e) => handleChange(param, e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                className="w-full border border-[#DBEAFE] rounded-xl px-2.5 py-1.5 text-xs text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent placeholder-[#6B7280] pr-7 disabled:bg-[#F8FAFC] disabled:text-[#6B7280] disabled:cursor-not-allowed"
+                className="w-full border border-[#D6E4F7] rounded-xl px-2.5 py-1.5 text-xs text-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#0F6CBD] focus:border-transparent placeholder-[#6B7280] pr-7 disabled:bg-[#F8FAFC] disabled:text-[#6B7280] disabled:cursor-not-allowed"
               />
               {supported && values[param] && (
                 <button
                   onClick={() => handleChange(param, "")}
-                  className="absolute right-2 top-2 text-[#6B7280] hover:text-[#111827]"
+                  className="absolute right-2 top-2 text-[#6B7280] hover:text-[#1F2937]"
                   aria-label={`Clear ${label}`}
                 >
                   <X size={12} />
@@ -58,14 +58,14 @@ function SearchBar({ onSearch, loading }) {
         <div className="flex gap-2">
           <button
             onClick={handleClear}
-            className="px-4 py-1.5 text-xs font-medium text-[#6B7280] border border-[#DBEAFE] rounded-xl hover:bg-[#EFF6FF]"
+            className="px-4 py-1.5 text-xs font-medium text-[#6B7280] border border-[#D6E4F7] rounded-xl hover:bg-[#EFF6FF]"
           >
             Clear
           </button>
           <button
             onClick={handleSubmit}
             disabled={!canSearch || loading}
-            className="px-5 py-1.5 text-xs font-semibold text-white bg-[#2563EB] rounded-xl hover:bg-[#1D4ED8] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+            className="px-5 py-1.5 text-xs font-semibold text-white bg-[#0F6CBD] rounded-xl hover:bg-[#0A5CA6] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
           >
             <SearchIcon size={12} />
             {loading ? "Searching…" : "Search"}

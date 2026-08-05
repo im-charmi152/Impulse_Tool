@@ -30,7 +30,7 @@ function SetupConfigDetails({ config }) {
         <div className="overflow-x-auto -mx-1 max-h-[340px] overflow-y-auto">
           <table className="w-full text-xs min-w-[760px]">
             <thead>
-              <tr className="bg-[#F8FAFC] border-b border-[#DBEAFE]">
+              <tr className="bg-[#F8FAFC] border-b border-[#D6E4F7]">
                 {SUMMARY_COLUMNS.map((column) => (
                   <th
                     key={column.key}
@@ -47,7 +47,7 @@ function SetupConfigDetails({ config }) {
                   <tr
                     key={`${row.coCd}-${row.partnerId}-${index}`}
                     onClick={() => openPartnerSetupDetailsTab(row)}
-                    className="border-b border-[#DBEAFE] transition-colors cursor-pointer hover:bg-[#EFF6FF]"
+                    className="border-b border-[#D6E4F7] transition-colors cursor-pointer hover:bg-[#EFF6FF]"
                   >
                     {SUMMARY_COLUMNS.map((column) => (
                       <td

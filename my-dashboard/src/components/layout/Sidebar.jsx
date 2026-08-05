@@ -15,7 +15,7 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
       )}
       <aside
         className={`
-          fixed top-14 left-0 bottom-0 z-20 bg-white border-r border-[#DBEAFE] flex flex-col shadow-sm transition-all duration-300
+          fixed top-14 left-0 bottom-0 z-20 bg-white border-r border-[#D6E4F7] flex flex-col shadow-sm transition-all duration-300
           ${collapsed ? "w-[60px]" : "w-[200px]"}
           ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
@@ -34,14 +34,14 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
                   w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors relative group
                   ${
                     isActive
-                      ? "bg-[#EFF6FF] text-[#1D4ED8] font-semibold border-r-[3px] border-[#2563EB]"
+                      ? "bg-[#EFF6FF] text-[#0F6CBD] font-semibold border-r-[3px] border-[#0F6CBD]"
                       : "text-[#6B7280] hover:bg-[#EFF6FF] hover:text-[#111827]"
                   }
                 `}
               >
                 <Icon
                   size={17}
-                  className={isActive ? "text-[#1D4ED8]" : "text-[#6B7280]"}
+                  className={isActive ? "text-[#0F6CBD]" : "text-[#6B7280]"}
                 />
                 {!collapsed && (
                   <>
@@ -60,7 +60,7 @@ function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
         </nav>
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="hidden md:flex items-center gap-2 px-3 py-3 text-sm text-[#6B7280] hover:bg-[#EFF6FF] hover:text-[#111827] border-t border-[#DBEAFE]"
+          className="hidden md:flex items-center gap-2 px-3 py-3 text-sm text-[#6B7280] hover:bg-[#EFF6FF] hover:text-[#1F2937] border-t border-[#D6E4F7]"
         >
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
           {!collapsed && <span>Collapse</span>}

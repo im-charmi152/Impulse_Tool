@@ -40,7 +40,7 @@ function CopyBtn({ value }) {
       onClick={handle}
       aria-label="Copy to clipboard"
       className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded
-        text-[#6B7280] hover:text-[#2563EB] hover:bg-[#EFF6FF] focus:opacity-100 focus:outline-none
+        text-[#6B7280] hover:text-[#0F6CBD] hover:bg-[#EFF6FF] focus:opacity-100 focus:outline-none
         focus:ring-2 focus:ring-blue-400"
     >
       {copied ? <Check size={11} className="text-green-500" /> : <Copy size={11} />}
@@ -60,7 +60,7 @@ function StatusBadge({ value }) {
     blue:  "bg-blue-50  text-blue-700  border-blue-200",
     red:   "bg-red-50   text-red-700   border-red-200",
     amber: "bg-amber-50 text-amber-700 border-amber-200",
-    gray:  "bg-[#F8FAFC]  text-[#6B7280]  border-[#DBEAFE]",
+    gray:  "bg-[#F8FAFC]  text-[#6B7280]  border-[#D6E4F7]",
   };
   const dots = { green: "bg-green-500", blue: "bg-blue-500", red: "bg-red-500", amber: "bg-amber-500", gray: "bg-gray-400" };
   const c = cfg.color;
@@ -138,7 +138,7 @@ function DrawerField({ field, value, highlight }) {
     : field.label;
 
   return (
-    <div className="group flex items-start justify-between py-2.5 border-b border-[#DBEAFE] last:border-0 gap-3">
+    <div className="group flex items-start justify-between py-2.5 border-b border-[#D6E4F7] last:border-0 gap-3">
       <span className="field-label text-[11px] min-w-[140px] leading-tight pt-0.5">{labelEl}</span>
       <div className="flex-1 text-right">
         <FieldValue type={field.type} value={value} copyable={field.copyable} />
@@ -170,7 +170,7 @@ function AccordionGroup({ group, order, searchQuery, forceOpen }) {
   const filledCount = group.fields.filter((f) => order[f.key] != null && order[f.key] !== "").length;
 
   return (
-    <div className={`border border-[#DBEAFE] rounded-xl overflow-hidden mb-2 ${group.technical ? "border-l-2 border-l-orange-300" : ""}`}>
+    <div className={`border border-[#D6E4F7] rounded-xl overflow-hidden mb-2 ${group.technical ? "border-l-2 border-l-orange-300" : ""}`}>
       <button
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between px-4 py-3 bg-[#F8FAFC] hover:bg-[#EFF6FF] transition-colors group"
@@ -180,7 +180,7 @@ function AccordionGroup({ group, order, searchQuery, forceOpen }) {
           <div className={`p-1.5 rounded-md ${group.technical ? "bg-orange-100" : "bg-blue-50"}`}>
             <Icon size={13} className={group.technical ? "text-orange-500" : "text-blue-600"} />
           </div>
-          <span className="text-xs font-semibold text-[#1D4ED8]">{group.label}</span>
+          <span className="text-xs font-semibold text-[#0F6CBD]">{group.label}</span>
           {group.technical && (
             <span className="text-[9px] uppercase tracking-wide font-bold text-orange-500 bg-orange-50 border border-orange-200 rounded px-1.5 py-0.5">
               Technical
@@ -275,9 +275,9 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
           ${open ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* Sticky header */}
-        <div className="flex-shrink-0 border-b border-[#DBEAFE]">
+        <div className="flex-shrink-0 border-b border-[#D6E4F7]">
           {/* Title bar */}
-          <div className="flex items-center justify-between px-5 py-3.5 bg-[#1D4ED8]">
+          <div className="flex items-center justify-between px-5 py-3.5 bg-[#0F6CBD]">
             <div>
               <h2 className="text-sm font-semibold text-white">Order Header Details</h2>
               <p className="text-[10px] text-blue-200 mt-0.5">{totalFields} fields populated</p>
@@ -301,14 +301,14 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search header fields… (e.g. hold, partner, ship)"
-                className="w-full pl-8 pr-9 py-2 text-xs border border-[#DBEAFE] rounded-xl bg-white text-[#111827]
-                  focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent
+                className="w-full pl-8 pr-9 py-2 text-xs border border-[#D6E4F7] rounded-xl bg-white text-[#1F2937]
+                  focus:outline-none focus:ring-2 focus:ring-[#0F6CBD] focus:border-transparent
                   placeholder-[#6B7280]"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-2.5 top-2 text-[#6B7280] hover:text-[#111827] p-0.5"
+                  className="absolute right-2.5 top-2 text-[#6B7280] hover:text-[#1F2937] p-0.5"
                 >
                   <X size={12} />
                 </button>
@@ -317,7 +317,7 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
             {search && (
               <p className="mt-1.5 text-[10px] text-[#6B7280]">
                 {matchCount > 0
-                  ? <><span className="font-semibold text-[#2563EB]">{matchCount}</span> field{matchCount !== 1 ? "s" : ""} matching <span className="font-medium">"{search}"</span></>
+                  ? <><span className="font-semibold text-[#0F6CBD]">{matchCount}</span> field{matchCount !== 1 ? "s" : ""} matching <span className="font-medium">"{search}"</span></>
                   : <span className="text-amber-600">No fields match "{search}"</span>
                 }
               </p>
@@ -339,13 +339,13 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
         </div>
 
         {/* Footer */}
-        <div className="flex-shrink-0 border-t border-[#DBEAFE] px-5 py-3 bg-[#F8FAFC] flex items-center justify-between">
+        <div className="flex-shrink-0 border-t border-[#D6E4F7] px-5 py-3 bg-[#F8FAFC] flex items-center justify-between">
           <span className="text-[10px] text-[#6B7280]">
             Showing all available fields for this order
           </span>
           <button
             onClick={onClose}
-            className="text-xs text-[#6B7280] hover:text-[#111827] font-medium transition-colors"
+            className="text-xs text-[#6B7280] hover:text-[#1F2937] font-medium transition-colors"
           >
             Close
           </button>
