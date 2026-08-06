@@ -10,6 +10,7 @@ import FlowTraceStatus from "./components/flow/FlowTraceStatus";
 import SetupConfigDetails from "./components/setup/SetupConfigDetails";
 import DatadogPanel from "./components/monitoring/DatadogPanel";
 import PoSwitchSection from "./components/order/PoSwitchSection";
+import ProcessFlowSection from "./components/order/ProcessFlowSection";
 import { LoadingState, EmptyState, ErrorState, IdleState } from "./components/common/StatusStates";
 
 import { useOrderSearch } from "./hooks/useOrderSearch";
@@ -22,7 +23,7 @@ export default function Dashboard() {
   const headerOrder = useMemo(() => data?.order ?? null, [data]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#1F2937] font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#1F2937] font-sans force-black-text">
       <Header toggleSidebar={() => setMobileOpen(!mobileOpen)} />
       <Sidebar
         collapsed={sidebarCollapsed}
@@ -62,6 +63,10 @@ export default function Dashboard() {
 
                 <div className="mt-4">
                   <FlowTraceStatus flowTrace={data.flowTrace} />
+                </div>
+
+                <div className="mt-4">
+                  <ProcessFlowSection />
                 </div>
 
                 <div className="mt-4">
