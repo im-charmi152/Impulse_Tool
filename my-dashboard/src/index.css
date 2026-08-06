@@ -58,3 +58,8 @@ a {
 	transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease,
 		box-shadow 180ms ease;
 }
+
+.force-black-text,
+.force-black-text * {
+	color: #111827 !important;
+}
