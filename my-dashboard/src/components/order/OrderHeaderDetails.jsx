@@ -112,7 +112,7 @@
  *
  * Replaces the flat key-value list with:
  *   1. Summary Card  — top 12 fields in a responsive icon grid (always visible)
- *   2. HeaderDrawer  — right slide-over with all 170+ fields, live search, accordions
+ *   2. New-tab details navigation for all fields (matches LineItems pattern)
  *
  * Drop-in replacement: the only prop is `order` (same shape as before).
  * The component is forward-compatible — unknown keys simply don't render.
@@ -137,7 +137,6 @@ import {
   Building,
   Info,
 } from "lucide-react";
-import HeaderDrawer from "./header/HeaderDrawer";
 import {
   SUMMARY_FIELDS,
   ORDER_STATUS_MAP,
@@ -145,6 +144,7 @@ import {
 } from "./header/fieldConfig";
 import { formatDateTime } from "../../utils/format";
 import SectionCard from "../common/SectionCard";
+import { openOrderHeaderDetailsTab } from "../../utils/detailsNavigation";
 
 // Icon map (string key → component)
 const ICON_MAP = {
@@ -355,11 +355,29 @@ export default function OrderHeaderDetails({
       <SectionCard
         icon={FileText}
         title="Order Header Details"
+        actions={
+          <button
+            type="button"
+            onClick={() => openOrderHeaderDetailsTab(order)}
+            className="inline-flex items-center gap-1.5 rounded-md border border-[#D6E4F7] px-2.5 py-1.5 text-[10px] font-semibold text-[#0F6CBD] hover:bg-[#EFF6FF]"
+          >
+            <ExternalLink size={11} />
+            View All Fields
+            <ChevronRight size={11} />
+          </button>
+        }
         footer={
         <div className="flex items-center gap-1.5 px-5 py-2.5 bg-[#F8FAFC]">
             <Info size={11} className="text-[#6B7280]" />
             <p className="text-[10px] text-[#6B7280]">
                 Showing 12 key fields.
+                <button
+                  type="button"
+                  onClick={() => openOrderHeaderDetailsTab(order)}
+                  className="ml-2 font-semibold text-[#0F6CBD] hover:text-[#0A5CA6]"
+                >
+                  View all fields
+                </button>
             </p>
         </div>
     }
