@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import Dashboard from "./App";
 import LineItemDetailsPage from "./pages/LineItemDetailsPage";
 import PartnerSetupDetailsPage from "./pages/PartnerSetupDetailsPage";
+import PoSwitchDetailsPage from "./pages/PoSwitchDetailsPage";
+import OrderHeaderDetailsPage from "./pages/OrderHeaderDetailsPage";
 
 function parseHashLocation() {
   const rawHash = window.location.hash || "#/";
@@ -31,6 +33,14 @@ export default function RootRouter() {
 
   if (location.path === "/partner-setup-details") {
     return <PartnerSetupDetailsPage searchParams={location.searchParams} />;
+  }
+
+  if (location.path === "/po-switch-details") {
+    return <PoSwitchDetailsPage searchParams={location.searchParams} />;
+  }
+
+  if (location.path === "/order-header-details") {
+    return <OrderHeaderDetailsPage searchParams={location.searchParams} />;
   }
 
   return <Dashboard />;

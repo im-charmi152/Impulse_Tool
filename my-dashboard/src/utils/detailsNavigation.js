@@ -78,6 +78,32 @@ export function openLineItemDetailsTab(item) {
   );
 }
 
+export function openOrderHeaderDetailsTab(record) {
+  openInNewTab(
+    "/order-header-details",
+    {
+      poNumber: record?.poNumber ?? "",
+      imiAsgdBrNbr: record?.imiAsgdBrNbr ?? "",
+      accountNumber: record?.accountNumber ?? "",
+      partnerId: record?.partnerId ?? "",
+    },
+    "order-header",
+    record,
+  );
+}
+
+export function openPoSwitchDetailsTab(record) {
+  openInNewTab(
+    "/po-switch-details",
+    {
+      coCd: record?.coCd ?? "",
+      partnerId: record?.partnerId ?? "",
+    },
+    "po-switch",
+    record,
+  );
+}
+
 export function openPartnerSetupDetailsTab(record) {
   openInNewTab(
     "/partner-setup-details",
