@@ -142,9 +142,9 @@ import {
   SUMMARY_FIELDS,
   ORDER_STATUS_MAP,
   HOLD_CODE_MAP,
-  countAvailableFields,
 } from "./header/fieldConfig";
 import { formatDateTime } from "../../utils/format";
+import SectionCard from "../common/SectionCard";
 
 // Icon map (string key → component)
 const ICON_MAP = {
@@ -174,7 +174,7 @@ function StatusBadge({ value }) {
     blue: "bg-blue-50  text-blue-700  border-blue-200",
     red: "bg-red-50   text-red-700   border-red-200",
     amber: "bg-amber-50 text-amber-700 border-amber-200",
-    gray: "bg-[#F8FAFC]  text-[#6B7280]  border-[#D6E4F7]",
+    gray: "bg-[#F8FAFC]  text-[#6B7280]  border-[#DBEAFE]",
   };
   const dots = {
     green: "bg-green-500",
@@ -278,11 +278,11 @@ function SummaryField({ fieldDef, value }) {
 
   return (
     <div
-      className="group flex items-start gap-2.5 p-3 rounded-xl bg-white border border-[#D6E4F7]
+      className="group flex items-start gap-2.5 p-3 rounded-xl bg-white border border-[#DBEAFE]
       hover:border-[#BFDBFE] hover:shadow-sm transition-all duration-150"
     >
       <div className="flex-shrink-0 w-7 h-7 rounded-md bg-[#EFF6FF] flex items-center justify-center mt-0.5">
-        <Icon size={13} className="text-[#0F6CBD]" />
+        <Icon size={13} className="text-[#2563EB]" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="field-label text-[9px] uppercase tracking-wider mb-1">
@@ -298,9 +298,8 @@ function SummaryField({ fieldDef, value }) {
 function SkeletonCard() {
   return (
     <div className="enterprise-card p-0 overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#D6E4F7] bg-[#F8FAFC]">
+      <div className="flex items-center px-5 py-3 border-b border-[#DBEAFE] bg-[#F8FAFC]">
         <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
-        <div className="h-7 w-36 bg-gray-200 rounded-lg animate-pulse" />
       </div>
       <div className="p-5 grid grid-cols-2 md:grid-cols-3 gap-3">
         {Array.from({ length: 12 }).map((_, i) => (
@@ -343,12 +342,8 @@ export default function OrderHeaderDetails({
   order,
   loading = false,
   error = null,
-}) {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const totalFields = useMemo(() => countAvailableFields(order), [order]);
-
-  const openDrawer = useCallback(() => setDrawerOpen(true), []);
-  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
+}) 
+{
 
   if (loading) return <SkeletonCard />;
   if (error) return <ErrorCard message={error} />;
@@ -357,36 +352,21 @@ export default function OrderHeaderDetails({
   return (
     <>
       {/* ── Summary Card ─────────────────────────────────────────────────── */}
-      <section
-        aria-label="Order header summary"
-        className="enterprise-card h-full p-0 overflow-hidden"
-      >
-        {/* Header bar */}
-        <div
-          className="flex items-center justify-between px-5 py-3.5 border-b border-[#D6E4F7] bg-[#F8FAFC]"
-        >
-          <div className="flex items-center gap-2">
-            <FileText size={15} className="text-[#0F6CBD]" />
-            <span className="enterprise-card-header text-sm font-semibold">
-              Order Header Details
-            </span>
-          </div>
-
-          <button
-            onClick={openDrawer}
-            aria-label="Open full header details drawer"
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white
-              bg-[#0F6CBD] rounded-xl hover:bg-[#0A5CA6] shadow-sm
-              focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-          >
-            <ExternalLink size={11} />
-            View All Fields
-            <ChevronRight size={11} className="opacity-60" />
-          </button>
+      <SectionCard
+        icon={FileText}
+        title="Order Header Details"
+        footer={
+        <div className="flex items-center gap-1.5 px-5 py-2.5 bg-[#F8FAFC]">
+            <Info size={11} className="text-[#6B7280]" />
+            <p className="text-[10px] text-[#6B7280]">
+                Showing 12 key fields.
+            </p>
         </div>
-
+    }
+      >
+        
         {/* 12-field summary grid */}
-        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
           {SUMMARY_FIELDS.map((fieldDef) => (
             <SummaryField
               key={fieldDef.key}
@@ -395,29 +375,7 @@ export default function OrderHeaderDetails({
             />
           ))}
         </div>
-
-        {/* Footer hint */}
-        <div className="flex items-center gap-1.5 px-5 py-2.5 border-t border-[#D6E4F7] bg-[#F8FAFC]">
-          <Info size={11} className="text-[#6B7280] flex-shrink-0" />
-          <p className="text-[10px] text-[#6B7280]">
-            Showing 12 key fields.{" "}
-            <button
-              onClick={openDrawer}
-              className="text-[#0F6CBD] hover:text-[#0A5CA6] font-medium focus:outline-none focus:underline"
-            >
-              View all {totalFields} header fields →
-            </button>
-          </p>
-        </div>
-      </section>
-
-      {/* ── Right slide-over drawer ───────────────────────────────────────── */}
-      <HeaderDrawer
-        open={drawerOpen}
-        onClose={closeDrawer}
-        order={order}
-        totalFields={totalFields}
-      />
+      </SectionCard>
     </>
   );
 }

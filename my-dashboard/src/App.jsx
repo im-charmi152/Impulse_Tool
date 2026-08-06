@@ -65,7 +65,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="mt-4">
-                  <PoSwitchSection order={data.order} />
+                  <PoSwitchSection inPoSw={data.inPoSw} />
                 </div>
 
                 <div className="mt-4">

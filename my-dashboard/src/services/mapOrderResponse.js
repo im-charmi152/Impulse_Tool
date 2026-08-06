@@ -37,6 +37,73 @@ export function mapOrderResponse(raw) {
     setupNotesTxt: entry.setupNotesTxt ?? entry.SETUP_NOTES_TXT ?? "—",
   });
 
+  const toInPoSwRecord = (entry) => ({
+    coCd: entry.coCd ?? entry.CO_CD ?? "—",
+    partnerId: entry.partnerId ?? entry.PARTNER_ID ?? "—",
+    skipFrTm: entry.skipFrTm ?? entry.SKIP_FR_TM ?? "—",
+    skipToTm: entry.skipToTm ?? entry.SKIP_TO_TM ?? "—",
+    custPrty: entry.custPrty ?? entry.CUST_PRTY ?? "—",
+    ackPoFlg: entry.ackPoFlg ?? entry.ACK_PO_FLG ?? "—",
+    ackPromoFlg: entry.ackPromoFlg ?? entry.ACK_PROMO_FLG ?? "—",
+    baserateFlg: entry.baserateFlg ?? entry.BASERATE_FLG ?? "—",
+    aggCdCpblFlg: entry.aggCdCpblFlg ?? entry.AGG_CD_CPBL_FLG ?? "—",
+    preImHoldFlg: entry.preImHoldFlg ?? entry.PRE_IM_HOLD_FLG ?? "—",
+    multShpToFlg: entry.multShpToFlg ?? entry.MULT_SHP_TO_FLG ?? "—",
+    systemPartsFlg: entry.systemPartsFlg ?? entry.SYSTEM_PARTS_FLG ?? "—",
+    voidTaxableFlg: entry.voidTaxableFlg ?? entry.VOID_TAXABLE_FLG ?? "—",
+    casepackMsgFlg: entry.casepackMsgFlg ?? entry.CASEPACK_MSG_FLG ?? "—",
+    chkCustPrcFlg: entry.chkCustPrcFlg ?? entry.CHK_CUST_PRC_FLG ?? "—",
+    distDepthFlg: entry.distDepthFlg ?? entry.DIST_DEPTH_FLG ?? "—",
+    airBrSeqFlg: entry.airBrSeqFlg ?? entry.AIR_BR_SEQ_FLG ?? "—",
+    brSeqOrideFlg: entry.brSeqOrideFlg ?? entry.BR_SEQ_ORIDE_FLG ?? "—",
+    multBrSeqFlg: entry.multBrSeqFlg ?? entry.MULT_BR_SEQ_FLG ?? "—",
+    exportBrSeqFlg: entry.exportBrSeqFlg ?? entry.EXPORT_BR_SEQ_FLG ?? "—",
+    holdOrderFlg: entry.holdOrderFlg ?? entry.HOLD_ORDER_FLG ?? "—",
+    dfltCustNbr: entry.dfltCustNbr ?? entry.DFLT_CUST_NBR ?? "—",
+    promoCustNbr: entry.promoCustNbr ?? entry.PROMO_CUST_NBR ?? "—",
+    priceCustNbr: entry.priceCustNbr ?? entry.PRICE_CUST_NBR ?? "—",
+    instRebatMsgFlg: entry.instRebatMsgFlg ?? entry.INST_REBAT_MSG_FLG ?? "—",
+    vlaFlg: entry.vlaFlg ?? entry.VLA_FLG ?? "—",
+    multiDistFlg: entry.multiDistFlg ?? entry.MULTI_DIST_FLG ?? "—",
+    saveFrtFlg: entry.saveFrtFlg ?? entry.SAVE_FRT_FLG ?? "—",
+    saveDistFlg: entry.saveDistFlg ?? entry.SAVE_DIST_FLG ?? "—",
+    bestWhseFlg: entry.bestWhseFlg ?? entry.BEST_WHSE_FLG ?? "—",
+    singleWhseFlg: entry.singleWhseFlg ?? entry.SINGLE_WHSE_FLG ?? "—",
+    prntOrdrFlg: entry.prntOrdrFlg ?? entry.PRNT_ORDR_FLG ?? "—",
+    multShpSortSeq: entry.multShpSortSeq ?? entry.MULT_SHP_SORT_SEQ ?? "—",
+    maxFutDay: entry.maxFutDay ?? entry.MAX_FUT_DAY ?? "—",
+    lstChgTs: entry.lstChgTs ?? entry.LST_CHG_TS ?? "—",
+    lstChgNam: entry.lstChgNam ?? entry.LST_CHG_NAM ?? "—",
+    clsXFltrTypCd: entry.clsXFltrTypCd ?? entry.CLS_X_FLTR_TYP_CD ?? "—",
+    clsSFltrTypCd: entry.clsSFltrTypCd ?? entry.CLS_S_FLTR_TYP_CD ?? "—",
+    updCustSkuFlg: entry.updCustSkuFlg ?? entry.UPD_CUST_SKU_FLG ?? "—",
+    saveCustPrcFlg: entry.saveCustPrcFlg ?? entry.SAVE_CUST_PRC_FLG ?? "—",
+    boBrXferFlg: entry.boBrXferFlg ?? entry.BO_BR_XFER_FLG ?? "—",
+    rejOrdrHdrFlg: entry.rejOrdrHdrFlg ?? entry.REJ_ORDR_HDR_FLG ?? "—",
+    rejCnsCmpHdrFlg: entry.rejCnsCmpHdrFlg ?? entry.REJ_CNSCMP_HDR_FLG ?? "—",
+    ackRptFlg: entry.ackRptFlg ?? entry.ACK_RPT_FLG ?? "—",
+    specPrcFlg: entry.specPrcFlg ?? entry.SPEC_PRC_FLG ?? "—",
+    euCaptureFlg: entry.euCaptureFlg ?? entry.EU_CAPTURE_FLG ?? "—",
+    customCarrFlg: entry.customCarrFlg ?? entry.CUSTOM_CARR_FLG ?? "—",
+    cascadeSkuFlg: entry.cascadeSkuFlg ?? entry.CASCADE_SKU_FLG ?? "—",
+    autoPoChgFlg: entry.autoPoChgFlg ?? entry.AUTO_PO_CHG_FLG ?? "—",
+    clsXHldFlg: entry.clsXHldFlg ?? entry.CLS_X_HLD_FLG ?? "—",
+    stStoreOvrRdFlg: entry.stStoreOvrRdFlg ?? entry.ST_STORE_OVRRD_FLG ?? "—",
+    rsrvCustNbr: entry.rsrvCustNbr ?? entry.RSRV_CUST_NBR ?? "—",
+    rsrvAllowed: entry.rsrvAllowed ?? entry.RSRV_ALLOWED ?? "—",
+    rsrvExpirDays: entry.rsrvExpirDays ?? entry.RSRV_EXPIR_DAYS ?? "—",
+    configVisibleFlg: entry.configVisibleFlg ?? entry.CONFIG_VISIBLE_FLG ?? "—",
+    etaCalcFlg: entry.etaCalcFlg ?? entry.ETA_CALC_FLG ?? "—",
+    etaDays: entry.etaDays ?? entry.ETA_DAYS ?? "—",
+    addrValidFlg: entry.addrValidFlg ?? entry.ADDR_VALID_FLG ?? "—",
+    autoSplitFlg: entry.autoSplitFlg ?? entry.AUTO_SPLIT_FLG ?? "—",
+    ordrCancDaysFlg: entry.ordrCancDaysFlg ?? entry.ORDR_CANC_DAYS_FLG ?? "—",
+    ordrCancDaysNbr: entry.ordrCancDaysNbr ?? entry.ORDR_CANC_DAYS_NBR ?? "—",
+    futOrdrSw: entry.futOrdrSw ?? entry.FUT_ORDR_SW ?? "—",
+    ackDelaySw: entry.ackDelaySw ?? entry.ACK_DELAY_SW ?? "—",
+    ackDelayHrs: entry.ackDelayHrs ?? entry.ACK_DELAY_HRS ?? "—",
+  });
+
   const order = {
     custCoCd: raw.custCoCd ?? "—",
     custBr: raw.custBr ?? "—",
@@ -392,9 +459,19 @@ export function mapOrderResponse(raw) {
       ? [toPartnerSetupRecord(rawPartnerSetup)]
       : [];
 
+  const rawInPoSw = raw.inPoSw ?? raw.ieInPoSw ?? raw.poSwitch ?? [];
+  const inPoSw = Array.isArray(rawInPoSw)
+    ? rawInPoSw
+      .filter((entry) => entry && typeof entry === "object" && !Array.isArray(entry))
+      .map((entry) => toInPoSwRecord(entry))
+    : rawInPoSw && typeof rawInPoSw === "object"
+      ? [toInPoSwRecord(rawInPoSw)]
+      : [];
+
   const availableSections = ["orderHeader", "lineItems"];
   if (statusChanges.length > 0) availableSections.push("flowTrace");
   if (setupConfig.length > 0) availableSections.push("setupConfig");
+  if (inPoSw.length > 0) availableSections.push("poSwitch");
 
   // Only these two sections have a real backend data source right now.
   // Flow Trace, Setup Validation, Datadog, and MQ still show "Not
@@ -406,6 +483,7 @@ export function mapOrderResponse(raw) {
     processingSteps: [],
     flowTrace: statusChanges,
     setupConfig,
+    inPoSw,
     setupValidation: [],
     logs: [],
     datadogAlerts: [],
