@@ -8,8 +8,8 @@
 	--accent-hover: #0a5ca6;
 	--section-header: #0f6cbd;
 	--border-soft: #d6e4f7;
-	--text-primary: #1f2937;
-	--text-secondary: #6b7280;
+	--text-primary: #767676;
+	--text-secondary: #575758;
 	--shadow-soft: 0 8px 24px rgba(15, 108, 189, 0.08);
 }
 
@@ -57,9 +57,4 @@ button,
 a {
 	transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease,
 		box-shadow 180ms ease;
-}
-
-.force-black-text,
-.force-black-text * {
-	color: #111827 !important;
 }

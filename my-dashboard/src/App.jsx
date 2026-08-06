@@ -23,7 +23,7 @@ export default function Dashboard() {
   const headerOrder = useMemo(() => data?.order ?? null, [data]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#1F2937] font-sans force-black-text">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#1F2937] font-sans">
       <Header toggleSidebar={() => setMobileOpen(!mobileOpen)} />
       <Sidebar
         collapsed={sidebarCollapsed}
