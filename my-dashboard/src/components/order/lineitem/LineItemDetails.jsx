@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { Download, ChevronLeft, ChevronRight, Layers } from "lucide-react";
-import SectionCard from "../common/SectionCard";
-import { recordEvent } from "../../utils/auditLog";
-import { openLineItemDetailsTab } from "../../utils/detailsNavigation";
+import SectionCard from "../../common/SectionCard";
+import { recordEvent } from "../../../utils/auditLog";
+import { openLineItemDetailsTab } from "../../../utils/detailsNavigation";
 
 const PAGE_SIZE_OPTIONS = [10, 25];
 

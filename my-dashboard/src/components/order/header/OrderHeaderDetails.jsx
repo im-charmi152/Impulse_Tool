@@ -141,10 +141,10 @@ import {
   SUMMARY_FIELDS,
   ORDER_STATUS_MAP,
   HOLD_CODE_MAP,
-} from "./header/fieldConfig";
-import { formatDateTime } from "../../utils/format";
-import SectionCard from "../common/SectionCard";
-import { openOrderHeaderDetailsTab } from "../../utils/detailsNavigation";
+} from "./fieldConfig";
+import { formatDateTime } from "../../../utils/format";
+import SectionCard from "../../common/SectionCard";
+import { openOrderHeaderDetailsTab } from "../../../utils/detailsNavigation";
 
 // Icon map (string key → component)
 const ICON_MAP = {

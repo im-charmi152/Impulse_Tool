@@ -2,7 +2,7 @@
 import { Database, ExternalLink } from "lucide-react";
 import SectionCard from "../common/SectionCard";
 
-function DatadogPanel({ logs, alerts }) {
+function DatadogPanel() {
   const openDetails = () => {
   window.open(
     "http://localhost:5173/", // Replace with your localhost URL
@@ -12,30 +12,25 @@ function DatadogPanel({ logs, alerts }) {
 };
 
   return (
-    <SectionCard
-      icon={Database}
-      title="Datadog"
-      actions={
-        <button 
+  <SectionCard
+    icon={Database}
+    title="Datadog"
+  >
+    <div className="flex flex-col items-center justify-center py-10 text-center">
+      <button
         onClick={openDetails}
-        className="flex items-center gap-1 text-[10px] text-[#0F6CBD] hover:underline">
-          More Details <ExternalLink size={10} />
-        </button>
-      }
-    >
-      <div className="flex flex-col items-center justify-center py-10">
-  <Database
-    size={36}
-    className="text-[#0F6CBD] mb-3 opacity-80"
-  />
+        className="inline-flex items-center gap-2 rounded-xl bg-[#2563EB] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#1D4ED8] hover:shadow-md"
+      >
+        <ExternalLink size={15} />
+        Click here
+      </button>
 
-  <p className="mt-2 text-xs text-[#6B7280] text-center max-w-md">
-    View complete logs, traces, alerts and monitoring metrics
-    from the Datadog dashboard.
-  </p>
-</div>
-    </SectionCard>
-  );
+      <p className="mt-4 max-w-lg text-xs leading-5 text-[#6B7280]">
+        Open Diagnostics Workspace
+      </p>
+    </div>
+  </SectionCard>
+);
 }
 
 export default DatadogPanel;
