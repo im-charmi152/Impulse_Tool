@@ -1,4 +1,5 @@
 
+import { SlidersHorizontal } from "lucide-react";
 import SectionCard from "../common/SectionCard";
 import Badge from "../common/Badge";
 import { openPoSwitchDetailsTab } from "../../utils/detailsNavigation";
