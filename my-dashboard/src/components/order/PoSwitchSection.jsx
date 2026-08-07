@@ -1,4 +1,4 @@
-import { SlidersHorizontal, ExternalLink, ChevronRight, Info } from "lucide-react";
+
 import SectionCard from "../common/SectionCard";
 import Badge from "../common/Badge";
 import { openPoSwitchDetailsTab } from "../../utils/detailsNavigation";
@@ -103,25 +103,24 @@ function PoSwitchSection({ inPoSw }) {
     );
   }
 
-  const totalFields = PO_SWITCH_FIELDS.length;
 
   return (
     <SectionCard
       icon={SlidersHorizontal}
       title="PO Switch"
-      actions={
-        <button
-          type="button"
-          onClick={() => openPoSwitchDetailsTab(record)}
-          className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-[#0F6CBD] rounded-xl hover:bg-[#0A5CA6] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-        >
-          <ExternalLink size={11} />
-          View All Fields
-          <ChevronRight size={11} className="opacity-60" />
-        </button>
-      }
     >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div
+  role="button"
+  tabIndex={0}
+  onClick={() => openPoSwitchDetailsTab(record)}
+  onKeyDown={(event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openPoSwitchDetailsTab(record);
+    }
+  }}
+  className="grid grid-cols-1 md:grid-cols-2 gap-3 cursor-pointer"
+>
         {PO_SWITCH_FIELDS.slice(0, PREVIEW_COUNT).map((field) => {
           const value = record[field.key];
           const isFlag = FLAG_KEYS.has(field.key);
@@ -130,7 +129,7 @@ function PoSwitchSection({ inPoSw }) {
           return (
             <div
               key={field.key}
-              className="flex items-center justify-between gap-3 rounded-xl border border-[#D6E4F7] bg-[#F8FAFC] px-3 py-2.5"
+              className="flex items-center justify-between gap-3 rounded-xl border border-[#D6E4F7] bg-[#F8FAFC] px-3 py-2.5 hover:bg-[#EFF6FF] transition-colors"
             >
               <span className="field-label text-xs leading-snug">{field.label}</span>
               {isFlag ? (
@@ -143,20 +142,6 @@ function PoSwitchSection({ inPoSw }) {
             </div>
           );
         })}
-      </div>
-
-      <div className="flex items-center gap-1.5 px-1 pt-3 mt-1 border-t border-[#D6E4F7]">
-        <Info size={11} className="text-[#6B7280] flex-shrink-0" />
-        <p className="text-[10px] text-[#6B7280]">
-          Showing {PREVIEW_COUNT} of {totalFields} fields.{" "}
-          <button
-            type="button"
-            onClick={() => openPoSwitchDetailsTab(record)}
-            className="text-[#0F6CBD] hover:text-[#0A5CA6] font-medium focus:outline-none focus:underline"
-          >
-            View all {totalFields} fields →
-          </button>
-        </p>
       </div>
     </SectionCard>
   );
