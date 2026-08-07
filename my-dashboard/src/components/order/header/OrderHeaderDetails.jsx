@@ -355,36 +355,26 @@ export default function OrderHeaderDetails({
       <SectionCard
         icon={FileText}
         title="Order Header Details"
-        actions={
-          <button
-            type="button"
-            onClick={() => openOrderHeaderDetailsTab(order)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-[#D6E4F7] px-2.5 py-1.5 text-[10px] font-semibold text-[#0F6CBD] hover:bg-[#EFF6FF]"
-          >
-            <ExternalLink size={11} />
-            View All Fields
-            <ChevronRight size={11} />
-          </button>
-        }
         footer={
         <div className="flex items-center gap-1.5 px-5 py-2.5 bg-[#F8FAFC]">
             <Info size={11} className="text-[#6B7280]" />
-            <p className="text-[10px] text-[#6B7280]">
-                Showing 12 key fields.
-                <button
-                  type="button"
-                  onClick={() => openOrderHeaderDetailsTab(order)}
-                  className="ml-2 font-semibold text-[#0F6CBD] hover:text-[#0A5CA6]"
-                >
-                  View all fields
-                </button>
-            </p>
         </div>
     }
       >
         
         {/* 12-field summary grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
+        <div
+  role="button"
+  tabIndex={0}
+  onClick={() => openOrderHeaderDetailsTab(order)}
+  onKeyDown={(event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openOrderHeaderDetailsTab(order);
+    }
+  }}
+  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 cursor-pointer"
+>
           {SUMMARY_FIELDS.map((fieldDef) => (
             <SummaryField
               key={fieldDef.key}

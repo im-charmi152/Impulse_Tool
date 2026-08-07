@@ -82,9 +82,9 @@ export function openOrderHeaderDetailsTab(record) {
   openInNewTab(
     "/order-header-details",
     {
-      poNumber: record?.poNumber ?? "",
+      custPoNbr: record?.custPoNbr ?? "",
       imiAsgdBrNbr: record?.imiAsgdBrNbr ?? "",
-      accountNumber: record?.accountNumber ?? "",
+      custNbr: record?.custNbr ?? "",
       partnerId: record?.partnerId ?? "",
     },
     "order-header",

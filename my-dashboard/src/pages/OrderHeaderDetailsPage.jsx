@@ -52,9 +52,9 @@ const SUMMARY_KEYS = new Set(SUMMARY_FIELDS.map((field) => field.key));
 
 function parseFallbackFromParams(searchParams) {
   return {
-    poNumber: searchParams.get("poNumber") || "-",
+    custPoNbr: searchParams.get("custPoNbr") || "-",
     imiAsgdBrNbr: searchParams.get("imiAsgdBrNbr") || "-",
-    accountNumber: searchParams.get("accountNumber") || "-",
+    custNbr: searchParams.get("custNbr") || "-",
     partnerId: searchParams.get("partnerId") || "-",
   };
 }
