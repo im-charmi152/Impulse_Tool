@@ -1,7 +1,7 @@
 import { ArrowLeft, Settings, Hash, Package, BarChart2, DollarSign, Calendar, AlertCircle, Truck, Cpu, Building2, Users, FileText, Globe } from "lucide-react";
 import Badge from "../components/common/Badge";
-import { PARTNER_SETUP_FIELD_GROUPS } from "../components/setup/setupFieldConfig";
-import { normalizeSetupRecord, statusColor } from "../components/setup/setupDetailsUtils";
+import { PARTNER_SETUP_FIELD_GROUPS } from "../components/PartnerSetup/setupFieldConfig";
+import { normalizeSetupRecord, statusColor } from "../components/PartnerSetup/setupDetailsUtils";
 import { loadDetailsRecord } from "../utils/detailsNavigation";
 import { AccordionCard, DetailFieldRow, SummaryTile, formatDetailValue } from "../components/details/DetailsLayout";
 
