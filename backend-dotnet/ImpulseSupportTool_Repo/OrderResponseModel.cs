@@ -185,8 +185,6 @@ namespace ImpulseSupportTool_Repo
         public string QuoteNbr { get; set; }
         public string XediAckFlg { get; set; }
         public string VmfHdrHldInd { get; set; }
-        public string HybrdAnntyOrdrInd { get; set; }
-        public string HybrdAnntyCnfmtnId { get; set; }
 
         // Nested list: line items (from EO_LINE_INFO)
         public List<OrderLineItem> LineItems { get; set; } = new();
