@@ -241,7 +241,14 @@ namespace ImpulseSupportTool_Repo
             public string UpdtRsnTxt { get; set; }
             public string EvntRsnCd { get; set; }
             public decimal FlrDnlQty { get; set; }
-        }
+            public string LastChgApplId { get; set; }
+            public string TransAuthId { get; set; }
+            public string CorrelId { get; set; }
+            public string PlanNam { get; set; }
+            public string OdsIsrtTs { get; set; }
+            public string OdsUpdTs { get; set; }
+
+    }
     public class OrderPartnerSetup
     {
         public string CoCd { get; set; }
