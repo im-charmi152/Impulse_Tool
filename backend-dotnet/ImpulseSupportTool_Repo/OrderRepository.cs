@@ -522,7 +522,97 @@ namespace OrderManagement.API.Repositories
             }
 
             Console.WriteLine($">>> ODS STATUS CHANGES FOUND: {response.StatusChanges.Count}");
-            
+
+            string partnerQuery = @"
+            SELECT
+                CO_CD,
+                PARTNER_ID,
+                PARTNER_TYPE_CD,
+                SRCE_SYS_ID,
+                SRCE_SYS_KEY_ID,
+                FORMAT_ID,
+                DIR_FLG_CD,
+                DOC_ID,
+                FREQ_ID,
+                DATA_STORE_MECH_ID,
+                COMMU_ID,
+                INTERNET_ADDR_TXT,
+                ACTV_DT,
+                DEACTV_DT,
+                HOLD_CD,
+                SETUP_NOTES_TXT,
+                SEND_THRU_ID,
+                LST_CHG_TS,
+                LST_CHG_NAM,
+                PRCS_OPTN_FLG,
+                CYCLE_INTVL,
+                CYCLE_LST_RUN_TS,
+                BATCH_SPLIT_CNT,
+                CYC_STRT_TM,
+                CYC_END_TM,
+                OVRD_APPL_BATCH_ID,
+                TRANS_AUTH_ID,
+                CORREL_ID,
+                PLAN_NAM,
+                ODS_ISRT_TS,
+                ODS_UPD_TS
+            FROM ODS.DB2_IE_PARTNER_SETUP
+            WHERE CO_CD = :companyCode
+              AND PARTNER_ID = :partnerId";
+
+            string partnerCoCd = response.CustCoCd?.Trim() switch { "MD" => "US", "FT" => "CA", _ => response.CustCoCd?.Trim() };
+            Console.WriteLine($">>> PARTNER SETUP CO_CD: Incoming={response.CustCoCd}, QueryValue={partnerCoCd}");
+
+            try
+            {
+                await using OracleCommand partnerCmd = new OracleCommand(partnerQuery, conn);
+                partnerCmd.BindByName = true;
+                partnerCmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = partnerCoCd;
+                partnerCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = response.PartnerId?.Trim();
+                Console.WriteLine($">>> EXECUTING ODS PARTNER SETUP QUERY...");
+                Console.WriteLine($">>> PARTNER CO_CD PARAMETER: {partnerCoCd}");
+                Console.WriteLine($">>> PARTNER ID PARAMETER: {response.PartnerId?.Trim()}");
+
+                await using OracleDataReader partnerReader = await partnerCmd.ExecuteReaderAsync();
+
+                Console.WriteLine($">>> ODS PARTNER SETUP READER HAS ROWS: {partnerReader.HasRows}");
+
+                if (await partnerReader.ReadAsync())
+                {
+                    response.PartnerSetup.Add(new OrderPartnerSetup
+                    {
+                        CoCd = partnerReader["CO_CD"]?.ToString()?.Trim(),
+                        PartnerId = partnerReader["PARTNER_ID"]?.ToString()?.Trim(),
+                        PartnerTypeCd = partnerReader["PARTNER_TYPE_CD"]?.ToString()?.Trim(),
+                        SrceSysId = partnerReader["SRCE_SYS_ID"]?.ToString()?.Trim(),
+                        SrceSysKeyId = partnerReader["SRCE_SYS_KEY_ID"]?.ToString()?.Trim(),
+                        FormatId = partnerReader["FORMAT_ID"]?.ToString()?.Trim(),
+                        DirFlgCd = partnerReader["DIR_FLG_CD"]?.ToString()?.Trim(),
+                        DocId = partnerReader["DOC_ID"]?.ToString()?.Trim(),
+                        FreqId = partnerReader["FREQ_ID"]?.ToString()?.Trim(),
+                        DataStoreMechId = partnerReader["DATA_STORE_MECH_ID"]?.ToString()?.Trim(),
+                        CommuId = partnerReader["COMMU_ID"]?.ToString()?.Trim(),
+                        InternetAddrTxt = partnerReader["INTERNET_ADDR_TXT"]?.ToString()?.Trim(),
+                        ActvDt = partnerReader["ACTV_DT"]?.ToString()?.Trim(),
+                        DeactvDt = partnerReader["DEACTV_DT"]?.ToString()?.Trim(),
+                        HoldCd = partnerReader["HOLD_CD"]?.ToString()?.Trim(),
+                        SetupNotesTxt = partnerReader["SETUP_NOTES_TXT"]?.ToString()?.Trim(),
+                        SendThruId = partnerReader["SEND_THRU_ID"]?.ToString()?.Trim(),
+                        LstChgTs = partnerReader["LST_CHG_TS"]?.ToString()?.Trim(),
+                        LstChgNam = partnerReader["LST_CHG_NAM"]?.ToString()?.Trim(),
+                        PrcsOptnFlg = partnerReader["PRCS_OPTN_FLG"]?.ToString()?.Trim(),
+                        CycleIntvl = partnerReader["CYCLE_INTVL"]?.ToString()?.Trim(),
+                        CycleLstRunTs = partnerReader["CYCLE_LST_RUN_TS"]?.ToString()?.Trim(),
+                        BatchSplitCnt = partnerReader["BATCH_SPLIT_CNT"]?.ToString()?.Trim(),
+                        CycStrtTm = partnerReader["CYC_STRT_TM"]?.ToString()?.Trim()
+                    });
+                }
+            }
+            catch (OracleException ex)
+            {
+                Console.WriteLine($">>> PARTNER SETUP ORACLE ERROR: {ex.Message}");
+            }
+
             return response;
             // TRIM fixes trailing spaces in CHAR fixed-width columns
         } 
