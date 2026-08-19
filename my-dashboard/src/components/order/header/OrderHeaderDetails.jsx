@@ -132,42 +132,50 @@ import {
   Truck,
   Copy,
   Check,
+  Shield,
   ExternalLink,
   ChevronRight,
   Building,
+  CreditCard,
+  UserCheck,
+  ToggleLeft,
+  MapPin,
+  Globe,
+  Flag,
   Info,
 } from "lucide-react";
-import {
-  SUMMARY_FIELDS,
-  ORDER_STATUS_MAP,
-  HOLD_CODE_MAP,
-} from "./fieldConfig";
+import { SUMMARY_FIELDS, ORDER_STATUS_MAP, HOLD_CODE_MAP } from "./fieldConfig";
 import { formatDateTime } from "../../../utils/format";
 import SectionCard from "../../common/SectionCard";
 import { openOrderHeaderDetailsTab } from "../../../utils/detailsNavigation";
 
 // Icon map (string key → component)
-const ICON_MAP = {
-  FileText,
-  Hash,
-  Activity,
-  User,
-  Building2,
-  Users,
-  Calendar,
-  DollarSign,
-  AlertCircle,
-  Truck,
-  Building,
-};
+// import {
+//   Hash, CreditCard, Truck, Shield, UserCheck, DollarSign,
+//   ToggleLeft, MapPin, FileText, Globe, User, Flag, Building2,
+// } from "lucide-react";
 
+const ICON_MAP = {
+  Hash,
+  CreditCard,
+  Truck,
+  Shield,
+  UserCheck,
+  DollarSign,
+  ToggleLeft,
+  MapPin,
+  FileText,
+  Globe,
+  User,
+  Flag,
+  Building2,
+};
 // ─── Status badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ value }) {
   if (!value) return <span className="text-gray-300 text-xs">—</span>;
   const key = String(value).toLowerCase();
   const cfg = ORDER_STATUS_MAP[key] ?? ORDER_STATUS_MAP[value] ?? null;
-  if (!cfg)
-    return <span className="field-value text-xs">{value}</span>;
+  if (!cfg) return <span className="field-value text-xs">{value}</span>;
 
   const styles = {
     green: "bg-green-50 text-green-700 border-green-200",
@@ -256,7 +264,7 @@ function SummaryField({ fieldDef, value }) {
     if (fieldDef.type === "hold") return <HoldBadge value={value} />;
     if (fieldDef.type === "date")
       return (
-          <span className="field-value text-xs leading-tight">
+        <span className="field-value text-xs leading-tight">
           {formatDateTime(value)}
         </span>
       );
@@ -342,9 +350,7 @@ export default function OrderHeaderDetails({
   order,
   loading = false,
   error = null,
-}) 
-{
-
+}) {
   if (loading) return <SkeletonCard />;
   if (error) return <ErrorCard message={error} />;
   if (!order) return null;
@@ -356,25 +362,24 @@ export default function OrderHeaderDetails({
         icon={FileText}
         title="Order Header Details"
         footer={
-        <div className="flex items-center gap-1.5 px-5 py-2.5 bg-[#F8FAFC]">
+          <div className="flex items-center gap-1.5 px-5 py-2.5 bg-[#F8FAFC]">
             <Info size={11} className="text-[#6B7280]" />
-        </div>
-    }
+          </div>
+        }
       >
-        
         {/* 12-field summary grid */}
         <div
-  role="button"
-  tabIndex={0}
-  onClick={() => openOrderHeaderDetailsTab(order)}
-  onKeyDown={(event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      openOrderHeaderDetailsTab(order);
-    }
-  }}
-  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 cursor-pointer"
->
+          role="button"
+          tabIndex={0}
+          onClick={() => openOrderHeaderDetailsTab(order)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openOrderHeaderDetailsTab(order);
+            }
+          }}
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 cursor-pointer"
+        >
           {SUMMARY_FIELDS.map((fieldDef) => (
             <SummaryField
               key={fieldDef.key}

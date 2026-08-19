@@ -14,16 +14,52 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
-  X, Search, Copy, Check, ChevronDown, ChevronRight,
-  ShoppingCart, User, Users, Truck, DollarSign,
-  Settings, Flag, Cpu, AlertCircle,
+  X,
+  Search,
+  Copy,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  ShoppingCart,
+  User,
+  Users,
+  Truck,
+  DollarSign,
+  Settings,
+  Flag,
+  UserCheck,
+  Cpu,
+  Shield,
+  CreditCard,
+  AlertCircle,
+  ToggleLeft,
+  MapPin,
+  Globe,
+  Flag,
 } from "lucide-react";
 import { FIELD_GROUPS, ORDER_STATUS_MAP, HOLD_CODE_MAP } from "./fieldConfig";
 import { formatDateTime } from "../../../utils/format";
 
 // ─── Icon map (string key → component) ───────────────────────────────────────
+// import {
+//    CreditCard, Shield, UserCheck, DollarSign,
+//   ToggleLeft, MapPin, FileText, Globe, User, Flag, Building2,
+// } from "lucide-react";
+
 const ICON_MAP = {
-  ShoppingCart, User, Users, Truck, DollarSign, Settings, Flag, Cpu,
+  Hash,
+  CreditCard,
+  Truck,
+  Shield,
+  UserCheck,
+  DollarSign,
+  ToggleLeft,
+  MapPin,
+  FileText,
+  Globe,
+  User,
+  Flag,
+  Building2,
 };
 
 // ─── Copy Button ──────────────────────────────────────────────────────────────
@@ -43,7 +79,11 @@ function CopyBtn({ value }) {
         text-[#6B7280] hover:text-[#0F6CBD] hover:bg-[#EFF6FF] focus:opacity-100 focus:outline-none
         focus:ring-2 focus:ring-blue-400"
     >
-      {copied ? <Check size={11} className="text-green-500" /> : <Copy size={11} />}
+      {copied ? (
+        <Check size={11} className="text-green-500" />
+      ) : (
+        <Copy size={11} />
+      )}
     </button>
   );
 }
@@ -57,16 +97,24 @@ function StatusBadge({ value }) {
 
   const colors = {
     green: "bg-green-50 text-green-700 border-green-200",
-    blue:  "bg-blue-50  text-blue-700  border-blue-200",
-    red:   "bg-red-50   text-red-700   border-red-200",
+    blue: "bg-blue-50  text-blue-700  border-blue-200",
+    red: "bg-red-50   text-red-700   border-red-200",
     amber: "bg-amber-50 text-amber-700 border-amber-200",
-    gray:  "bg-[#F8FAFC]  text-[#6B7280]  border-[#D6E4F7]",
+    gray: "bg-[#F8FAFC]  text-[#6B7280]  border-[#D6E4F7]",
   };
-  const dots = { green: "bg-green-500", blue: "bg-blue-500", red: "bg-red-500", amber: "bg-amber-500", gray: "bg-gray-400" };
+  const dots = {
+    green: "bg-green-500",
+    blue: "bg-blue-500",
+    red: "bg-red-500",
+    amber: "bg-amber-500",
+    gray: "bg-gray-400",
+  };
   const c = cfg.color;
 
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${colors[c]}`}>
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${colors[c]}`}
+    >
       <span className={`w-1.5 h-1.5 rounded-full ${dots[c]}`} />
       {cfg.label}
     </span>
@@ -75,7 +123,12 @@ function StatusBadge({ value }) {
 
 function HoldBadge({ value }) {
   if (!value || value === "N" || value === "0" || value === "") {
-    return <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-600"><span className="w-1.5 h-1.5 rounded-full bg-green-500" />Clear</span>;
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-600">
+        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+        Clear
+      </span>
+    );
   }
   const desc = HOLD_CODE_MAP[value];
   return (
@@ -88,10 +141,17 @@ function HoldBadge({ value }) {
 
 function FlagBadge({ value }) {
   if (value === "Y" || value === true || value === "1") {
-    return <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5"><span className="w-1.5 h-1.5 bg-green-500 rounded-full" />Enabled</span>;
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
+        <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+        Enabled
+      </span>
+    );
   }
   if (value === "N" || value === false || value === "0") {
-    return <span className="text-[10px] font-medium text-[#6B7280]">Disabled</span>;
+    return (
+      <span className="text-[10px] font-medium text-[#6B7280]">Disabled</span>
+    );
   }
   return <span className="text-xs text-[#6B7280]">{String(value ?? "—")}</span>;
 }
@@ -103,22 +163,33 @@ function FieldValue({ type, value, copyable }) {
 
   const text = (() => {
     switch (type) {
-      case "date":     return formatDateTime(value);
-      case "currency": return typeof value === "number"
-        ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value)
-        : value;
-      case "number":   return String(value);
-      default:         return String(value);
+      case "date":
+        return formatDateTime(value);
+      case "currency":
+        return typeof value === "number"
+          ? new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(value)
+          : value;
+      case "number":
+        return String(value);
+      default:
+        return String(value);
     }
   })();
 
   if (type === "status") return <StatusBadge value={value} />;
-  if (type === "hold")   return <HoldBadge value={value} />;
-  if (type === "flag")   return <FlagBadge value={value} />;
+  if (type === "hold") return <HoldBadge value={value} />;
+  if (type === "flag") return <FlagBadge value={value} />;
 
   return (
     <span className="flex items-center gap-1 group">
-      <span className={`text-xs field-value ${type === "id" ? "font-mono" : ""}`}>{text}</span>
+      <span
+        className={`text-xs field-value ${type === "id" ? "font-mono" : ""}`}
+      >
+        {text}
+      </span>
       {copyable && <CopyBtn value={text} />}
     </span>
   );
@@ -130,16 +201,25 @@ function DrawerField({ field, value, highlight }) {
     ? (() => {
         const parts = field.label.split(new RegExp(`(${highlight})`, "gi"));
         return parts.map((p, i) =>
-          p.toLowerCase() === highlight.toLowerCase()
-            ? <mark key={i} className="bg-yellow-200 text-yellow-900 rounded-sm px-0.5">{p}</mark>
-            : p
+          p.toLowerCase() === highlight.toLowerCase() ? (
+            <mark
+              key={i}
+              className="bg-yellow-200 text-yellow-900 rounded-sm px-0.5"
+            >
+              {p}
+            </mark>
+          ) : (
+            p
+          ),
         );
       })()
     : field.label;
 
   return (
     <div className="group flex items-start justify-between py-2.5 border-b border-[#D6E4F7] last:border-0 gap-3">
-      <span className="field-label text-[11px] min-w-[140px] leading-tight pt-0.5">{labelEl}</span>
+      <span className="field-label text-[11px] min-w-[140px] leading-tight pt-0.5">
+        {labelEl}
+      </span>
       <div className="flex-1 text-right">
         <FieldValue type={field.type} value={value} copyable={field.copyable} />
       </div>
@@ -158,29 +238,46 @@ function AccordionGroup({ group, order, searchQuery, forceOpen }) {
     return group.fields.filter((f) => {
       const hasValue = order[f.key] != null && order[f.key] !== "";
       if (!q) return hasValue;
-      return f.label.toLowerCase().includes(q) || String(order[f.key] ?? "").toLowerCase().includes(q);
+      return (
+        f.label.toLowerCase().includes(q) ||
+        String(order[f.key] ?? "")
+          .toLowerCase()
+          .includes(q)
+      );
     });
   }, [group.fields, order, searchQuery]);
 
   // Auto-open when search matches
-  const shouldOpen = forceOpen || (searchQuery && visibleFields.length > 0) || open;
+  const shouldOpen =
+    forceOpen || (searchQuery && visibleFields.length > 0) || open;
 
   if (searchQuery && visibleFields.length === 0) return null;
 
-  const filledCount = group.fields.filter((f) => order[f.key] != null && order[f.key] !== "").length;
+  const filledCount = group.fields.filter(
+    (f) => order[f.key] != null && order[f.key] !== "",
+  ).length;
 
   return (
-    <div className={`border border-[#D6E4F7] rounded-xl overflow-hidden mb-2 ${group.technical ? "border-l-2 border-l-orange-300" : ""}`}>
+    <div
+      className={`border border-[#D6E4F7] rounded-xl overflow-hidden mb-2 ${group.technical ? "border-l-2 border-l-orange-300" : ""}`}
+    >
       <button
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between px-4 py-3 bg-[#F8FAFC] hover:bg-[#EFF6FF] transition-colors group"
         aria-expanded={shouldOpen}
       >
         <div className="flex items-center gap-2.5">
-          <div className={`p-1.5 rounded-md ${group.technical ? "bg-orange-100" : "bg-blue-50"}`}>
-            <Icon size={13} className={group.technical ? "text-orange-500" : "text-blue-600"} />
+          <div
+            className={`p-1.5 rounded-md ${group.technical ? "bg-orange-100" : "bg-blue-50"}`}
+          >
+            <Icon
+              size={13}
+              className={group.technical ? "text-orange-500" : "text-blue-600"}
+            />
           </div>
-          <span className="text-xs font-semibold text-[#0F6CBD]">{group.label}</span>
+          <span className="text-xs font-semibold text-[#0F6CBD]">
+            {group.label}
+          </span>
           {group.technical && (
             <span className="text-[9px] uppercase tracking-wide font-bold text-orange-500 bg-orange-50 border border-orange-200 rounded px-1.5 py-0.5">
               Technical
@@ -188,18 +285,29 @@ function AccordionGroup({ group, order, searchQuery, forceOpen }) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-[#6B7280] tabular-nums">{filledCount} fields</span>
-          {shouldOpen
-            ? <ChevronDown size={14} className="text-[#6B7280] transition-transform" />
-            : <ChevronRight size={14} className="text-[#6B7280] transition-transform" />
-          }
+          <span className="text-[10px] text-[#6B7280] tabular-nums">
+            {filledCount} fields
+          </span>
+          {shouldOpen ? (
+            <ChevronDown
+              size={14}
+              className="text-[#6B7280] transition-transform"
+            />
+          ) : (
+            <ChevronRight
+              size={14}
+              className="text-[#6B7280] transition-transform"
+            />
+          )}
         </div>
       </button>
 
       {shouldOpen && (
         <div className="px-4 bg-white animate-in slide-in-from-top-1 duration-150">
           {visibleFields.length === 0 ? (
-            <p className="py-4 text-xs text-[#6B7280] text-center">No data available for this section.</p>
+            <p className="py-4 text-xs text-[#6B7280] text-center">
+              No data available for this section.
+            </p>
           ) : (
             visibleFields.map((field) => (
               <DrawerField
@@ -233,7 +341,9 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
 
   // Keyboard: Escape → close
   useEffect(() => {
-    const handle = (e) => { if (e.key === "Escape" && open) onClose(); };
+    const handle = (e) => {
+      if (e.key === "Escape" && open) onClose();
+    };
     document.addEventListener("keydown", handle);
     return () => document.removeEventListener("keydown", handle);
   }, [open, onClose]);
@@ -241,14 +351,20 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
   // Trap scroll behind when drawer is open
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   const matchCount = useMemo(() => {
     if (!search) return 0;
     const q = search.toLowerCase();
     return FIELD_GROUPS.flatMap((g) => g.fields).filter(
-      (f) => f.label.toLowerCase().includes(q) || String(order?.[f.key] ?? "").toLowerCase().includes(q)
+      (f) =>
+        f.label.toLowerCase().includes(q) ||
+        String(order?.[f.key] ?? "")
+          .toLowerCase()
+          .includes(q),
     ).length;
   }, [search, order]);
 
@@ -279,8 +395,12 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
           {/* Title bar */}
           <div className="flex items-center justify-between px-5 py-3.5 bg-[#0F6CBD]">
             <div>
-              <h2 className="text-sm font-semibold text-white">Order Header Details</h2>
-              <p className="text-[10px] text-blue-200 mt-0.5">{totalFields} fields populated</p>
+              <h2 className="text-sm font-semibold text-white">
+                Order Header Details
+              </h2>
+              <p className="text-[10px] text-blue-200 mt-0.5">
+                {totalFields} fields populated
+              </p>
             </div>
             <button
               onClick={onClose}
@@ -294,7 +414,10 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
           {/* Search */}
           <div className="px-4 py-3 bg-[#F8FAFC]">
             <div className="relative">
-              <Search size={13} className="absolute left-3 top-2.5 text-[#6B7280]" />
+              <Search
+                size={13}
+                className="absolute left-3 top-2.5 text-[#6B7280]"
+              />
               <input
                 ref={searchRef}
                 type="text"
@@ -316,10 +439,19 @@ export default function HeaderDrawer({ open, onClose, order, totalFields }) {
             </div>
             {search && (
               <p className="mt-1.5 text-[10px] text-[#6B7280]">
-                {matchCount > 0
-                  ? <><span className="font-semibold text-[#0F6CBD]">{matchCount}</span> field{matchCount !== 1 ? "s" : ""} matching <span className="font-medium">"{search}"</span></>
-                  : <span className="text-amber-600">No fields match "{search}"</span>
-                }
+                {matchCount > 0 ? (
+                  <>
+                    <span className="font-semibold text-[#0F6CBD]">
+                      {matchCount}
+                    </span>{" "}
+                    field{matchCount !== 1 ? "s" : ""} matching{" "}
+                    <span className="font-medium">"{search}"</span>
+                  </>
+                ) : (
+                  <span className="text-amber-600">
+                    No fields match "{search}"
+                  </span>
+                )}
               </p>
             )}
           </div>
