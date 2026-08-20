@@ -36,10 +36,10 @@ function OrderSummaryBanner({ order }) {
       icon: Flag,
     },
     {
-      key: "partner",
-      label: "Partner ID",
-      value: order?.partnerId || "—",
-      icon: Users,
+      key: "orderSource",
+      label: "Order Source",
+      value: order?.termId || "—",
+      icon: FileText,
     },
     {
       key: "status",
@@ -99,5 +99,5 @@ function OrderSummaryBanner({ order }) {
     </div>
   </div>
 );
-}
+
 export default OrderSummaryBanner;

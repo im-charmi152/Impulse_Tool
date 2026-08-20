@@ -63,17 +63,24 @@ function SetupFieldCard({ field, value }) {
 
 function SetupConfigDetails({ config }) {
   const records = useMemo(() => {
-    if (!Array.isArray(config)) return [];
-    if (config.length > 0 && typeof config[0] === "object" && !Array.isArray(config[0])) {
-      return config.map((entry) => normalizeSetupRecord(entry));
+    if (Array.isArray(config)) {
+      return config
+        .filter((entry) => entry && typeof entry === "object" && !Array.isArray(entry))
+        .map((entry) => normalizeSetupRecord(entry));
     }
+
+    if (config && typeof config === "object" && !Array.isArray(config)) {
+      return [normalizeSetupRecord(config)];
+    }
+
     return [];
   }, [config]);
 
-  const primaryRecord = records[0] ?? null;
-
-
-  if (!primaryRecord) return null;
+  const fallbackRecord = useMemo(
+    () => ({ ...normalizeSetupRecord({}), activeStatus: "—" }),
+    [],
+  );
+  const primaryRecord = records[0] ?? fallbackRecord;
 
   return (
     <SectionCard icon={Settings} title="Partner Setup Details">
