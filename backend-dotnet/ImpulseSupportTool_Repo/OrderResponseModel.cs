@@ -416,6 +416,8 @@ namespace ImpulseSupportTool_Repo
         public string FutOrdrSw { get; set; }
         public string AckDelaySw { get; set; }
         public string AckDelayHrs { get; set; }
+        public string TransAuthId { get; set; }
+
     }
 
 }
