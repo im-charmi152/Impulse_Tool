@@ -36,7 +36,12 @@ export default function Dashboard() {
         className={`pt-14 transition-all duration-300 hidden-mobile-margin ${sidebarCollapsed ? "md:ml-[60px]" : "md:ml-[200px]"}`}
       >
         <div className="p-4 md:p-5 max-w-[1400px]">
-          <SearchBar onSearch={search} loading={status === "loading"} />
+          <SearchBar
+            onSearch={search}
+            loading={status === "loading"}
+            resultOrder={data?.order ?? null}
+            resultLineItems={data?.lineItems ?? []}
+          />
 
           <div className="mt-4">
             {status === "idle" && <IdleState />}

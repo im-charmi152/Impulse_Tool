@@ -67,9 +67,9 @@ export function openLineItemDetailsTab(item) {
   openInNewTab(
     "/line-item-details",
     {
-      imiLineNbr: item?.imiLineNbr ?? "",
-      custCoCd: item?.custCoCd ?? "",
-      custBr: item?.custBr ?? "",
+      lineNbr: item?.lineNbr ?? "",
+      companyCd: item?.companyCd ?? "",
+      branchNbr: item?.branchNbr ?? "",
       custNbr: item?.custNbr ?? "",
       custPoNbr: item?.custPoNbr ?? "",
     },
