@@ -9,42 +9,48 @@ import {
 import Badge from "../common/Badge";
 import { formatDateTime } from "../../utils/format";
 
+// Returns null for missing/placeholder values so || fallbacks work correctly.
+// mapOrderResponse stores "—" for null backend fields; treat it the same as null.
+function val(v) {
+  return v == null || v === "—" ? null : v;
+}
+
 function OrderSummaryBanner({ order }) {
   const tiles = [
     {
       key: "custPo",
       label: "Customer PO",
-      value: order?.custPoNbr || order?.poNumber || "—",
+      value: val(order?.custPoNbr) ?? "—",
       icon: FileText,
     },
     {
       key: "orderNo",
       label: "Order Number",
-      value: order?.imiAsgdOrdrNbr || order?.orderNumber || "—",
+      value: val(order?.imiAsgdOrdrNbr) ?? "—",
       icon: Hash,
     },
     {
       key: "custPoDate",
       label: "Customer PO Date",
-      value: order?.custPoDt ? formatDateTime(order.custPoDt) : "—",
+      value: val(order?.custPoDt) ? formatDateTime(order.custPoDt) : "—",
       icon: CalendarDays,
     },
     {
       key: "country",
       label: "Country Code",
-      value: order?.custCoCd || "—",
+      value: val(order?.custCoCd) ?? "—",
       icon: Flag,
     },
     {
       key: "orderSource",
       label: "Order Source",
-      value: order?.termId || "—",
+      value: val(order?.termId) ?? "—",
       icon: FileText,
     },
     {
       key: "status",
       label: "Status",
-      value: order?.ordSt || "Found",
+      value: val(order?.ordSt) ?? "Found",
       icon: CircleCheck,
       isStatus: true,
     },
@@ -99,6 +105,6 @@ function OrderSummaryBanner({ order }) {
     </div>
   </div>
 );
-}
 
 export default OrderSummaryBanner;
+}
