@@ -105,6 +105,6 @@ function OrderSummaryBanner({ order }) {
     </div>
   </div>
 );
+}
 
 export default OrderSummaryBanner;
-}
