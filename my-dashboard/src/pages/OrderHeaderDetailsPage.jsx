@@ -16,6 +16,13 @@ import {
   AlertCircle,
   Building,
   Globe,
+  CreditCard,
+  Briefcase,
+  UserCheck,
+  UserCircle,
+  Shield,
+  KeyRound,
+  ToggleLeft,
 } from "lucide-react";
 import {
   FIELD_GROUPS,
@@ -46,6 +53,13 @@ const ICON_MAP = {
   AlertCircle,
   Building,
   Globe,
+  CreditCard,
+  Briefcase,
+  UserCheck,
+  UserCircle,
+  Shield,
+  KeyRound,
+  ToggleLeft,
 };
 
 const SUMMARY_KEYS = new Set(SUMMARY_FIELDS.map((field) => field.key));
@@ -85,7 +99,9 @@ export default function OrderHeaderDetailsPage({ searchParams }) {
       <main className="max-w-[1400px] mx-auto p-4 md:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
-            <h1 className="text-xl font-bold text-[#0F6CBD]">Order Header Details</h1>
+            <h1 className="text-xl font-bold text-[#0F6CBD]">
+              Order Header Details
+            </h1>
             <p className="text-xs text-[#6B7280] mt-0.5">
               Dedicated detail page for the selected order header record
             </p>
