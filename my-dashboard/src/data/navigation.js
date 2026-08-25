@@ -37,9 +37,9 @@ export const SEARCH_FIELDS = [
   { label: "CUST PO NBR", param: "poNumber", supported: true },
   { label: "Country Code", param: "countryCode", supported: true },
   { label: "Order Number", param: "orderNumber", supported: false },
-  { label: "SKU", param: "sku", supported: false },
-  { label: "Account Number", param: "accountNumber", supported: false },
   { label: "Partner ID", param: "partnerId", supported: false },
+  { label: "Customer Number", param: "accountNumber", supported: false },
+  { label: "SKU", param: "sku", supported: false },
   { label: "Transaction ID", param: "transactionId", supported: false },
 ];
 

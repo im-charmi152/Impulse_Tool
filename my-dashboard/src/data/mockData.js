@@ -6,20 +6,15 @@
 // component code changing — only this file (or its usage) goes away.
 
 export const ORDER = {
-  orderNumber: "ORD123456789",
-  transactionId: "TXN987654321",
-  poNumber: "PO456789",
-  partnerId: "P123456",
-  accountNumber: "ACCT10001",
-  orderDate: "May 15, 2024 10:30 AM",
-  status: "Completed",
-  lastUpdated: "May 15, 2024 11:45 AM",
-  accountName: "ABC Technologies Inc.",
-  partnerName: "XYZ Solutions",
-  orderSource: "Partner Portal",
-  totalLineItems: 5,
-  orderTotal: "USD 15,678.90",
-  currency: "USD",
+  // Keys match mapOrderResponse.js const order — ORSHED column-style names.
+  custOrdrNbr: "PO456789",      // CUST_ORDR_NBR
+  ordrNbr: "ORD123456789",      // ORDR_NBR
+  entyDt: "2024-05-15",         // ENTY_DT
+  companyCd: "US",              // COMPANY_CD
+  termId: "Partner Portal",     // TERM_ID
+  bordrStus: "Completed",       // BORDR_STUS
+  billToCustNbr: "ACCT10001",   // BILL_TO_CUST_NBR
+  branchNbr: "001",             // BRANCH_NBR
 };
 
 export const LINE_ITEMS = [
