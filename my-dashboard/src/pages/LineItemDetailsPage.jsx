@@ -17,26 +17,26 @@ const ICON_MAP = {
 };
 
 const SUMMARY_FIELDS = [
-  { key: "custCoCd", label: "Customer Company Code", icon: "Building2" },
-  { key: "custBr", label: "Customer Branch", icon: "Building2" },
+  { key: "companyCd", label: "Company Code", icon: "Building2" },
+  { key: "branchNbr", label: "Branch Number", icon: "Building2" },
   { key: "custNbr", label: "Customer Number", icon: "Hash" },
   { key: "custPoNbr", label: "Customer PO Number", icon: "FileText" },
-  { key: "imiLineNbr", label: "IMI Line Number", icon: "Hash" },
-  { key: "imiPartNbr", label: "IMI Part Number", icon: "Package" },
-  { key: "qtyOrdered", label: "Quantity Ordered", icon: "BarChart2" },
+  { key: "lineNbr", label: "Line Number", icon: "Hash" },
+  { key: "imPartNbr", label: "IM Part Number", icon: "Package" },
+  { key: "qtyOrded", label: "Quantity Ordered", icon: "BarChart2" },
 ];
 
 const SUMMARY_KEYS = new Set(SUMMARY_FIELDS.map((field) => field.key));
 
 function parseFallbackFromParams(searchParams) {
   return {
-    imiLineNbr: searchParams.get("imiLineNbr") || "—",
-    custCoCd: searchParams.get("custCoCd") || "—",
-    custBr: searchParams.get("custBr") || "—",
+    lineNbr: searchParams.get("lineNbr") || "—",
+    companyCd: searchParams.get("companyCd") || "—",
+    branchNbr: searchParams.get("branchNbr") || "—",
     custNbr: searchParams.get("custNbr") || "—",
     custPoNbr: searchParams.get("custPoNbr") || "—",
-    imiPartNbr: "—",
-    qtyOrdered: "—",
+    imPartNbr: "—",
+    qtyOrded: "—",
   };
 }
 

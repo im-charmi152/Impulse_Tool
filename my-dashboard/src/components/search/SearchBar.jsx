@@ -1,12 +1,37 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Search as SearchIcon, X, Lock } from "lucide-react";
 import { SEARCH_FIELDS } from "../../data/navigation";
 
-function SearchBar({ onSearch, loading }) {
+function normalizeDisplayValue(value) {
+  if (value == null || value === "" || value === "—") return "N/A";
+  return String(value);
+}
+
+function SearchBar({ onSearch, loading, resultOrder, resultLineItems }) {
   const [values, setValues] = useState({});
 
   const requiredParams = SEARCH_FIELDS.filter((f) => f.supported).map((f) => f.param);
   const canSearch = requiredParams.every((param) => values[param]?.trim());
+
+  const derivedValues = useMemo(() => {
+    const firstLine = Array.isArray(resultLineItems) ? resultLineItems[0] : null;
+
+    return {
+      orderNumber: normalizeDisplayValue(
+        resultOrder?.imiAsgdOrdrNbr ?? resultOrder?.ordrNbr ?? resultOrder?.orderNumber,
+      ),
+      partnerId: normalizeDisplayValue(resultOrder?.partnerId),
+      accountNumber: normalizeDisplayValue(
+        resultOrder?.custNbr ?? resultOrder?.accountNumber,
+      ),
+      sku: normalizeDisplayValue(
+        firstLine?.imPartNbr ?? firstLine?.sku,
+      ),
+      transactionId: normalizeDisplayValue(
+        resultOrder?.xactSet ?? resultOrder?.transactionId,
+      ),
+    };
+  }, [resultOrder, resultLineItems]);
 
   const handleChange = useCallback((param, value) => {
     setValues((prev) => ({ ...prev, [param]: value }));
@@ -22,7 +47,12 @@ function SearchBar({ onSearch, loading }) {
   return (
     <div className="enterprise-card">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {SEARCH_FIELDS.map(({ label, param, supported }) => (
+        {SEARCH_FIELDS.map(({ label, param, supported }) => {
+          const displayValue = supported
+            ? values[param] || ""
+            : derivedValues[param] || "N/A";
+
+          return (
           <div key={param}>
             <label className="field-label flex items-center gap-1 text-xs mb-1">
               {label}
@@ -31,9 +61,10 @@ function SearchBar({ onSearch, loading }) {
             <div className="relative">
               <input
                 type="text"
+                readOnly={!supported}
                 disabled={!supported}
-                placeholder={supported ? `Enter ${label}` : "Coming soon"}
-                value={values[param] || ""}
+                placeholder={supported ? `Enter ${label}` : "N/A"}
+                value={displayValue}
                 onChange={(e) => handleChange(param, e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                 className="w-full border border-[#D6E4F7] rounded-xl px-2.5 py-1.5 text-xs text-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#0F6CBD] focus:border-transparent placeholder-[#6B7280] pr-7 disabled:bg-[#F8FAFC] disabled:text-[#6B7280] disabled:cursor-not-allowed"
@@ -49,11 +80,12 @@ function SearchBar({ onSearch, loading }) {
               )}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
       <div className="flex items-center justify-between mt-3">
         <span className="text-[10px] text-[#6B7280]">
-          Search by Order Number, SKU, Account, Partner ID, and Transaction ID is coming soon.
+          Additional fields auto-populate from results. Missing values are shown as N/A.
         </span>
         <div className="flex gap-2">
           <button
