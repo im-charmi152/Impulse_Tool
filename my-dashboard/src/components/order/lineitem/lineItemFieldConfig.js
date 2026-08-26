@@ -10,9 +10,8 @@
  *   "date"    – formatDateTime()
  *   "flag"    – "Y" → Enabled (green) | "N" → Disabled (muted)
  *
- * NOTE: custNbr, custPoNbr, custSfx, sdqSeqNbr, custPoDt, custPoSeqNbr are
- * header-level fields injected into each line item by mapOrderResponse.js so
- * the detail page has full context without a separate header fetch.
+ * NOTE: This config intentionally mirrors line-item fields selected by the
+ * ODS.IMS_ORDER_LINE_ORSLNE query used by the backend.
  */
 
 // ─── Accordion groups — backend-native keys from OrderLineItem ───────────────
@@ -31,14 +30,6 @@ export const LINE_ITEM_FIELD_GROUPS = [
       { key: "lineNbr",      label: "LINE_NBR",         type: "id", copyable: true },
       { key: "lineTyp",      label: "LINE_TYP",         type: "text" },
       { key: "lineStus",     label: "LINE_STUS",        type: "text" },
-      // Header-level context fields injected by mapOrderResponse.js
-      { key: "custNbr",      label: "CUST_NBR",         type: "id", copyable: true },
-      { key: "custPoNbr",    label: "CUST_PO_NBR",      type: "id", copyable: true },
-      { key: "custSfx",      label: "CUST_SFX",         type: "text" },
-      { key: "sdqSeqNbr",    label: "SDQ_SEQ_NBR",      type: "number" },
-      { key: "custPoDt",     label: "CUST_PO_DT",       type: "date" },
-      { key: "custPoSeqNbr", label: "CUST_PO_SEQ_NBR",  type: "number" },
-      { key: "custLineNbr",  label: "CUST_LINE_NBR",    type: "text" },
     ],
   },
 
@@ -49,6 +40,7 @@ export const LINE_ITEM_FIELD_GROUPS = [
     defaultOpen: true,
     fields: [
       { key: "imPartNbr",      label: "IM_PART_NBR",       type: "id", copyable: true },
+      { key: "custLineNbr",    label: "CUST_LINE_NBR",     type: "text" },
       { key: "custItemNbr",    label: "CUST_ITEM_NBR",     type: "id", copyable: true },
       { key: "vendPartNbr",    label: "VEND_PART_NBR",     type: "id", copyable: true },
       { key: "upcNbr",         label: "UPC_NBR",           type: "text" },
@@ -256,8 +248,8 @@ export const LINE_ITEM_FIELD_GROUPS = [
       { key: "refdirOverrideText",label: "REFDIR_OVERRIDE_TEXT",type: "text" },
       { key: "refdirOvrdTyp",     label: "REFDIR_OVRD_TYP",     type: "text" },
       { key: "ossNo",             label: "OSS_NO",              type: "text" },
-      { key: "pgmTyp1",           label: "PGM_TYP_1",           type: "text" },
-      { key: "pgmTyp2",           label: "PGM_TYP_2",           type: "text" },
+      { key: "pgmTyp1",           label: "PGM_TYP1",            type: "text" },
+      { key: "pgmTyp2",           label: "PGM_TYP2",            type: "text" },
       { key: "lastChgOpid",       label: "LAST_CHG_OPID",       type: "text" },
     ],
   },
