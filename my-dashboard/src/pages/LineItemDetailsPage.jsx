@@ -19,8 +19,7 @@ const ICON_MAP = {
 const SUMMARY_FIELDS = [
   { key: "companyCd", label: "Company Code", icon: "Building2" },
   { key: "branchNbr", label: "Branch Number", icon: "Building2" },
-  { key: "custNbr", label: "Customer Number", icon: "Hash" },
-  { key: "custPoNbr", label: "Customer PO Number", icon: "FileText" },
+  { key: "ordrNbr", label: "Order Number", icon: "FileText" },
   { key: "lineNbr", label: "Line Number", icon: "Hash" },
   { key: "imPartNbr", label: "IM Part Number", icon: "Package" },
   { key: "qtyOrded", label: "Quantity Ordered", icon: "BarChart2" },
@@ -33,8 +32,7 @@ function parseFallbackFromParams(searchParams) {
     lineNbr: searchParams.get("lineNbr") || "—",
     companyCd: searchParams.get("companyCd") || "—",
     branchNbr: searchParams.get("branchNbr") || "—",
-    custNbr: searchParams.get("custNbr") || "—",
-    custPoNbr: searchParams.get("custPoNbr") || "—",
+    ordrNbr: searchParams.get("ordrNbr") || "—",
     imPartNbr: "—",
     qtyOrded: "—",
   };

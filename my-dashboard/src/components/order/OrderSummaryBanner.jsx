@@ -3,7 +3,6 @@ import {
   Hash,
   CalendarDays,
   Flag,
-  Users,
   CircleCheck,
 } from "lucide-react";
 import Badge from "../common/Badge";
@@ -15,30 +14,40 @@ function val(v) {
   return v == null || v === "—" ? null : v;
 }
 
+function firstValue(order, keys) {
+  for (const key of keys) {
+    const candidate = val(order?.[key]);
+    if (candidate != null) return candidate;
+  }
+  return null;
+}
+
 function OrderSummaryBanner({ order }) {
   const tiles = [
     {
       key: "custPo",
       label: "Customer PO",
-      value: val(order?.custPoNbr) ?? "—",
+      value: firstValue(order, ["custOrdrNbr", "custPoNbr"]) ?? "—",
       icon: FileText,
     },
     {
       key: "orderNo",
       label: "Order Number",
-      value: val(order?.imiAsgdOrdrNbr) ?? "—",
+      value: firstValue(order, ["ordrNbr", "imiAsgdOrdrNbr"]) ?? "—",
       icon: Hash,
     },
     {
       key: "custPoDate",
       label: "Customer PO Date",
-      value: val(order?.custPoDt) ? formatDateTime(order.custPoDt) : "—",
+      value: firstValue(order, ["custPoDt", "entyDt"])
+        ? formatDateTime(firstValue(order, ["custPoDt", "entyDt"]))
+        : "—",
       icon: CalendarDays,
     },
     {
       key: "country",
       label: "Country Code",
-      value: val(order?.custCoCd) ?? "—",
+      value: firstValue(order, ["custCoCd", "companyCd", "countryCode"]) ?? "—",
       icon: Flag,
     },
     {
@@ -50,7 +59,7 @@ function OrderSummaryBanner({ order }) {
     {
       key: "status",
       label: "Status",
-      value: val(order?.ordSt) ?? "Found",
+      value: firstValue(order, ["ordSt", "ordrStatus"]) ?? "Found",
       icon: CircleCheck,
       isStatus: true,
     },

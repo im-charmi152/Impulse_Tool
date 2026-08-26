@@ -3,45 +3,13 @@ import { Download, ChevronLeft, ChevronRight, Layers } from "lucide-react";
 import SectionCard from "../../common/SectionCard";
 import { recordEvent } from "../../../utils/auditLog";
 import { openLineItemDetailsTab } from "../../../utils/detailsNavigation";
+import { LINE_ITEM_FIELD_GROUPS } from "./lineItemFieldConfig";
 
 const PAGE_SIZE_OPTIONS = [10, 25];
 
-const LINE_ITEM_COLUMNS = [
-  { key: "companyCd", label: "COMPANY_CD" },
-  { key: "branchNbr", label: "BRANCH_NBR" },
-  { key: "custNbr", label: "CUST_NBR" },
-  { key: "custPoNbr", label: "CUST_PO_NBR" },
-  { key: "ordrNbr", label: "ORDR_NBR" },
-  { key: "lineNbr", label: "LINE_NBR" },
-  { key: "imPartNbr", label: "IM_PART_NBR" },
-  { key: "qtyOrded", label: "QTY_ORDED" },
-  { key: "qtyBord", label: "QTY_BORD" },
-  { key: "qtyShpd", label: "QTY_SHPD" },
-  { key: "unitPrc", label: "UNIT_PRC" },
-  { key: "unitCost", label: "UNIT_COST" },
-  { key: "lineStus", label: "LINE_STUS" },
-  { key: "lineTyp", label: "LINE_TYP" },
-  { key: "custLineNbr", label: "CUST_LINE_NBR" },
-  { key: "custItemNbr", label: "CUST_ITEM_NBR" },
-  { key: "vendPartNbr", label: "VEND_PART_NBR" },
-  { key: "upcNbr", label: "UPC_NBR" },
-  { key: "entryTime", label: "ENTRY_TIME" },
-  { key: "boEtaDate", label: "BO_ETA_DATE" },
-  { key: "holdCode", label: "HOLD_CODE" },
-  { key: "aggregateCode", label: "AGGREGATE_CODE" },
-  { key: "mchgCd", label: "MCHG_CD" },
-  { key: "configurationLab", label: "CONFIGURATION_LAB" },
-  { key: "serialNbrAvailSw", label: "SERIAL_NBR_AVAIL_SW" },
-  { key: "freeItemSw", label: "FREE_ITEM_SW" },
-  { key: "vendNbr", label: "VEND_NBR" },
-  { key: "relatedGovtBidVsn", label: "RELATED_GOVT_BID_VSN" },
-  { key: "relatedGovtBidGsn", label: "RELATED_GOVT_BID_GSN" },
-  { key: "odsLstUpdDt", label: "ODS_LST_UPD_DT" },
-  { key: "custSfx", label: "CUST_SFX" },
-  { key: "sdqSeqNbr", label: "SDQ_SEQ_NBR" },
-  { key: "custPoDt", label: "CUST_PO_DT" },
-  { key: "custPoSeqNbr", label: "CUST_PO_SEQ_NBR" },
-];
+const LINE_ITEM_COLUMNS = LINE_ITEM_FIELD_GROUPS.flatMap((group) =>
+  group.fields.map((field) => ({ key: field.key, label: field.label })),
+);
 
 function LineItemDetails({ items }) {
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);

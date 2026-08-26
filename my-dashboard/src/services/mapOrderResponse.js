@@ -115,6 +115,13 @@ export function mapOrderResponse(raw) {
 
   const order = {
     // ── Order Information ──
+    // Preserve key ODS ORSHED fields for components that still read source keys.
+    custPoNbr: raw.custPoNbr ?? "—",
+    imiAsgdOrdrNbr: raw.imiAsgdOrdrNbr ?? "—",
+    custPoDt: raw.custPoDt ?? "—",
+    custCoCd: raw.custCoCd ?? "—",
+    ordSt: raw.ordSt ?? raw.ordrStatus ?? "—",
+
     ordrNbr: raw.imiAsgdOrdrNbr ?? "—",
     custOrdrNbr: raw.custPoNbr ?? "—",
     ordRefNbr: raw.ordRefNbr ?? "—",
@@ -250,17 +257,7 @@ export function mapOrderResponse(raw) {
   
 
 
-  const rawLineItems = Array.isArray(raw.lineItems) ? raw.lineItems : [];
-  const lineItems = rawLineItems.map((li) => ({
-    ...li,
-    // Header-level context fields are attached as-is for line-item screens.
-    custNbr: raw.custNbr ?? "—",
-    custPoNbr: raw.custPoNbr ?? "—",
-    custSfx: raw.custSfx ?? "—",
-    sdqSeqNbr: raw.sdqSeqNbr ?? "—",
-    custPoDt: raw.custPoDt ?? "—",
-    custPoSeqNbr: raw.custPoSeqNbr ?? "—",
-  }));
+  const lineItems = Array.isArray(raw.lineItems) ? raw.lineItems : [];
 
   const toStatusChangeRecord = (entry) => ({
     coCd: entry.coCd ?? entry.CO_CD ?? "—",
