@@ -1,54 +1,48 @@
-import {
-  GitBranch,
-  Check,
-  AlertTriangle,
-  X,
-  Clock3,
-} from "lucide-react";
+import { GitBranch, Check, AlertTriangle, X, Clock3 } from "lucide-react";
 import SectionCard from "../common/SectionCard";
 
 const FLOW_STEPS = [
   {
     id: 1,
     name: "Seeburger (SB)",
-    status: "success",
-    time: "10:01:00 AM",
+    status: "pending",
+    time: " ",
   },
   {
     id: 2,
     name: "SB Msg Tracker",
-    status: "success",
-    time: "10:01:30 AM",
+    status: "pending",
+    time: " ",
   },
   {
     id: 3,
     name: "C : D",
-    status: "success",
-    time: "10:02:10 AM",
+    status: "pending",
+    time: " ",
   },
   {
     id: 4,
     name: "C : E",
-    status: "failed",
-    time: "10:03:15 AM",
+    status: "pending",
+    time: " ",
   },
   {
     id: 5,
     name: "EDI DB2",
     status: "pending",
-    time: "10:04:00 AM",
+    time: " ",
   },
   {
     id: 6,
     name: "Impulse DB",
     status: "pending",
-    time: "--",
+    time: " ",
   },
   {
     id: 7,
     name: "ODS DB",
     status: "pending",
-    time: "--",
+    time: " ",
   },
 ];
 
@@ -124,9 +118,7 @@ export default function ProcessFlowSection() {
                   <Icon
                     size={15}
                     className={
-                      step.status === "pending"
-                        ? "text-gray-500"
-                        : "text-white"
+                      step.status === "pending" ? "text-gray-500" : "text-white"
                     }
                   />
                 </div>
