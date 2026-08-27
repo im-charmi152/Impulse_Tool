@@ -9,7 +9,7 @@ const BASE_URL =
 
 const client = axios.create({
   baseURL: BASE_URL,
-  timeout: 15000,
+  timeout: 60000,
 });
 
 export const getOrderDetails = async (poNumber, countryCode, signal) => {
