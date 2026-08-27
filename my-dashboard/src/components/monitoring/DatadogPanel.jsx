@@ -5,7 +5,7 @@ import SectionCard from "../common/SectionCard";
 function DatadogPanel() {
   const openDetails = () => {
   window.open(
-    "http://localhost:5173/", // Replace with your localhost URL
+    "http://localhost:5174/", // Replace with API Hosted ENDPOINT
     "_blank",
     "noopener,noreferrer"
   );
