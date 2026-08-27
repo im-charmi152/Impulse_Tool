@@ -36,11 +36,11 @@ export const NAV_ITEMS = [
 export const SEARCH_FIELDS = [
   { label: "CUST PO NBR", param: "poNumber", supported: true },
   { label: "Country Code", param: "countryCode", supported: true },
-  { label: "Order Number", param: "orderNumber", supported: false },
-  { label: "Partner ID", param: "partnerId", supported: false },
-  { label: "Customer Number", param: "accountNumber", supported: false },
-  { label: "SKU", param: "sku", supported: false },
-  { label: "Transaction ID", param: "transactionId", supported: false },
+  { label: "Order Number", param: "orderNumber", supported: true },
+  { label: "Partner ID", param: "partnerId", supported: true },
+  { label: "Customer Number", param: "accountNumber", supported: true },
+  { label: "SKU", param: "sku", supported: true },
+  { label: "Transaction ID", param: "transactionId", supported: true },
 ];
 
 // The three order-entry flows the tool must be able to trace, per
