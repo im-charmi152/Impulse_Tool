@@ -27,7 +27,15 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK_API === "false";
 export async function searchOrder(params, signal) {
   if (USE_MOCK) return mockSearchOrder(params, signal);
 
-  const { poNumber, countryCode } = params || {};
+  const {
+  poNumber,
+  countryCode,
+  orderNumber,
+  partnerId,
+  accountNumber,
+  sku,
+  transactionId,
+  } = params || {};
 
   if (!poNumber || !countryCode) {
     // The live backend only supports lookup by PO Number + Country Code
@@ -37,7 +45,16 @@ export async function searchOrder(params, signal) {
   }
 
   try {
-    const raw = await getOrderDetails(poNumber, countryCode, signal);
+    const raw = await getOrderDetails(
+    poNumber,
+    countryCode,
+    orderNumber,
+    partnerId,
+    accountNumber,
+    sku,
+    transactionId,
+    signal
+    );
     if (!raw) return null;
     return mapOrderResponse(raw);
   } catch (error) {

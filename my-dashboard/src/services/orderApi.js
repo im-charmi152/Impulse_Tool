@@ -11,6 +11,16 @@ const client = axios.create({
   timeout: 60000,
 });
 
+const toNullableString = (value) => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  const stringValue = String(value).trim();
+
+  return stringValue === "" ? null : stringValue;
+};
+
 export const getOrderDetails = async (
   poNumber,
   countryCode,
@@ -25,16 +35,17 @@ export const getOrderDetails = async (
     const response = await client.post(
       "/GetOrder",
       {
-        poNumber,
-        countryCode,
-        orderNumber,
-        partnerId,
-        accountNumber,
-        sku,
-        transactionId,
+        poNumber: toNullableString(poNumber),
+        countryCode: toNullableString(countryCode),
+        orderNumber: toNullableString(orderNumber),
+        partnerId: toNullableString(partnerId),
+        customerNumber: toNullableString(accountNumber),
+        sku: toNullableString(sku),
+        transactionId: toNullableString(transactionId),
       },
       { signal },
     );
+
     return response.data;
   } catch (error) {
     console.error("API Error:", error);
