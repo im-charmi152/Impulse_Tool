@@ -763,11 +763,11 @@ namespace OrderManagement.API.Repositories
                 partnerCmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = partnerCoCd;
 
                 // CHANGED: was response.PartnerId?.Trim()
-                //partnerCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = request.PartnerId?.Trim();
-                partnerCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = "470887";
+                partnerCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = request.PartnerId?.Trim();
+                //partnerCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = "470887";
                 Console.WriteLine($">>> EXECUTING ODS PARTNER SETUP QUERY...");
                 Console.WriteLine($">>> PARTNER CO_CD PARAMETER: {partnerCoCd}");
-                //Console.WriteLine($">>> PARTNER ID PARAMETER: {request.PartnerId?.Trim()}");
+                Console.WriteLine($">>> PARTNER ID PARAMETER: {request.PartnerId?.Trim()}");
 
                 await using OracleDataReader partnerReader = await partnerCmd.ExecuteReaderAsync();
 
@@ -883,7 +883,7 @@ namespace OrderManagement.API.Repositories
             // since that is the key confirmed to exist for this partner in ODS.
 
             string inPoSwCoCd = partnerCoCd;              // reuse the already-mapped CO_CD (MD->US, FT->CA)
-            //string inPoSwPartnerId = request.PartnerId?.Trim();
+            string inPoSwPartnerId = request.PartnerId?.Trim();
             //string inPoSwPartnerId = "470887";
 
             try
@@ -892,12 +892,12 @@ namespace OrderManagement.API.Repositories
                 inPoSwCmd.BindByName = true;
 
                 inPoSwCmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = inPoSwCoCd;
-                //inPoSwCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = request.PartnerId?.Trim();
-                inPoSwCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = "470887";
+                inPoSwCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = request.PartnerId?.Trim();
+                //inPoSwCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = "470887";
 
                 Console.WriteLine($">>> EXECUTING ODS IE_IN_PO_SW QUERY...");
                     Console.WriteLine($">>> IE_IN_PO_SW CO_CD PARAMETER: {inPoSwCoCd}");
-                    //Console.WriteLine($">>> IE_IN_PO_SW PARTNER_ID PARAMETER: {inPoSwPartnerId}");
+                    Console.WriteLine($">>> IE_IN_PO_SW PARTNER_ID PARAMETER: {inPoSwPartnerId}");
 
                     await using OracleDataReader inPoSwReader = await inPoSwCmd.ExecuteReaderAsync();
 
