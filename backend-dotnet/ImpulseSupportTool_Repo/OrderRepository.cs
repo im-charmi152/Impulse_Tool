@@ -143,7 +143,7 @@ namespace OrderManagement.API.Repositories
                     OUTSOURCE_SKU_IND,
                     DELETE_TODAY_SW,
                     PRICE_RECALC_SW
-                    FROM ODS.IMS_ORDER_ORSHED
+                    FROM ODS.ODS_ORDER
                     WHERE CUST_ORDR_NBR = :poNumber
                     AND COMPANY_CD = :companyCode";
 
