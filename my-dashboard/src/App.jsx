@@ -294,7 +294,7 @@ export default function Dashboard() {
 
                   <div className="bg-white border border-[#D6E4F7] rounded-t-xl shadow-sm flex items-center justify-between">
 
-                    <div className="flex items-center overflow-x-auto">
+                    <div className="flex items-center overflow-hidden">
 
                       {tabs.map((tab) => {
 
