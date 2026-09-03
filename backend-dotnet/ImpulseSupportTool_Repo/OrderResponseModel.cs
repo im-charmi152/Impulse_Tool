@@ -288,9 +288,31 @@ namespace ImpulseSupportTool_Repo
         public string? RmaRecvToday { get; set; }
         public string? RmaQtyOpen { get; set; }
         public string? FaastSapInvcNbr { get; set; }
+        public string? OrdrDt { get; set; }
+        public string? ImsDelFlg { get; set; }
+		public string? SysItemLineNbr { get; set; }
+        public string? AggrCd { get; internal set; }
+        public string? ConfigAsmbyCd { get; internal set; }
+        public string? LastChgTm { get; internal set; }
+        public string? RelGovtBidVsn { get; internal set; }
+        public string? ResvSeqNbr { get; internal set; }
+        public string? UnitPriceRslr { get; internal set; }
+        public string? ForeignUnitPrice { get; internal set; }
+        public string? ActualExchgRate { get; internal set; }
+        public string? VdrExchgRate { get; internal set; }
+        public string? InvBrNbr { get; internal set; }
+        public string? CommodCd { get; internal set; }
+        public string? InvcCoCd { get; internal set; }
+        public string? InvcBrNbr { get; internal set; }
+        public string? InvcOrdrNbr { get; internal set; }
+        public string? InvcInvcDt { get; internal set; }
+        public string? InvcDistNbr { get; internal set; }
+        public string? InvcShipNbr { get; internal set; }
+        public string? OdsIsrtTs { get; internal set; }
+        public string? EntyTm { get; internal set; }
     }
 
-    public class OrderStatusChange
+	public class OrderStatusChange
         {
             public string CoCd { get; set; }
             public string OrdrBrNbr { get; set; }
