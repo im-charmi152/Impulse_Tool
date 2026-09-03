@@ -5,7 +5,7 @@ using Oracle.ManagedDataAccess.Client;
 
 
 namespace OrderManagement.API.Repositories
-{ 
+{
     public class OrderRepository : IOrderRepository
     {
         private readonly IConfiguration _configuration;
@@ -35,9 +35,8 @@ namespace OrderManagement.API.Repositories
 
             OrderResponse response = null;
 
-            
+
             string headerQuery = @"
-            string headerQuery = @""
                     SELECT
                     COMPANY_CD,
                     BRANCH_NBR,
@@ -152,9 +151,9 @@ namespace OrderManagement.API.Repositories
 
             cmd.BindByName = true;
 
-            cmd.Parameters.Add( "poNumber",OracleDbType.Varchar2).Value =request.PoNumber.Trim();
+            cmd.Parameters.Add("poNumber", OracleDbType.Varchar2).Value = request.PoNumber.Trim();
 
-            cmd.Parameters.Add("companyCode",OracleDbType.Varchar2).Value =request.CountryCode.Trim();
+            cmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = request.CountryCode.Trim();
 
             Console.WriteLine(
                 ">>> EXECUTING ODS HEADER QUERY...");
@@ -290,9 +289,9 @@ namespace OrderManagement.API.Repositories
                     ">>> NO ODS HEADER ROW FOUND");
             }
 
-         
+
             if (response != null)
-                {
+            {
                 string lineQuery = @"
                 SELECT
                     COMPANY_CD,
@@ -654,7 +653,7 @@ namespace OrderManagement.API.Repositories
                 }
 
                 Console.WriteLine($">>> ODS LINE ITEMS FOUND: {response.LineItems.Count}");
-                }
+            }
 
             string statusQuery = @"
             SELECT
@@ -713,7 +712,7 @@ namespace OrderManagement.API.Repositories
 
                 while (await statusReader.ReadAsync())
                 {
-                   
+
                     response.StatusChanges.Add(new OrderStatusChange
                     {
                         CoCd = statusReader["CO_CD"]?.ToString()?.Trim(),
@@ -935,94 +934,94 @@ namespace OrderManagement.API.Repositories
                 //inPoSwCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = "470887";
 
                 Console.WriteLine($">>> EXECUTING ODS IE_IN_PO_SW QUERY...");
-                    Console.WriteLine($">>> IE_IN_PO_SW CO_CD PARAMETER: {inPoSwCoCd}");
-                    Console.WriteLine($">>> IE_IN_PO_SW PARTNER_ID PARAMETER: {inPoSwPartnerId}");
+                Console.WriteLine($">>> IE_IN_PO_SW CO_CD PARAMETER: {inPoSwCoCd}");
+                Console.WriteLine($">>> IE_IN_PO_SW PARTNER_ID PARAMETER: {inPoSwPartnerId}");
 
-                    await using OracleDataReader inPoSwReader = await inPoSwCmd.ExecuteReaderAsync();
+                await using OracleDataReader inPoSwReader = await inPoSwCmd.ExecuteReaderAsync();
 
-                    Console.WriteLine($">>> ODS IE_IN_PO_SW READER HAS ROWS: {inPoSwReader.HasRows}");
+                Console.WriteLine($">>> ODS IE_IN_PO_SW READER HAS ROWS: {inPoSwReader.HasRows}");
 
-                    if (await inPoSwReader.ReadAsync())
+                if (await inPoSwReader.ReadAsync())
+                {
+                    response.InPoSw.Add(new OrderInPoSw
                     {
-                        response.InPoSw.Add(new OrderInPoSw
-                        {
-                            CoCd = inPoSwReader["CO_CD"]?.ToString()?.Trim(),
-                            PartnerId = inPoSwReader["PARTNER_ID"]?.ToString()?.Trim(),
-                            SkipFrTm = inPoSwReader["SKIP_FR_TM"]?.ToString()?.Trim(),
-                            SkipToTm = inPoSwReader["SKIP_TO_TM"]?.ToString()?.Trim(),
-                            CustPrty = inPoSwReader["CUST_PRTY"]?.ToString()?.Trim(),
-                            AckPoFlg = inPoSwReader["ACK_PO_FLG"]?.ToString()?.Trim(),
-                            AckPromoFlg = inPoSwReader["ACK_PROMO_FLG"]?.ToString()?.Trim(),
-                            BaserateFlg = inPoSwReader["BASERATE_FLG"]?.ToString()?.Trim(),
-                            AggCdCpblFlg = inPoSwReader["AGG_CD_CPBL_FLG"]?.ToString()?.Trim(),
-                            PreImHoldFlg = inPoSwReader["PRE_IM_HOLD_FLG"]?.ToString()?.Trim(),
-                            MultShpToFlg = inPoSwReader["MULT_SHP_TO_FLG"]?.ToString()?.Trim(),
-                            SystemPartsFlg = inPoSwReader["SYSTEM_PARTS_FLG"]?.ToString()?.Trim(),
-                            VoidTaxableFlg = inPoSwReader["VOID_TAXABLE_FLG"]?.ToString()?.Trim(),
-                            CasepackMsgFlg = inPoSwReader["CASEPACK_MSG_FLG"]?.ToString()?.Trim(),
-                            ChkCustPrcFlg = inPoSwReader["CHK_CUST_PRC_FLG"]?.ToString()?.Trim(),
-                            DistDepthFlg = inPoSwReader["DIST_DEPTH_FLG"]?.ToString()?.Trim(),
-                            AirBrSeqFlg = inPoSwReader["AIR_BR_SEQ_FLG"]?.ToString()?.Trim(),
-                            BrSeqOrideFlg = inPoSwReader["BR_SEQ_ORIDE_FLG"]?.ToString()?.Trim(),
-                            MultBrSeqFlg = inPoSwReader["MULT_BR_SEQ_FLG"]?.ToString()?.Trim(),
-                            ExportBrSeqFlg = inPoSwReader["EXPORT_BR_SEQ_FLG"]?.ToString()?.Trim(),
-                            HoldOrderFlg = inPoSwReader["HOLD_ORDER_FLG"]?.ToString()?.Trim(),
-                            DfltCustNbr = inPoSwReader["DFLT_CUST_NBR"]?.ToString()?.Trim(),
-                            PromoCustNbr = inPoSwReader["PROMO_CUST_NBR"]?.ToString()?.Trim(),
-                            PriceCustNbr = inPoSwReader["PRICE_CUST_NBR"]?.ToString()?.Trim(),
-                            InstRebatMsgFlg = inPoSwReader["INST_REBAT_MSG_FLG"]?.ToString()?.Trim(),
-                            VlaFlg = inPoSwReader["VLA_FLG"]?.ToString()?.Trim(),
-                            MultiDistFlg = inPoSwReader["MULTI_DIST_FLG"]?.ToString()?.Trim(),
-                            SaveFrtFlg = inPoSwReader["SAVE_FRT_FLG"]?.ToString()?.Trim(),
-                            SaveDistFlg = inPoSwReader["SAVE_DIST_FLG"]?.ToString()?.Trim(),
-                            BestWhseFlg = inPoSwReader["BEST_WHSE_FLG"]?.ToString()?.Trim(),
-                            SingleWhseFlg = inPoSwReader["SINGLE_WHSE_FLG"]?.ToString()?.Trim(),
-                            PrntOrdrFlg = inPoSwReader["PRNT_ORDR_FLG"]?.ToString()?.Trim(),
-                            MultShpSortSeq = inPoSwReader["MULT_SHP_SORT_SEQ"]?.ToString()?.Trim(),
-                            MaxFutDay = inPoSwReader["MAX_FUT_DAY"]?.ToString()?.Trim(),
-                            LstChgTs = inPoSwReader["LST_CHG_TS"]?.ToString()?.Trim(),
-                            LstChgNam = inPoSwReader["LST_CHG_NAM"]?.ToString()?.Trim(),
-                            ClsXFltrTypCd = inPoSwReader["CLS_X_FLTR_TYP_CD"]?.ToString()?.Trim(),
-                            ClsSFltrTypCd = inPoSwReader["CLS_S_FLTR_TYP_CD"]?.ToString()?.Trim(),
-                            UpdCustSkuFlg = inPoSwReader["UPD_CUST_SKU_FLG"]?.ToString()?.Trim(),
-                            SaveCustPrcFlg = inPoSwReader["SAVE_CUST_PRC_FLG"]?.ToString()?.Trim(),
-                            BoBrXferFlg = inPoSwReader["BO_BR_XFER_FLG"]?.ToString()?.Trim(),
-                            RejOrdrHdrFlg = inPoSwReader["REJ_ORDR_HDR_FLG"]?.ToString()?.Trim(),
-                            RejCnsCmpHdrFlg = inPoSwReader["REJ_CNSCMP_HDR_FLG"]?.ToString()?.Trim(),
-                            AckRptFlg = inPoSwReader["ACK_RPT_FLG"]?.ToString()?.Trim(),
-                            SpecPrcFlg = inPoSwReader["SPEC_PRC_FLG"]?.ToString()?.Trim(),
-                            EuCaptureFlg = inPoSwReader["EU_CAPTURE_FLG"]?.ToString()?.Trim(),
-                            CustomCarrFlg = inPoSwReader["CUSTOM_CARR_FLG"]?.ToString()?.Trim(),
-                            CascadeSkuFlg = inPoSwReader["CASCADE_SKU_FLG"]?.ToString()?.Trim(),
-                            AutoPoChgFlg = inPoSwReader["AUTO_PO_CHG_FLG"]?.ToString()?.Trim(),
-                            ClsXHldFlg = inPoSwReader["CLS_X_HLD_FLG"]?.ToString()?.Trim(),
-                            StStoreOvrRdFlg = inPoSwReader["ST_STORE_OVRRD_FLG"]?.ToString()?.Trim(),
-                            RsrvCustNbr = inPoSwReader["RSRV_CUST_NBR"]?.ToString()?.Trim(),
-                            RsrvAllowed = inPoSwReader["RSRV_ALLOWED"]?.ToString()?.Trim(),
-                            RsrvExpirDays = inPoSwReader["RSRV_EXPIR_DAYS"]?.ToString()?.Trim(),
-                            ConfigVisibleFlg = inPoSwReader["CONFIG_VISIBLE_FLG"]?.ToString()?.Trim(),
-                            EtaCalcFlg = inPoSwReader["ETA_CALC_FLG"]?.ToString()?.Trim(),
-                            EtaDays = inPoSwReader["ETA_DAYS"]?.ToString()?.Trim(),
-                            AddrValidFlg = inPoSwReader["ADDR_VALID_FLG"]?.ToString()?.Trim(),
-                            AutoSplitFlg = inPoSwReader["AUTO_SPLIT_FLG"]?.ToString()?.Trim(),
-                            OrdrCancDaysFlg = inPoSwReader["ORDR_CANC_DAYS_FLG"]?.ToString()?.Trim(),
-                            OrdrCancDaysNbr = inPoSwReader["ORDR_CANC_DAYS_NBR"]?.ToString()?.Trim(),
-                            FutOrdrSw = inPoSwReader["FUT_ORDR_SW"]?.ToString()?.Trim(),
-                            AckDelaySw = inPoSwReader["ACK_DELAY_SW"]?.ToString()?.Trim(),
-                            AckDelayHrs = inPoSwReader["ACK_DELAY_HRS"]?.ToString()?.Trim(),
-                            TransAuthId = inPoSwReader["TRANS_AUTH_ID"]?.ToString()?.Trim()
-                        });
-                    }
-             }
+                        CoCd = inPoSwReader["CO_CD"]?.ToString()?.Trim(),
+                        PartnerId = inPoSwReader["PARTNER_ID"]?.ToString()?.Trim(),
+                        SkipFrTm = inPoSwReader["SKIP_FR_TM"]?.ToString()?.Trim(),
+                        SkipToTm = inPoSwReader["SKIP_TO_TM"]?.ToString()?.Trim(),
+                        CustPrty = inPoSwReader["CUST_PRTY"]?.ToString()?.Trim(),
+                        AckPoFlg = inPoSwReader["ACK_PO_FLG"]?.ToString()?.Trim(),
+                        AckPromoFlg = inPoSwReader["ACK_PROMO_FLG"]?.ToString()?.Trim(),
+                        BaserateFlg = inPoSwReader["BASERATE_FLG"]?.ToString()?.Trim(),
+                        AggCdCpblFlg = inPoSwReader["AGG_CD_CPBL_FLG"]?.ToString()?.Trim(),
+                        PreImHoldFlg = inPoSwReader["PRE_IM_HOLD_FLG"]?.ToString()?.Trim(),
+                        MultShpToFlg = inPoSwReader["MULT_SHP_TO_FLG"]?.ToString()?.Trim(),
+                        SystemPartsFlg = inPoSwReader["SYSTEM_PARTS_FLG"]?.ToString()?.Trim(),
+                        VoidTaxableFlg = inPoSwReader["VOID_TAXABLE_FLG"]?.ToString()?.Trim(),
+                        CasepackMsgFlg = inPoSwReader["CASEPACK_MSG_FLG"]?.ToString()?.Trim(),
+                        ChkCustPrcFlg = inPoSwReader["CHK_CUST_PRC_FLG"]?.ToString()?.Trim(),
+                        DistDepthFlg = inPoSwReader["DIST_DEPTH_FLG"]?.ToString()?.Trim(),
+                        AirBrSeqFlg = inPoSwReader["AIR_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        BrSeqOrideFlg = inPoSwReader["BR_SEQ_ORIDE_FLG"]?.ToString()?.Trim(),
+                        MultBrSeqFlg = inPoSwReader["MULT_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        ExportBrSeqFlg = inPoSwReader["EXPORT_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        HoldOrderFlg = inPoSwReader["HOLD_ORDER_FLG"]?.ToString()?.Trim(),
+                        DfltCustNbr = inPoSwReader["DFLT_CUST_NBR"]?.ToString()?.Trim(),
+                        PromoCustNbr = inPoSwReader["PROMO_CUST_NBR"]?.ToString()?.Trim(),
+                        PriceCustNbr = inPoSwReader["PRICE_CUST_NBR"]?.ToString()?.Trim(),
+                        InstRebatMsgFlg = inPoSwReader["INST_REBAT_MSG_FLG"]?.ToString()?.Trim(),
+                        VlaFlg = inPoSwReader["VLA_FLG"]?.ToString()?.Trim(),
+                        MultiDistFlg = inPoSwReader["MULTI_DIST_FLG"]?.ToString()?.Trim(),
+                        SaveFrtFlg = inPoSwReader["SAVE_FRT_FLG"]?.ToString()?.Trim(),
+                        SaveDistFlg = inPoSwReader["SAVE_DIST_FLG"]?.ToString()?.Trim(),
+                        BestWhseFlg = inPoSwReader["BEST_WHSE_FLG"]?.ToString()?.Trim(),
+                        SingleWhseFlg = inPoSwReader["SINGLE_WHSE_FLG"]?.ToString()?.Trim(),
+                        PrntOrdrFlg = inPoSwReader["PRNT_ORDR_FLG"]?.ToString()?.Trim(),
+                        MultShpSortSeq = inPoSwReader["MULT_SHP_SORT_SEQ"]?.ToString()?.Trim(),
+                        MaxFutDay = inPoSwReader["MAX_FUT_DAY"]?.ToString()?.Trim(),
+                        LstChgTs = inPoSwReader["LST_CHG_TS"]?.ToString()?.Trim(),
+                        LstChgNam = inPoSwReader["LST_CHG_NAM"]?.ToString()?.Trim(),
+                        ClsXFltrTypCd = inPoSwReader["CLS_X_FLTR_TYP_CD"]?.ToString()?.Trim(),
+                        ClsSFltrTypCd = inPoSwReader["CLS_S_FLTR_TYP_CD"]?.ToString()?.Trim(),
+                        UpdCustSkuFlg = inPoSwReader["UPD_CUST_SKU_FLG"]?.ToString()?.Trim(),
+                        SaveCustPrcFlg = inPoSwReader["SAVE_CUST_PRC_FLG"]?.ToString()?.Trim(),
+                        BoBrXferFlg = inPoSwReader["BO_BR_XFER_FLG"]?.ToString()?.Trim(),
+                        RejOrdrHdrFlg = inPoSwReader["REJ_ORDR_HDR_FLG"]?.ToString()?.Trim(),
+                        RejCnsCmpHdrFlg = inPoSwReader["REJ_CNSCMP_HDR_FLG"]?.ToString()?.Trim(),
+                        AckRptFlg = inPoSwReader["ACK_RPT_FLG"]?.ToString()?.Trim(),
+                        SpecPrcFlg = inPoSwReader["SPEC_PRC_FLG"]?.ToString()?.Trim(),
+                        EuCaptureFlg = inPoSwReader["EU_CAPTURE_FLG"]?.ToString()?.Trim(),
+                        CustomCarrFlg = inPoSwReader["CUSTOM_CARR_FLG"]?.ToString()?.Trim(),
+                        CascadeSkuFlg = inPoSwReader["CASCADE_SKU_FLG"]?.ToString()?.Trim(),
+                        AutoPoChgFlg = inPoSwReader["AUTO_PO_CHG_FLG"]?.ToString()?.Trim(),
+                        ClsXHldFlg = inPoSwReader["CLS_X_HLD_FLG"]?.ToString()?.Trim(),
+                        StStoreOvrRdFlg = inPoSwReader["ST_STORE_OVRRD_FLG"]?.ToString()?.Trim(),
+                        RsrvCustNbr = inPoSwReader["RSRV_CUST_NBR"]?.ToString()?.Trim(),
+                        RsrvAllowed = inPoSwReader["RSRV_ALLOWED"]?.ToString()?.Trim(),
+                        RsrvExpirDays = inPoSwReader["RSRV_EXPIR_DAYS"]?.ToString()?.Trim(),
+                        ConfigVisibleFlg = inPoSwReader["CONFIG_VISIBLE_FLG"]?.ToString()?.Trim(),
+                        EtaCalcFlg = inPoSwReader["ETA_CALC_FLG"]?.ToString()?.Trim(),
+                        EtaDays = inPoSwReader["ETA_DAYS"]?.ToString()?.Trim(),
+                        AddrValidFlg = inPoSwReader["ADDR_VALID_FLG"]?.ToString()?.Trim(),
+                        AutoSplitFlg = inPoSwReader["AUTO_SPLIT_FLG"]?.ToString()?.Trim(),
+                        OrdrCancDaysFlg = inPoSwReader["ORDR_CANC_DAYS_FLG"]?.ToString()?.Trim(),
+                        OrdrCancDaysNbr = inPoSwReader["ORDR_CANC_DAYS_NBR"]?.ToString()?.Trim(),
+                        FutOrdrSw = inPoSwReader["FUT_ORDR_SW"]?.ToString()?.Trim(),
+                        AckDelaySw = inPoSwReader["ACK_DELAY_SW"]?.ToString()?.Trim(),
+                        AckDelayHrs = inPoSwReader["ACK_DELAY_HRS"]?.ToString()?.Trim(),
+                        TransAuthId = inPoSwReader["TRANS_AUTH_ID"]?.ToString()?.Trim()
+                    });
+                }
+            }
             catch (OracleException ex)
             {
-                 Console.WriteLine($">>> ODS IE_IN_PO_SW QUERY FAILED: {ex.Message}");
+                Console.WriteLine($">>> ODS IE_IN_PO_SW QUERY FAILED: {ex.Message}");
             }
-            
+
             Console.WriteLine($">>> ODS IE_IN_PO_SW FOUND: {response.InPoSw.Count}");
             return response;
             // TRIM fixes trailing spaces in CHAR fixed-width columns
-        } 
+        }
 
         // Helper: safely converts DB2 numeric columns to decimal, defaulting to 0 if null/DBNull
         private static decimal ToDecimalSafe(object value)
