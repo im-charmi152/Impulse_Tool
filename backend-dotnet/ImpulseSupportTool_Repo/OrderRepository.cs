@@ -5,7 +5,7 @@ using Oracle.ManagedDataAccess.Client;
 
 
 namespace OrderManagement.API.Repositories
-{ 
+{
     public class OrderRepository : IOrderRepository
     {
         private readonly IConfiguration _configuration;
@@ -35,9 +35,8 @@ namespace OrderManagement.API.Repositories
 
             OrderResponse response = null;
 
-            
+
             string headerQuery = @"
-            string headerQuery = @""
                     SELECT
                     COMPANY_CD,
                     BRANCH_NBR,
@@ -152,9 +151,9 @@ namespace OrderManagement.API.Repositories
 
             cmd.BindByName = true;
 
-            cmd.Parameters.Add( "poNumber",OracleDbType.Varchar2).Value =request.PoNumber.Trim();
+            cmd.Parameters.Add("poNumber", OracleDbType.Varchar2).Value = request.PoNumber.Trim();
 
-            cmd.Parameters.Add("companyCode",OracleDbType.Varchar2).Value =request.CountryCode.Trim();
+            cmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = request.CountryCode.Trim();
 
             Console.WriteLine(
                 ">>> EXECUTING ODS HEADER QUERY...");
@@ -290,9 +289,9 @@ namespace OrderManagement.API.Repositories
                     ">>> NO ODS HEADER ROW FOUND");
             }
 
-         
+
             if (response != null)
-                {
+            {
                 string lineQuery = @"
                 SELECT
                     COMPANY_CD,
@@ -301,6 +300,7 @@ namespace OrderManagement.API.Repositories
                     DIST_NBR,
                     SHIP_NBR,
                     LINE_NBR,
+                    ORDR_DT,
                     LINE_TYP,
                     IM_PART_NBR,
                     INV_IND,
@@ -352,6 +352,7 @@ namespace OrderManagement.API.Repositories
                     ODS_LST_UPD_DT,
                     ADJ_COST,
                     ORIG_ADJ_COST,
+                    IMS_DEL_FLG,
                     SERIAL_NBR_AVAIL_SW,
                     CUST_ITEM_NBR,
                     CUST_LINE_NBR,
@@ -361,105 +362,117 @@ namespace OrderManagement.API.Repositories
                     RETAIL_PRICE,
                     CONV_BASE_PRICE,
                     CONFIG_UNIT_PRICE,
-                    CONFIG_IND,
-                    SYSTEM_ITEM_LINE_NBR,
+                    CFG_IND,
+                    SYS_ITEM_LINE_NBR,
                     UM,
-                    AGGREGATE_CODE,
-                    CONFIG_ASSEMBLY_CD,
-                    CONFIGURATION_LAB,
+                    AGGR_CD,
+                    CONFIG_ASMBY_CD,
+                    CFG_LAB,
                     CAT_NBR,
                     FREE_ITEM_SW,
                     ICMS_TAX_AMT,
                     IPI_ISS_TAX_SW,
                     IPI_ISS_TAX_AMT,
-                    LAST_CHG_OPID,
-                    LAST_CHG_TIME,
+                    LST_CHG_OPID,
+                    LST_CHG_TM,
                     PC_TAX_AMT,
-                    RELATED_GOVT_BID_VSN,
-                    RESERVE_SEQ_NBR,
-                    UNIT_PRICE_RESELLER,
-                    ORL_FOREIGN_UNIT_PRICE,
-                    ORL_ACTUAL_EXCHG_RATE,
-                    ORL_VDR_EXCHG_RATE,
+                    REL_GOVT_BID_VSN,
+                    RESV_SEQ_NBR,
+                    UNIT_PRC_RSLR,
+                    FOREIGN_UNIT_PRICE,
+                    ACTUAL_EXCHG_RATE,
+                    VDR_EXCHG_RATE,
                     CONFIG_ID,
+                    KEY_CO,
+                    KEY_BR,
+                    INV_BR_NBR,
+                    SHT_IND,
+                    REQ_PRFT_PCT,
+                    COMMOD_CD,
+                    IN_STK_BR,
+                    IN_STK_OTH,
+                    TRADE_DISC,
+                    TR_TO_BR_NBR,
+                    TR_TO_ORDR_NBR,
+                    TR_TO_DIST_NBR,
+                    TR_TO_SHIP_NBR,
+                    WGT_PER,
+                    RVS_ACOP_IND,
+                    USYS_CONT_ACOP_IND,
+                    SLS_TYP_SW,
+                    BASE_UNIT,
+                    BASE_UM,
+                    NON_STD_CONV_SW,
+                    FRGN_UNIT_PRC_SEMI,
+                    VAT_TAX_CD,
+                    VAT_TAX_RT,
+                    COOP_FLG,
+                    RMA_OVERGOODS_CD,
+                    ALT_WHSE_CO,
+                    ALT_WHSE_BR,
+                    ALT_WHSE_CCY,
+                    ALT_UNIT_COST,
+                    ALNC_SW,
+                    PROMO_CD,
+                    CNTRY_OF_ORIG,
+                    EXP_LICENCE,
+                    ACOP_DELTA_PRC_IND,
+                    ACOP_END_USER_NBR,
+                    LSB_QTY_AVAIL,
+                    VDR_EXCHG_RT_TYP,
+                    TXBL_ITEM_SW,
+                    ALLOC_RESV_QTY,
+                    CFSCMP_SYS_ITEM_CO,
+                    CFSCMP_SYS_ITEM_NBR,
+                    ENTY_TM,
+                    ASET_TAG_SW,
+                    LSB,
+                    REFDIR_OVRD_TYP,
+                    SPLIT_BILL_TO_SUFF,
+                    SPEC_COMP_IND,
+                    OSS_NO,
+                    AAP_BUILD_IND,
+                    BOH_UPD_ONLINE_SW,
+                    PGM_TYP1,
+                    PGM_TYP2,
+                    DISC_PCT,
+                    DISC_CD,
+                    SEMI_CNDUC_SW,
+                    INVC_CO_CD,
+                    INVC_BR_NBR,
+                    INVC_ORDR_NBR,
+                    INVC_INVC_DT,
+                    INVC_DIST_NBR,
+                    INVC_SHIP_NBR,
                     RELATED_GOVT_BID_GSN,
                     HOLD_CODE,
                     GOVT_BID_BASED_LINE_SW,
                     COMMOD_CODE,
                     REFDIR_OVERRIDE_TEXT,
                     ALLOC_TYPE,
+                    ODS_ISRT_TS,
                     INVOICE_BREAK_CODE,
                     ENTRY_TIME,
                     ICMS_CODE,
                     ICMS_TAX_RATE,
                     IPI_ISS_TAX_RATE,
                     TES_CODE,
-                    AAP_BUILD_IND,
-                    ACOP_DELTA_PRC_IND,
-                    ACOP_END_USER_NBR,
-                    ALLOC_RESV_QTY,
-                    ALNC_SW,
-                    ALT_UNIT_COST,
-                    ALT_WHSE_BR,
-                    ALT_WHSE_CCY,
-                    ALT_WHSE_CO,
-                    ASET_TAG_SW,
-                    BASE_UM,
-                    BASE_UNIT,
-                    BOH_UPD_ONLINE_SW,
-                    CFG_IND,
-                    CFG_LAB,
-                    CFSCMP_SYS_ITEM_CO,
-                    CFSCMP_SYS_ITEM_NBR,
-                    CNTRY_OF_ORIG,
-                    COOP_FLG,
-                    DISC_CD,
-                    DISC_PCT,
-                    EXP_LICENCE,
-                    FRGN_UNIT_PRC_SEMI,
-                    IN_STK_BR,
-                    IN_STK_OTH,
-                    KEY_BR,
-                    KEY_CO,
-                    LSB_QTY_AVAIL,
-                    LSB,
-                    NON_STD_CONV_SW,
-                    OSS_NO,
-                    PGM_TYP1,
-                    PGM_TYP2,
-                    PROMO_CD,
-                    REFDIR_OVRD_TYP,
-                    REQ_PRFT_PCT,
-                    RMA_OVERGOODS_CD,
-                    RVS_ACOP_IND,
-                    SEMI_CNDUC_SW,
-                    SHT_IND,
-                    SLS_TYP_SW,
-                    SPEC_COMP_IND,
-                    SPLIT_BILL_TO_SUFF,
-                    TR_TO_BR_NBR,
-                    TR_TO_DIST_NBR,
-                    TR_TO_ORDR_NBR,
-                    TR_TO_SHIP_NBR,
-                    TRADE_DISC,
-                    TXBL_ITEM_SW,
-                    USYS_CONT_ACOP_IND,
-                    VAT_TAX_CD,
-                    VAT_TAX_RT,
-                    VDR_EXCHG_RT_TYP,
-                    WGT_PER,
                     RMA_RECV_TODAY,
                     RMA_QTY_OPEN,
                     FAAST_SAP_INVC_NBR
-                FROM ODS.IMS_ORDER_LINE_ORSLNE
-                WHERE TRIM(ORDR_NBR) = :orderNumber
-                  AND TRIM(COMPANY_CD) = :companyCode
-                ORDER BY LINE_NBR";
+                FROM ODS.ODS_ORDER_LINE
+                WHERE COMPANY_CD = :companyCode
+                  AND BRANCH_NBR = :BranchNbr
+                  AND ORDR_NBR = :orderNumber";
+                //       AND TRIM(DIST_NBR) = :DistNbr
+                //       AND TRIM(SHIP_NBR) = :ShipNbr";
 
                 await using OracleCommand lineCmd = new OracleCommand(lineQuery, conn);
                 lineCmd.BindByName = true;
                 lineCmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = response.CustCoCd.Trim();
                 lineCmd.Parameters.Add("orderNumber", OracleDbType.Varchar2).Value = response.ImiAsgdOrdrNbr.Trim();
+                lineCmd.Parameters.Add("BranchNbr", OracleDbType.Varchar2).Value = response.CustBr.Trim();
+
                 Console.WriteLine($">>> EXECUTING ODS LINE QUERY: COMPANY_CD='{response.CustCoCd}', ORDR_NBR='{response.ImiAsgdOrdrNbr}'");
                 await using OracleDataReader lineReader = await lineCmd.ExecuteReaderAsync();
                 Console.WriteLine($">>> ODS LINE READER HAS ROWS: {lineReader.HasRows}");
@@ -474,6 +487,7 @@ namespace OrderManagement.API.Repositories
                         DistNbr = lineReader["DIST_NBR"]?.ToString()?.Trim(),
                         ShipNbr = lineReader["SHIP_NBR"]?.ToString()?.Trim(),
                         LineNbr = lineReader["LINE_NBR"]?.ToString()?.Trim(),
+                        OrdrDt = lineReader["ORDR_DT"]?.ToString()?.Trim(),
                         LineTyp = lineReader["LINE_TYP"]?.ToString()?.Trim(),
                         ImPartNbr = lineReader["IM_PART_NBR"]?.ToString()?.Trim(),
                         InvInd = lineReader["INV_IND"]?.ToString()?.Trim(),
@@ -525,6 +539,7 @@ namespace OrderManagement.API.Repositories
                         OdsLstUpdDt = lineReader["ODS_LST_UPD_DT"]?.ToString()?.Trim(),
                         AdjCost = lineReader["ADJ_COST"]?.ToString()?.Trim(),
                         OrigAdjCost = lineReader["ORIG_ADJ_COST"]?.ToString()?.Trim(),
+                        ImsDelFlg = lineReader["IMS_DEL_FLG"]?.ToString()?.Trim(),
                         SerialNbrAvailSw = lineReader["SERIAL_NBR_AVAIL_SW"]?.ToString()?.Trim(),
                         CustItemNbr = lineReader["CUST_ITEM_NBR"]?.ToString()?.Trim(),
                         CustLineNbr = lineReader["CUST_LINE_NBR"]?.ToString()?.Trim(),
@@ -534,101 +549,111 @@ namespace OrderManagement.API.Repositories
                         RetailPrice = lineReader["RETAIL_PRICE"]?.ToString()?.Trim(),
                         ConvBasePrice = lineReader["CONV_BASE_PRICE"]?.ToString()?.Trim(),
                         ConfigUnitPrice = lineReader["CONFIG_UNIT_PRICE"]?.ToString()?.Trim(),
-                        ConfigInd = lineReader["CONFIG_IND"]?.ToString()?.Trim(),
-                        SystemItemLineNbr = lineReader["SYSTEM_ITEM_LINE_NBR"]?.ToString()?.Trim(),
+                        CfgInd = lineReader["CFG_IND"]?.ToString()?.Trim(),
+                        SysItemLineNbr = lineReader["SYS_ITEM_LINE_NBR"]?.ToString()?.Trim(),
                         Um = lineReader["UM"]?.ToString()?.Trim(),
-                        AggregateCode = lineReader["AGGREGATE_CODE"]?.ToString()?.Trim(),
-                        ConfigAssemblyCd = lineReader["CONFIG_ASSEMBLY_CD"]?.ToString()?.Trim(),
-                        ConfigurationLab = lineReader["CONFIGURATION_LAB"]?.ToString()?.Trim(),
+                        AggrCd = lineReader["AGGR_CD"]?.ToString()?.Trim(),
+                        ConfigAsmbyCd = lineReader["CONFIG_ASMBY_CD"]?.ToString()?.Trim(),
+                        CfgLab = lineReader["CFG_LAB"]?.ToString()?.Trim(),
                         CatNbr = lineReader["CAT_NBR"]?.ToString()?.Trim(),
                         FreeItemSw = lineReader["FREE_ITEM_SW"]?.ToString()?.Trim(),
                         IcmsTaxAmt = lineReader["ICMS_TAX_AMT"]?.ToString()?.Trim(),
                         IpiIssTaxSw = lineReader["IPI_ISS_TAX_SW"]?.ToString()?.Trim(),
                         IpiIssTaxAmt = lineReader["IPI_ISS_TAX_AMT"]?.ToString()?.Trim(),
-                        LastChgOpid = lineReader["LAST_CHG_OPID"]?.ToString()?.Trim(),
-                        LastChgTime = lineReader["LAST_CHG_TIME"]?.ToString()?.Trim(),
+
+                        LastChgOpid = lineReader["LST_CHG_OPID"]?.ToString()?.Trim(),
+
+                        LastChgTm = lineReader["LST_CHG_TM"]?.ToString()?.Trim(),
                         PcTaxAmt = lineReader["PC_TAX_AMT"]?.ToString()?.Trim(),
-                        RelatedGovtBidVsn = lineReader["RELATED_GOVT_BID_VSN"]?.ToString()?.Trim(),
-                        ReserveSeqNbr = lineReader["RESERVE_SEQ_NBR"]?.ToString()?.Trim(),
-                        UnitPriceReseller = lineReader["UNIT_PRICE_RESELLER"]?.ToString()?.Trim(),
-                        OrlForeignUnitPrice = lineReader["ORL_FOREIGN_UNIT_PRICE"]?.ToString()?.Trim(),
-                        OrlActualExchgRate = lineReader["ORL_ACTUAL_EXCHG_RATE"]?.ToString()?.Trim(),
-                        OrlVdrExchgRate = lineReader["ORL_VDR_EXCHG_RATE"]?.ToString()?.Trim(),
+                        RelGovtBidVsn = lineReader["REL_GOVT_BID_VSN"]?.ToString()?.Trim(),
+                        ResvSeqNbr = lineReader["RESV_SEQ_NBR"]?.ToString()?.Trim(),
+                        UnitPriceRslr = lineReader["UNIT_PRC_RSLR"]?.ToString()?.Trim(),
+                        ForeignUnitPrice = lineReader["FOREIGN_UNIT_PRICE"]?.ToString()?.Trim(),
+                        ActualExchgRate = lineReader["ACTUAL_EXCHG_RATE"]?.ToString()?.Trim(),
+                        VdrExchgRate = lineReader["VDR_EXCHG_RATE"]?.ToString()?.Trim(),
                         ConfigId = lineReader["CONFIG_ID"]?.ToString()?.Trim(),
+                        KeyCo = lineReader["KEY_CO"]?.ToString()?.Trim(),
+                        KeyBr = lineReader["KEY_BR"]?.ToString()?.Trim(),
+                        InvBrNbr = lineReader["INV_BR_NBR"]?.ToString()?.Trim(),
+                        ShtInd = lineReader["SHT_IND"]?.ToString()?.Trim(),
+                        ReqPrftPct = lineReader["REQ_PRFT_PCT"]?.ToString()?.Trim(),
+                        CommodCd = lineReader["COMMOD_CD"]?.ToString()?.Trim(),
+                        InStkBr = lineReader["IN_STK_BR"]?.ToString()?.Trim(),
+                        InStkOth = lineReader["IN_STK_OTH"]?.ToString()?.Trim(),
+                        TradeDisc = lineReader["TRADE_DISC"]?.ToString()?.Trim(),
+                        TrToBrNbr = lineReader["TR_TO_BR_NBR"]?.ToString()?.Trim(),
+                        TrToOrdrNbr = lineReader["TR_TO_ORDR_NBR"]?.ToString()?.Trim(),
+                        TrToDistNbr = lineReader["TR_TO_DIST_NBR"]?.ToString()?.Trim(),
+                        TrToShipNbr = lineReader["TR_TO_SHIP_NBR"]?.ToString()?.Trim(),
+                        WgtPer = lineReader["WGT_PER"]?.ToString()?.Trim(),
+                        RvsAcopInd = lineReader["RVS_ACOP_IND"]?.ToString()?.Trim(),
+                        UsysContAcopInd = lineReader["USYS_CONT_ACOP_IND"]?.ToString()?.Trim(),
+                        SlsTypSw = lineReader["SLS_TYP_SW"]?.ToString()?.Trim(),
+                        BaseUnit = lineReader["BASE_UNIT"]?.ToString()?.Trim(),
+                        BaseUm = lineReader["BASE_UM"]?.ToString()?.Trim(),
+                        NonStdConvSw = lineReader["NON_STD_CONV_SW"]?.ToString()?.Trim(),
+                        FrgnUnitPrcSemi = lineReader["FRGN_UNIT_PRC_SEMI"]?.ToString()?.Trim(),
+                        VatTaxCd = lineReader["VAT_TAX_CD"]?.ToString()?.Trim(),
+                        VatTaxRt = lineReader["VAT_TAX_RT"]?.ToString()?.Trim(),
+                        CoopFlg = lineReader["COOP_FLG"]?.ToString()?.Trim(),
+                        RmaOvergoodsCd = lineReader["RMA_OVERGOODS_CD"]?.ToString()?.Trim(),
+                        AltWhseCo = lineReader["ALT_WHSE_CO"]?.ToString()?.Trim(),
+                        AltWhseBr = lineReader["ALT_WHSE_BR"]?.ToString()?.Trim(),
+                        AltWhseCcy = lineReader["ALT_WHSE_CCY"]?.ToString()?.Trim(),
+                        AltUnitCost = lineReader["ALT_UNIT_COST"]?.ToString()?.Trim(),
+                        AlncSw = lineReader["ALNC_SW"]?.ToString()?.Trim(),
+                        PromoCd = lineReader["PROMO_CD"]?.ToString()?.Trim(),
+                        CntryOfOrig = lineReader["CNTRY_OF_ORIG"]?.ToString()?.Trim(),
+                        ExpLicence = lineReader["EXP_LICENCE"]?.ToString()?.Trim(),
+                        AcopDeltaPrcInd = lineReader["ACOP_DELTA_PRC_IND"]?.ToString()?.Trim(),
+                        AcopEndUserNbr = lineReader["ACOP_END_USER_NBR"]?.ToString()?.Trim(),
+                        LsbQtyAvail = lineReader["LSB_QTY_AVAIL"]?.ToString()?.Trim(),
+                        VdrExchgRtTyp = lineReader["VDR_EXCHG_RT_TYP"]?.ToString()?.Trim(),
+                        TxblItemSw = lineReader["TXBL_ITEM_SW"]?.ToString()?.Trim(),
+                        AllocResvQty = lineReader["ALLOC_RESV_QTY"]?.ToString()?.Trim(),
+                        CfscmpSysItemCo = lineReader["CFSCMP_SYS_ITEM_CO"]?.ToString()?.Trim(),
+                        CfscmpSysItemNbr = lineReader["CFSCMP_SYS_ITEM_NBR"]?.ToString()?.Trim(),
+                        EntyTm = lineReader["ENTY_TM"]?.ToString()?.Trim(),
+                        AsetTagSw = lineReader["ASET_TAG_SW"]?.ToString()?.Trim(),
+                        Lsb = lineReader["LSB"]?.ToString()?.Trim(),
+                        RefdirOvrdTyp = lineReader["REFDIR_OVRD_TYP"]?.ToString()?.Trim(),
+                        SplitBillToSuff = lineReader["SPLIT_BILL_TO_SUFF"]?.ToString()?.Trim(),
+                        SpecCompInd = lineReader["SPEC_COMP_IND"]?.ToString()?.Trim(),
+                        OssNo = lineReader["OSS_NO"]?.ToString()?.Trim(),
+                        AapBuildInd = lineReader["AAP_BUILD_IND"]?.ToString()?.Trim(),
+                        BohUpdOnlineSw = lineReader["BOH_UPD_ONLINE_SW"]?.ToString()?.Trim(),
+                        PgmTyp1 = lineReader["PGM_TYP1"]?.ToString()?.Trim(),
+                        PgmTyp2 = lineReader["PGM_TYP2"]?.ToString()?.Trim(),
+                        DiscPct = lineReader["DISC_PCT"]?.ToString()?.Trim(),
+                        DiscCd = lineReader["DISC_CD"]?.ToString()?.Trim(),
+                        SemiCnducSw = lineReader["SEMI_CNDUC_SW"]?.ToString()?.Trim(),
+                        InvcCoCd = lineReader["INVC_CO_CD"]?.ToString()?.Trim(),
+                        InvcBrNbr = lineReader["INVC_BR_NBR"]?.ToString()?.Trim(),
+                        InvcOrdrNbr = lineReader["INVC_ORDR_NBR"]?.ToString()?.Trim(),
+                        InvcInvcDt = lineReader["INVC_INVC_DT"]?.ToString()?.Trim(),
+                        InvcDistNbr = lineReader["INVC_DIST_NBR"]?.ToString()?.Trim(),
+                        InvcShipNbr = lineReader["INVC_SHIP_NBR"]?.ToString()?.Trim(),
                         RelatedGovtBidGsn = lineReader["RELATED_GOVT_BID_GSN"]?.ToString()?.Trim(),
                         HoldCode = lineReader["HOLD_CODE"]?.ToString()?.Trim(),
                         GovtBidBasedLineSw = lineReader["GOVT_BID_BASED_LINE_SW"]?.ToString()?.Trim(),
-                        CommodCode = lineReader["COMMOD_CODE"]?.ToString()?.Trim(),
                         RefdirOverrideText = lineReader["REFDIR_OVERRIDE_TEXT"]?.ToString()?.Trim(),
                         AllocType = lineReader["ALLOC_TYPE"]?.ToString()?.Trim(),
+                        OdsIsrtTs = lineReader["ODS_ISRT_TS"]?.ToString()?.Trim(),
                         InvoiceBreakCode = lineReader["INVOICE_BREAK_CODE"]?.ToString()?.Trim(),
                         EntryTime = lineReader["ENTRY_TIME"]?.ToString()?.Trim(),
                         IcmsCode = lineReader["ICMS_CODE"]?.ToString()?.Trim(),
                         IcmsTaxRate = lineReader["ICMS_TAX_RATE"]?.ToString()?.Trim(),
                         IpiIssTaxRate = lineReader["IPI_ISS_TAX_RATE"]?.ToString()?.Trim(),
                         TesCode = lineReader["TES_CODE"]?.ToString()?.Trim(),
-                        AapBuildInd = lineReader["AAP_BUILD_IND"]?.ToString()?.Trim(),
-                        AcopDeltaPrcInd = lineReader["ACOP_DELTA_PRC_IND"]?.ToString()?.Trim(),
-                        AcopEndUserNbr = lineReader["ACOP_END_USER_NBR"]?.ToString()?.Trim(),
-                        AllocResvQty = lineReader["ALLOC_RESV_QTY"]?.ToString()?.Trim(),
-                        AlncSw = lineReader["ALNC_SW"]?.ToString()?.Trim(),
-                        AltUnitCost = lineReader["ALT_UNIT_COST"]?.ToString()?.Trim(),
-                        AltWhseBr = lineReader["ALT_WHSE_BR"]?.ToString()?.Trim(),
-                        AltWhseCcy = lineReader["ALT_WHSE_CCY"]?.ToString()?.Trim(),
-                        AltWhseCo = lineReader["ALT_WHSE_CO"]?.ToString()?.Trim(),
-                        AsetTagSw = lineReader["ASET_TAG_SW"]?.ToString()?.Trim(),
-                        BaseUm = lineReader["BASE_UM"]?.ToString()?.Trim(),
-                        BaseUnit = lineReader["BASE_UNIT"]?.ToString()?.Trim(),
-                        BohUpdOnlineSw = lineReader["BOH_UPD_ONLINE_SW"]?.ToString()?.Trim(),
-                        CfgInd = lineReader["CFG_IND"]?.ToString()?.Trim(),
-                        CfgLab = lineReader["CFG_LAB"]?.ToString()?.Trim(),
-                        CfscmpSysItemCo = lineReader["CFSCMP_SYS_ITEM_CO"]?.ToString()?.Trim(),
-                        CfscmpSysItemNbr = lineReader["CFSCMP_SYS_ITEM_NBR"]?.ToString()?.Trim(),
-                        CntryOfOrig = lineReader["CNTRY_OF_ORIG"]?.ToString()?.Trim(),
-                        CoopFlg = lineReader["COOP_FLG"]?.ToString()?.Trim(),
-                        DiscCd = lineReader["DISC_CD"]?.ToString()?.Trim(),
-                        DiscPct = lineReader["DISC_PCT"]?.ToString()?.Trim(),
-                        ExpLicence = lineReader["EXP_LICENCE"]?.ToString()?.Trim(),
-                        FrgnUnitPrcSemi = lineReader["FRGN_UNIT_PRC_SEMI"]?.ToString()?.Trim(),
-                        InStkBr = lineReader["IN_STK_BR"]?.ToString()?.Trim(),
-                        InStkOth = lineReader["IN_STK_OTH"]?.ToString()?.Trim(),
-                        KeyBr = lineReader["KEY_BR"]?.ToString()?.Trim(),
-                        KeyCo = lineReader["KEY_CO"]?.ToString()?.Trim(),
-                        LsbQtyAvail = lineReader["LSB_QTY_AVAIL"]?.ToString()?.Trim(),
-                        Lsb = lineReader["LSB"]?.ToString()?.Trim(),
-                        NonStdConvSw = lineReader["NON_STD_CONV_SW"]?.ToString()?.Trim(),
-                        OssNo = lineReader["OSS_NO"]?.ToString()?.Trim(),
-                        PgmTyp1 = lineReader["PGM_TYP1"]?.ToString()?.Trim(),
-                        PgmTyp2 = lineReader["PGM_TYP2"]?.ToString()?.Trim(),
-                        PromoCd = lineReader["PROMO_CD"]?.ToString()?.Trim(),
-                        RefdirOvrdTyp = lineReader["REFDIR_OVRD_TYP"]?.ToString()?.Trim(),
-                        ReqPrftPct = lineReader["REQ_PRFT_PCT"]?.ToString()?.Trim(),
-                        RmaOvergoodsCd = lineReader["RMA_OVERGOODS_CD"]?.ToString()?.Trim(),
-                        RvsAcopInd = lineReader["RVS_ACOP_IND"]?.ToString()?.Trim(),
-                        SemiCnducSw = lineReader["SEMI_CNDUC_SW"]?.ToString()?.Trim(),
-                        ShtInd = lineReader["SHT_IND"]?.ToString()?.Trim(),
-                        SlsTypSw = lineReader["SLS_TYP_SW"]?.ToString()?.Trim(),
-                        SpecCompInd = lineReader["SPEC_COMP_IND"]?.ToString()?.Trim(),
-                        SplitBillToSuff = lineReader["SPLIT_BILL_TO_SUFF"]?.ToString()?.Trim(),
-                        TrToBrNbr = lineReader["TR_TO_BR_NBR"]?.ToString()?.Trim(),
-                        TrToDistNbr = lineReader["TR_TO_DIST_NBR"]?.ToString()?.Trim(),
-                        TrToOrdrNbr = lineReader["TR_TO_ORDR_NBR"]?.ToString()?.Trim(),
-                        TrToShipNbr = lineReader["TR_TO_SHIP_NBR"]?.ToString()?.Trim(),
-                        TradeDisc = lineReader["TRADE_DISC"]?.ToString()?.Trim(),
-                        TxblItemSw = lineReader["TXBL_ITEM_SW"]?.ToString()?.Trim(),
-                        UsysContAcopInd = lineReader["USYS_CONT_ACOP_IND"]?.ToString()?.Trim(),
-                        VatTaxCd = lineReader["VAT_TAX_CD"]?.ToString()?.Trim(),
-                        VatTaxRt = lineReader["VAT_TAX_RT"]?.ToString()?.Trim(),
-                        VdrExchgRtTyp = lineReader["VDR_EXCHG_RT_TYP"]?.ToString()?.Trim(),
-                        WgtPer = lineReader["WGT_PER"]?.ToString()?.Trim(),
                         RmaRecvToday = lineReader["RMA_RECV_TODAY"]?.ToString()?.Trim(),
                         RmaQtyOpen = lineReader["RMA_QTY_OPEN"]?.ToString()?.Trim(),
                         FaastSapInvcNbr = lineReader["FAAST_SAP_INVC_NBR"]?.ToString()?.Trim()
+
                     });
                 }
 
                 Console.WriteLine($">>> ODS LINE ITEMS FOUND: {response.LineItems.Count}");
-                }
+            }
 
             string statusQuery = @"
             SELECT
@@ -662,10 +687,12 @@ namespace OrderManagement.API.Repositories
                 ODS_ISRT_TS,
                 ODS_UPD_TS
             FROM ODS.DB2_OR_ORDER_STUS_CHGS
-            WHERE TRIM(ORDR_NBR) = :orderNumber
-              AND TRIM(ORDR_BR_NBR) = :branchNumber
-              AND TRIM(CO_CD) = :companyCode
-            ORDER BY STUS_CHG_TS";
+            WHERE CO_CD = :companyCode
+              AND ORDR_NBR = :orderNumber
+              AND ORDR_BR_NBR = :branchNumber";
+
+            //    AND DIST_NBR = :distNumber
+            //    AND SHIP_NBR = :shipNumber";
 
             try
             {
@@ -685,7 +712,7 @@ namespace OrderManagement.API.Repositories
 
                 while (await statusReader.ReadAsync())
                 {
-                   
+
                     response.StatusChanges.Add(new OrderStatusChange
                     {
                         CoCd = statusReader["CO_CD"]?.ToString()?.Trim(),
@@ -907,94 +934,94 @@ namespace OrderManagement.API.Repositories
                 //inPoSwCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = "470887";
 
                 Console.WriteLine($">>> EXECUTING ODS IE_IN_PO_SW QUERY...");
-                    Console.WriteLine($">>> IE_IN_PO_SW CO_CD PARAMETER: {inPoSwCoCd}");
-                    Console.WriteLine($">>> IE_IN_PO_SW PARTNER_ID PARAMETER: {inPoSwPartnerId}");
+                Console.WriteLine($">>> IE_IN_PO_SW CO_CD PARAMETER: {inPoSwCoCd}");
+                Console.WriteLine($">>> IE_IN_PO_SW PARTNER_ID PARAMETER: {inPoSwPartnerId}");
 
-                    await using OracleDataReader inPoSwReader = await inPoSwCmd.ExecuteReaderAsync();
+                await using OracleDataReader inPoSwReader = await inPoSwCmd.ExecuteReaderAsync();
 
-                    Console.WriteLine($">>> ODS IE_IN_PO_SW READER HAS ROWS: {inPoSwReader.HasRows}");
+                Console.WriteLine($">>> ODS IE_IN_PO_SW READER HAS ROWS: {inPoSwReader.HasRows}");
 
-                    if (await inPoSwReader.ReadAsync())
+                if (await inPoSwReader.ReadAsync())
+                {
+                    response.InPoSw.Add(new OrderInPoSw
                     {
-                        response.InPoSw.Add(new OrderInPoSw
-                        {
-                            CoCd = inPoSwReader["CO_CD"]?.ToString()?.Trim(),
-                            PartnerId = inPoSwReader["PARTNER_ID"]?.ToString()?.Trim(),
-                            SkipFrTm = inPoSwReader["SKIP_FR_TM"]?.ToString()?.Trim(),
-                            SkipToTm = inPoSwReader["SKIP_TO_TM"]?.ToString()?.Trim(),
-                            CustPrty = inPoSwReader["CUST_PRTY"]?.ToString()?.Trim(),
-                            AckPoFlg = inPoSwReader["ACK_PO_FLG"]?.ToString()?.Trim(),
-                            AckPromoFlg = inPoSwReader["ACK_PROMO_FLG"]?.ToString()?.Trim(),
-                            BaserateFlg = inPoSwReader["BASERATE_FLG"]?.ToString()?.Trim(),
-                            AggCdCpblFlg = inPoSwReader["AGG_CD_CPBL_FLG"]?.ToString()?.Trim(),
-                            PreImHoldFlg = inPoSwReader["PRE_IM_HOLD_FLG"]?.ToString()?.Trim(),
-                            MultShpToFlg = inPoSwReader["MULT_SHP_TO_FLG"]?.ToString()?.Trim(),
-                            SystemPartsFlg = inPoSwReader["SYSTEM_PARTS_FLG"]?.ToString()?.Trim(),
-                            VoidTaxableFlg = inPoSwReader["VOID_TAXABLE_FLG"]?.ToString()?.Trim(),
-                            CasepackMsgFlg = inPoSwReader["CASEPACK_MSG_FLG"]?.ToString()?.Trim(),
-                            ChkCustPrcFlg = inPoSwReader["CHK_CUST_PRC_FLG"]?.ToString()?.Trim(),
-                            DistDepthFlg = inPoSwReader["DIST_DEPTH_FLG"]?.ToString()?.Trim(),
-                            AirBrSeqFlg = inPoSwReader["AIR_BR_SEQ_FLG"]?.ToString()?.Trim(),
-                            BrSeqOrideFlg = inPoSwReader["BR_SEQ_ORIDE_FLG"]?.ToString()?.Trim(),
-                            MultBrSeqFlg = inPoSwReader["MULT_BR_SEQ_FLG"]?.ToString()?.Trim(),
-                            ExportBrSeqFlg = inPoSwReader["EXPORT_BR_SEQ_FLG"]?.ToString()?.Trim(),
-                            HoldOrderFlg = inPoSwReader["HOLD_ORDER_FLG"]?.ToString()?.Trim(),
-                            DfltCustNbr = inPoSwReader["DFLT_CUST_NBR"]?.ToString()?.Trim(),
-                            PromoCustNbr = inPoSwReader["PROMO_CUST_NBR"]?.ToString()?.Trim(),
-                            PriceCustNbr = inPoSwReader["PRICE_CUST_NBR"]?.ToString()?.Trim(),
-                            InstRebatMsgFlg = inPoSwReader["INST_REBAT_MSG_FLG"]?.ToString()?.Trim(),
-                            VlaFlg = inPoSwReader["VLA_FLG"]?.ToString()?.Trim(),
-                            MultiDistFlg = inPoSwReader["MULTI_DIST_FLG"]?.ToString()?.Trim(),
-                            SaveFrtFlg = inPoSwReader["SAVE_FRT_FLG"]?.ToString()?.Trim(),
-                            SaveDistFlg = inPoSwReader["SAVE_DIST_FLG"]?.ToString()?.Trim(),
-                            BestWhseFlg = inPoSwReader["BEST_WHSE_FLG"]?.ToString()?.Trim(),
-                            SingleWhseFlg = inPoSwReader["SINGLE_WHSE_FLG"]?.ToString()?.Trim(),
-                            PrntOrdrFlg = inPoSwReader["PRNT_ORDR_FLG"]?.ToString()?.Trim(),
-                            MultShpSortSeq = inPoSwReader["MULT_SHP_SORT_SEQ"]?.ToString()?.Trim(),
-                            MaxFutDay = inPoSwReader["MAX_FUT_DAY"]?.ToString()?.Trim(),
-                            LstChgTs = inPoSwReader["LST_CHG_TS"]?.ToString()?.Trim(),
-                            LstChgNam = inPoSwReader["LST_CHG_NAM"]?.ToString()?.Trim(),
-                            ClsXFltrTypCd = inPoSwReader["CLS_X_FLTR_TYP_CD"]?.ToString()?.Trim(),
-                            ClsSFltrTypCd = inPoSwReader["CLS_S_FLTR_TYP_CD"]?.ToString()?.Trim(),
-                            UpdCustSkuFlg = inPoSwReader["UPD_CUST_SKU_FLG"]?.ToString()?.Trim(),
-                            SaveCustPrcFlg = inPoSwReader["SAVE_CUST_PRC_FLG"]?.ToString()?.Trim(),
-                            BoBrXferFlg = inPoSwReader["BO_BR_XFER_FLG"]?.ToString()?.Trim(),
-                            RejOrdrHdrFlg = inPoSwReader["REJ_ORDR_HDR_FLG"]?.ToString()?.Trim(),
-                            RejCnsCmpHdrFlg = inPoSwReader["REJ_CNSCMP_HDR_FLG"]?.ToString()?.Trim(),
-                            AckRptFlg = inPoSwReader["ACK_RPT_FLG"]?.ToString()?.Trim(),
-                            SpecPrcFlg = inPoSwReader["SPEC_PRC_FLG"]?.ToString()?.Trim(),
-                            EuCaptureFlg = inPoSwReader["EU_CAPTURE_FLG"]?.ToString()?.Trim(),
-                            CustomCarrFlg = inPoSwReader["CUSTOM_CARR_FLG"]?.ToString()?.Trim(),
-                            CascadeSkuFlg = inPoSwReader["CASCADE_SKU_FLG"]?.ToString()?.Trim(),
-                            AutoPoChgFlg = inPoSwReader["AUTO_PO_CHG_FLG"]?.ToString()?.Trim(),
-                            ClsXHldFlg = inPoSwReader["CLS_X_HLD_FLG"]?.ToString()?.Trim(),
-                            StStoreOvrRdFlg = inPoSwReader["ST_STORE_OVRRD_FLG"]?.ToString()?.Trim(),
-                            RsrvCustNbr = inPoSwReader["RSRV_CUST_NBR"]?.ToString()?.Trim(),
-                            RsrvAllowed = inPoSwReader["RSRV_ALLOWED"]?.ToString()?.Trim(),
-                            RsrvExpirDays = inPoSwReader["RSRV_EXPIR_DAYS"]?.ToString()?.Trim(),
-                            ConfigVisibleFlg = inPoSwReader["CONFIG_VISIBLE_FLG"]?.ToString()?.Trim(),
-                            EtaCalcFlg = inPoSwReader["ETA_CALC_FLG"]?.ToString()?.Trim(),
-                            EtaDays = inPoSwReader["ETA_DAYS"]?.ToString()?.Trim(),
-                            AddrValidFlg = inPoSwReader["ADDR_VALID_FLG"]?.ToString()?.Trim(),
-                            AutoSplitFlg = inPoSwReader["AUTO_SPLIT_FLG"]?.ToString()?.Trim(),
-                            OrdrCancDaysFlg = inPoSwReader["ORDR_CANC_DAYS_FLG"]?.ToString()?.Trim(),
-                            OrdrCancDaysNbr = inPoSwReader["ORDR_CANC_DAYS_NBR"]?.ToString()?.Trim(),
-                            FutOrdrSw = inPoSwReader["FUT_ORDR_SW"]?.ToString()?.Trim(),
-                            AckDelaySw = inPoSwReader["ACK_DELAY_SW"]?.ToString()?.Trim(),
-                            AckDelayHrs = inPoSwReader["ACK_DELAY_HRS"]?.ToString()?.Trim(),
-                            TransAuthId = inPoSwReader["TRANS_AUTH_ID"]?.ToString()?.Trim()
-                        });
-                    }
-             }
+                        CoCd = inPoSwReader["CO_CD"]?.ToString()?.Trim(),
+                        PartnerId = inPoSwReader["PARTNER_ID"]?.ToString()?.Trim(),
+                        SkipFrTm = inPoSwReader["SKIP_FR_TM"]?.ToString()?.Trim(),
+                        SkipToTm = inPoSwReader["SKIP_TO_TM"]?.ToString()?.Trim(),
+                        CustPrty = inPoSwReader["CUST_PRTY"]?.ToString()?.Trim(),
+                        AckPoFlg = inPoSwReader["ACK_PO_FLG"]?.ToString()?.Trim(),
+                        AckPromoFlg = inPoSwReader["ACK_PROMO_FLG"]?.ToString()?.Trim(),
+                        BaserateFlg = inPoSwReader["BASERATE_FLG"]?.ToString()?.Trim(),
+                        AggCdCpblFlg = inPoSwReader["AGG_CD_CPBL_FLG"]?.ToString()?.Trim(),
+                        PreImHoldFlg = inPoSwReader["PRE_IM_HOLD_FLG"]?.ToString()?.Trim(),
+                        MultShpToFlg = inPoSwReader["MULT_SHP_TO_FLG"]?.ToString()?.Trim(),
+                        SystemPartsFlg = inPoSwReader["SYSTEM_PARTS_FLG"]?.ToString()?.Trim(),
+                        VoidTaxableFlg = inPoSwReader["VOID_TAXABLE_FLG"]?.ToString()?.Trim(),
+                        CasepackMsgFlg = inPoSwReader["CASEPACK_MSG_FLG"]?.ToString()?.Trim(),
+                        ChkCustPrcFlg = inPoSwReader["CHK_CUST_PRC_FLG"]?.ToString()?.Trim(),
+                        DistDepthFlg = inPoSwReader["DIST_DEPTH_FLG"]?.ToString()?.Trim(),
+                        AirBrSeqFlg = inPoSwReader["AIR_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        BrSeqOrideFlg = inPoSwReader["BR_SEQ_ORIDE_FLG"]?.ToString()?.Trim(),
+                        MultBrSeqFlg = inPoSwReader["MULT_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        ExportBrSeqFlg = inPoSwReader["EXPORT_BR_SEQ_FLG"]?.ToString()?.Trim(),
+                        HoldOrderFlg = inPoSwReader["HOLD_ORDER_FLG"]?.ToString()?.Trim(),
+                        DfltCustNbr = inPoSwReader["DFLT_CUST_NBR"]?.ToString()?.Trim(),
+                        PromoCustNbr = inPoSwReader["PROMO_CUST_NBR"]?.ToString()?.Trim(),
+                        PriceCustNbr = inPoSwReader["PRICE_CUST_NBR"]?.ToString()?.Trim(),
+                        InstRebatMsgFlg = inPoSwReader["INST_REBAT_MSG_FLG"]?.ToString()?.Trim(),
+                        VlaFlg = inPoSwReader["VLA_FLG"]?.ToString()?.Trim(),
+                        MultiDistFlg = inPoSwReader["MULTI_DIST_FLG"]?.ToString()?.Trim(),
+                        SaveFrtFlg = inPoSwReader["SAVE_FRT_FLG"]?.ToString()?.Trim(),
+                        SaveDistFlg = inPoSwReader["SAVE_DIST_FLG"]?.ToString()?.Trim(),
+                        BestWhseFlg = inPoSwReader["BEST_WHSE_FLG"]?.ToString()?.Trim(),
+                        SingleWhseFlg = inPoSwReader["SINGLE_WHSE_FLG"]?.ToString()?.Trim(),
+                        PrntOrdrFlg = inPoSwReader["PRNT_ORDR_FLG"]?.ToString()?.Trim(),
+                        MultShpSortSeq = inPoSwReader["MULT_SHP_SORT_SEQ"]?.ToString()?.Trim(),
+                        MaxFutDay = inPoSwReader["MAX_FUT_DAY"]?.ToString()?.Trim(),
+                        LstChgTs = inPoSwReader["LST_CHG_TS"]?.ToString()?.Trim(),
+                        LstChgNam = inPoSwReader["LST_CHG_NAM"]?.ToString()?.Trim(),
+                        ClsXFltrTypCd = inPoSwReader["CLS_X_FLTR_TYP_CD"]?.ToString()?.Trim(),
+                        ClsSFltrTypCd = inPoSwReader["CLS_S_FLTR_TYP_CD"]?.ToString()?.Trim(),
+                        UpdCustSkuFlg = inPoSwReader["UPD_CUST_SKU_FLG"]?.ToString()?.Trim(),
+                        SaveCustPrcFlg = inPoSwReader["SAVE_CUST_PRC_FLG"]?.ToString()?.Trim(),
+                        BoBrXferFlg = inPoSwReader["BO_BR_XFER_FLG"]?.ToString()?.Trim(),
+                        RejOrdrHdrFlg = inPoSwReader["REJ_ORDR_HDR_FLG"]?.ToString()?.Trim(),
+                        RejCnsCmpHdrFlg = inPoSwReader["REJ_CNSCMP_HDR_FLG"]?.ToString()?.Trim(),
+                        AckRptFlg = inPoSwReader["ACK_RPT_FLG"]?.ToString()?.Trim(),
+                        SpecPrcFlg = inPoSwReader["SPEC_PRC_FLG"]?.ToString()?.Trim(),
+                        EuCaptureFlg = inPoSwReader["EU_CAPTURE_FLG"]?.ToString()?.Trim(),
+                        CustomCarrFlg = inPoSwReader["CUSTOM_CARR_FLG"]?.ToString()?.Trim(),
+                        CascadeSkuFlg = inPoSwReader["CASCADE_SKU_FLG"]?.ToString()?.Trim(),
+                        AutoPoChgFlg = inPoSwReader["AUTO_PO_CHG_FLG"]?.ToString()?.Trim(),
+                        ClsXHldFlg = inPoSwReader["CLS_X_HLD_FLG"]?.ToString()?.Trim(),
+                        StStoreOvrRdFlg = inPoSwReader["ST_STORE_OVRRD_FLG"]?.ToString()?.Trim(),
+                        RsrvCustNbr = inPoSwReader["RSRV_CUST_NBR"]?.ToString()?.Trim(),
+                        RsrvAllowed = inPoSwReader["RSRV_ALLOWED"]?.ToString()?.Trim(),
+                        RsrvExpirDays = inPoSwReader["RSRV_EXPIR_DAYS"]?.ToString()?.Trim(),
+                        ConfigVisibleFlg = inPoSwReader["CONFIG_VISIBLE_FLG"]?.ToString()?.Trim(),
+                        EtaCalcFlg = inPoSwReader["ETA_CALC_FLG"]?.ToString()?.Trim(),
+                        EtaDays = inPoSwReader["ETA_DAYS"]?.ToString()?.Trim(),
+                        AddrValidFlg = inPoSwReader["ADDR_VALID_FLG"]?.ToString()?.Trim(),
+                        AutoSplitFlg = inPoSwReader["AUTO_SPLIT_FLG"]?.ToString()?.Trim(),
+                        OrdrCancDaysFlg = inPoSwReader["ORDR_CANC_DAYS_FLG"]?.ToString()?.Trim(),
+                        OrdrCancDaysNbr = inPoSwReader["ORDR_CANC_DAYS_NBR"]?.ToString()?.Trim(),
+                        FutOrdrSw = inPoSwReader["FUT_ORDR_SW"]?.ToString()?.Trim(),
+                        AckDelaySw = inPoSwReader["ACK_DELAY_SW"]?.ToString()?.Trim(),
+                        AckDelayHrs = inPoSwReader["ACK_DELAY_HRS"]?.ToString()?.Trim(),
+                        TransAuthId = inPoSwReader["TRANS_AUTH_ID"]?.ToString()?.Trim()
+                    });
+                }
+            }
             catch (OracleException ex)
             {
-                 Console.WriteLine($">>> ODS IE_IN_PO_SW QUERY FAILED: {ex.Message}");
+                Console.WriteLine($">>> ODS IE_IN_PO_SW QUERY FAILED: {ex.Message}");
             }
-            
+
             Console.WriteLine($">>> ODS IE_IN_PO_SW FOUND: {response.InPoSw.Count}");
             return response;
             // TRIM fixes trailing spaces in CHAR fixed-width columns
-        } 
+        }
 
         // Helper: safely converts DB2 numeric columns to decimal, defaulting to 0 if null/DBNull
         private static decimal ToDecimalSafe(object value)

@@ -272,39 +272,61 @@ namespace ImpulseSupportTool_Repo
         public string? RmaRecvToday { get; set; }
         public string? RmaQtyOpen { get; set; }
         public string? FaastSapInvcNbr { get; set; }
+        public string? OrdrDt { get; set; }
+        public string? ImsDelFlg { get; set; }
+        public string? SysItemLineNbr { get; set; }
+        public string? AggrCd { get; internal set; }
+        public string? ConfigAsmbyCd { get; internal set; }
+        public string? LastChgTm { get; internal set; }
+        public string? RelGovtBidVsn { get; internal set; }
+        public string? ResvSeqNbr { get; internal set; }
+        public string? UnitPriceRslr { get; internal set; }
+        public string? ForeignUnitPrice { get; internal set; }
+        public string? ActualExchgRate { get; internal set; }
+        public string? VdrExchgRate { get; internal set; }
+        public string? InvBrNbr { get; internal set; }
+        public string? CommodCd { get; internal set; }
+        public string? InvcCoCd { get; internal set; }
+        public string? InvcBrNbr { get; internal set; }
+        public string? InvcOrdrNbr { get; internal set; }
+        public string? InvcInvcDt { get; internal set; }
+        public string? InvcDistNbr { get; internal set; }
+        public string? InvcShipNbr { get; internal set; }
+        public string? OdsIsrtTs { get; internal set; }
+        public string? EntyTm { get; internal set; }
     }
 
     public class OrderStatusChange
-        {
-            public string CoCd { get; set; }
-            public string OrdrBrNbr { get; set; }
-            public string OrdrNbr { get; set; }
-            public string DistNbr { get; set; }
-            public string ShipNbr { get; set; }
-            public string OrdrDt { get; set; }
-            public string StusChgTypCd { get; set; }
-            public string StusChgTs { get; set; }
-            public string OrdrLineNbr { get; set; }
-            public string CustBrNbr { get; set; }
-            public string CustNbr { get; set; }
-            public string WebProcsFlg { get; set; }
-            public string TomcatProcsFlg { get; set; }
-            public string OrdrChgStusCd { get; set; }
-            public string ConfigStusCd { get; set; }
-            public string AggregateId { get; set; }
-            public string PrmsChgDt { get; set; }
-            public string FamilyCd { get; set; }
-            public string LstChgProgNam { get; set; }
-            public string LstChgOperId { get; set; }
-            public string UpdtRsnTxt { get; set; }
-            public string EvntRsnCd { get; set; }
-            public decimal FlrDnlQty { get; set; }
-            public string LastChgApplId { get; set; }
-            public string TransAuthId { get; set; }
-            public string CorrelId { get; set; }
-            public string PlanNam { get; set; }
-            public string OdsIsrtTs { get; set; }
-            public string OdsUpdTs { get; set; }
+    {
+        public string CoCd { get; set; }
+        public string OrdrBrNbr { get; set; }
+        public string OrdrNbr { get; set; }
+        public string DistNbr { get; set; }
+        public string ShipNbr { get; set; }
+        public string OrdrDt { get; set; }
+        public string StusChgTypCd { get; set; }
+        public string StusChgTs { get; set; }
+        public string OrdrLineNbr { get; set; }
+        public string CustBrNbr { get; set; }
+        public string CustNbr { get; set; }
+        public string WebProcsFlg { get; set; }
+        public string TomcatProcsFlg { get; set; }
+        public string OrdrChgStusCd { get; set; }
+        public string ConfigStusCd { get; set; }
+        public string AggregateId { get; set; }
+        public string PrmsChgDt { get; set; }
+        public string FamilyCd { get; set; }
+        public string LstChgProgNam { get; set; }
+        public string LstChgOperId { get; set; }
+        public string UpdtRsnTxt { get; set; }
+        public string EvntRsnCd { get; set; }
+        public decimal FlrDnlQty { get; set; }
+        public string LastChgApplId { get; set; }
+        public string TransAuthId { get; set; }
+        public string CorrelId { get; set; }
+        public string PlanNam { get; set; }
+        public string OdsIsrtTs { get; set; }
+        public string OdsUpdTs { get; set; }
 
     }
     public class OrderPartnerSetup
