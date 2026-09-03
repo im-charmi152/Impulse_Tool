@@ -4,126 +4,110 @@ namespace ImpulseSupportTool_Repo
 {
     public class OrderResponse
     {
-        public string CustCoCd { get; set; }
-        public string PartnerId { get; set; }
-
-        public string CustBr { get; set; }
-        public string ImiAsgdOrdrNbr { get; set; }
-        public string CustPoNbr { get; set; }
-
-        public string BillToBranchNbr { get; set; }
-        public string BillToCustNbr { get; set; }
-        public string BillToSfx { get; set; }
-        public string ShipToSfx { get; set; }
-
-        public string CapsIdCd { get; set; }
-        public string Terms { get; set; }
-        public string ResdntlSw { get; set; }
-        public string OrdrStatus { get; set; }
-        public string OrdrCmpltFillSw { get; set; }
-        public string CrRels { get; set; }
-        public string EntyDt { get; set; }
-        public string TermId { get; set; }
-        public string OsSlsmn { get; set; }
-        public string IsSlsmn { get; set; }
-        public string PostalCd { get; set; }
-        public string EntyMthd { get; set; }
-        public string EdiCo { get; set; }
-        public string SplitSw { get; set; }
-        public string OrdRefNbr { get; set; }
-        public string FulmntSw { get; set; }
-        public string CrCrdSw { get; set; }
-        public string EntyTm { get; set; }
-
-        public string BidQotFlg { get; set; }
-        public string BidExpDt { get; set; }
-
-        public string OrdrCcyCd { get; set; }
-        public decimal CcyRate { get; set; }
-
-        public string PoCrtedSw { get; set; }
-        public string GovtBidFlg { get; set; }
-        public string EnhancedRmaSw { get; set; }
-        public string FlrngAuthActnCd { get; set; }
-
-        public string CuBusSgmt { get; set; }
-        public string CuBusTyp { get; set; }
-        public string CuaShipFrom { get; set; }
-        public string BaseRateOrdrSw { get; set; }
-        public string UserNam { get; set; }
-
-        public string GovtEndUserZip { get; set; }
-        public string BinTyp { get; set; }
-        public string GovtGsaInd { get; set; }
-        public string SplitBillToSw { get; set; }
-        public string GovtEndUserTyp { get; set; }
-
-        public string OdsLstUpdDt { get; set; }
-        public string EnhancedCrMemoSw { get; set; }
-        public string SpecialHandleSw { get; set; }
-        public string ConfigurationFlag { get; set; }
-
-        public string EndUserPoNbr { get; set; }
-        public string ResellerNbr { get; set; }
-        public string TnSpecCd { get; set; }
-        public string EndUserDataSw { get; set; }
-        public string EndUserAuthorization { get; set; }
-        public string EndUserAddrSuffix { get; set; }
-        public string EndUserVendorFlag { get; set; }
-        public string EndUserNbr { get; set; }
-        public string VendorClaimNbr { get; set; }
-        public string PayeeNbr { get; set; }
-        public string PayeeSuf { get; set; }
-
-        public string Campaign { get; set; }
-        public string IndiaGstOrderInd { get; set; }
-
-        public string LastDistNbr { get; set; }
-        public string LastShipmentNbr { get; set; }
-        public string PriorityCode { get; set; }
-        public string OutsourceSkuInd { get; set; }
-        public string DeleteTodaySw { get; set; }
-
-        public string FlrngAuthNbr { get; set; }
-        public string PriceRecalcSw { get; set; }
-        public string AckCode { get; set; }
-        public string AllianceSw { get; set; }
-        public string AodSw { get; set; }
-        public string CapsBuyer { get; set; }
-
-        public string CityCode { get; set; }
-        public string Contract { get; set; }
-        public string CopyCode { get; set; }
-        public string CountyCode { get; set; }
-        public string CountryCode { get; set; }
-        public string CustomersLanguageCode { get; set; }
-
-        public string CustRefNbr { get; set; }
-        public string CustRefNbr2 { get; set; }
-        public string CustType { get; set; }
-        public string DeliveryTerms { get; set; }
-
-        public string EndCustId { get; set; }
-        public string EndCustNum { get; set; }
-        public string EndUserContSuffix { get; set; }
-        public string EndUserOrderSw { get; set; }
-
-        public string ExtSoCode { get; set; }
-        public string FreightForwarder { get; set; }
-
-        public string GlOffsetNbr { get; set; }
-        public string GlOffsetType { get; set; }
-        public string GwmdImagApplyFlag { get; set; }
-        public string JobAcctNbr { get; set; }
-
-        public string OrderManagementSw { get; set; }
-        public decimal OrderValueAtAdd { get; set; }
-        public decimal ResellerSplitPct { get; set; }
-
-        public string SoldToSuffix { get; set; }
-        public string SourceCode { get; set; }
-        public string StateCd { get; set; }
-        public string SummInvoiceCode { get; set; }
+        public string? CustCoCd { get; set; }
+        public string? CustBr { get; set; }
+        public string? ImiAsgdOrdrNbr { get; set; }
+        public string? OrdrDt { get; set; }
+        public string? CustPoNbr { get; set; }
+        public string? BillToBranchNbr { get; set; }
+        public string? BillToCustNbr { get; set; }
+        public string? BillToSfx { get; set; }
+        public string? ShipToSfx { get; set; }
+        public string? CapsIdCd { get; set; }
+        public string? Terms { get; set; }
+        public string? ResdntlSw { get; set; }
+        public string? OrdrStatus { get; set; }
+        public string? OrdrCmpltFillSw { get; set; }
+        public string? CrRels { get; set; }
+        public string? EntyDt { get; set; }
+        public string? TermId { get; set; }
+        public string? OsSlsmn { get; set; }
+        public string? IsSlsmn { get; set; }
+        public string? PostalCd { get; set; }
+        public string? EntyMthd { get; set; }
+        public string? EdiCo { get; set; }
+        public string? SplitSw { get; set; }
+        public string? OrdRefNbr { get; set; }
+        public string? FulmntSw { get; set; }
+        public string? CrCrdSw { get; set; }
+        public string? EntyTm { get; set; }
+        public string? BidQotFlg { get; set; }
+        public string? BidExpDt { get; set; }
+        public string? OrdrCcyCd { get; set; }
+        public decimal? CcyRate { get; set; }
+        public string? PoCrtedSw { get; set; }
+        public string? GovtBidFlg { get; set; }
+        public string? EnhancedRmaSw { get; set; }
+        public string? FlrngAuthActnCd { get; set; }
+        public string? CuBusSgmt { get; set; }
+        public string? CuBusTyp { get; set; }
+        public string? CuaShipFrom { get; set; }
+        public string? BaseRateOrdrSw { get; set; }
+        public string? UserNam { get; set; }
+        public string? GovtEndUserZip { get; set; }
+        public string? BinTyp { get; set; }
+        public string? GovtGsaInd { get; set; }
+        public string? SplitBillToSw { get; set; }
+        public string? GovtEndUserTyp { get; set; }
+        public string? OdsLstUpdDt { get; set; }
+        public string? EnhancedCrMemoSw { get; set; }
+        public string? ImsDelFlg { get; set; }
+        public string? SpecialHandleSw { get; set; }
+        public string? CfgFlg { get; set; }
+        public string? EndUserPoNbr { get; set; }
+        public string? ResellerNbr { get; set; }
+        public string? TnSpecCd { get; set; }
+        public string? EndUserDataSw { get; set; }
+        public string? EndUserAuthorization { get; set; }
+        public string? EndUserAddrSuffix { get; set; }
+        public string? EndUserVendorFlag { get; set; }
+        public string? EndUserNbr { get; set; }
+        public string? WasBord { get; set; }
+        public string? JobAcctNbr { get; set; }
+        public string? CapsBuyer { get; set; }
+        public string? AckCode { get; set; }
+        public string? CopyCode { get; set; }
+        public string? ExtSoCode { get; set; }
+        public string? TaxCode { get; set; }
+        public string? StateCd { get; set; }
+        public string? CountyCode { get; set; }
+        public string? CityCode { get; set; }
+        public decimal? TradeDisc { get; set; }
+        public string? OrderManagementSw { get; set; }
+        public string? SourceCode { get; set; }
+        public string? SummInvoiceCode { get; set; }
+        public string? CustType { get; set; }
+        public string? CustRefNbr { get; set; }
+        public decimal? OrderValueAtAdd { get; set; }
+        public string? GwmdImagApplyFlag { get; set; }
+        public string? CustomersLanguageCode { get; set; }
+        public string? GlOffsetNbr { get; set; }
+        public string? GlOffsetType { get; set; }
+        public string? EndCustNum { get; set; }
+        public string? FlrngAuthNbr { get; set; }
+        public string? AllianceSw { get; set; }
+        public string? CustRefNbr2 { get; set; }
+        public string? Campaign { get; set; }
+        public string? Contract { get; set; }
+        public string? EndUserContSuffix { get; set; }
+        public string? FreightForwarder { get; set; }
+        public string? EndUserOrderSw { get; set; }
+        public string? AodSw { get; set; }
+        public string? CountryCode { get; set; }
+        public string? SoldToSuffix { get; set; }
+        public string? PayeeNbr { get; set; }
+        public string? PayeeSuf { get; set; }
+        public decimal? ResellerSplitPct { get; set; }
+        public string? DeliveryTerms { get; set; }
+        public string? EndCustId { get; set; }
+        public string? VendorClaimNbr { get; set; }
+        public string? IndiaGstOrderInd { get; set; }
+        public string? LastDistNbr { get; set; }
+        public string? LastShipmentNbr { get; set; }
+        public string? PriorityCode { get; set; }
+        public string? OutsourceSkuInd { get; set; }
+        public string? DeleteTodaySw { get; set; }
+        public string? PriceRecalcSw { get; set; }
 
         public List<OrderLineItem> LineItems { get; set; } = new();
         public List<OrderStatusChange>? StatusChanges { get; set; } = new();
