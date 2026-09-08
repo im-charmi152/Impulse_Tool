@@ -1,36 +1,29 @@
 /**
- * fieldConfig.js  —  Single source of truth for order header fields.
+ * fieldConfig.js
  *
- * Scoped ONLY to this specific column list (COMPANY_CD through TRADE_DISC).
- * Every key EXACTLY matches the real backend property name on the `order`
- * object, camelCased. To add a new field: append one entry to the correct
- * group. Nothing else changes.
+ * IMPORTANT:
+ * These are ONLY React keys / .NET JSON camelCase property names.
  *
- * Field types
- * -----------
- * "text"     – plain string
- * "id"       – monospace font + copy-to-clipboard button
- * "date"     – formatDateTime()
- * "currency" – Intl currency formatter
- * "status"   – ORDER_STATUS_MAP → coloured badge
- * "hold"     – HOLD_CODE_MAP → red badge when set, green "Clear" when empty
- * "flag"     – "Y" → Enabled (green)  |  "N" → Disabled (muted)
- * "number"   – integer / decimal
+ * Do NOT use DB2 column names here.
+ *
+ * Example:
+ * COMPANY_CD     -> custCoCd
+ * BRANCH_NBR     -> custBr
+ * ORDR_NBR       -> imiAsgdOrdrNbr
+ * CUST_ORDR_NBR  -> custPoNbr
  */
 
-// ─── Kept exported for compatibility with HeaderDrawer.jsx's StatusBadge /
-// HoldBadge renderers. No field in this column list uses type:"status" or
-// type:"hold" — this table has no order-status or hold-code column.
 export const ORDER_STATUS_MAP = {
-  10: { label: "Draft", color: "gray" },
-  20: { label: "Processing", color: "blue" },
-  30: { label: "Booked", color: "blue" },
-  40: { label: "Completed", color: "green" },
-  50: { label: "Cancelled", color: "red" },
-  60: { label: "On Hold", color: "amber" },
-  70: { label: "Backordered", color: "amber" },
-  80: { label: "Shipped", color: "green" },
-  90: { label: "Closed", color: "gray" },
+  "10": { label: "Draft", color: "gray" },
+  "20": { label: "Processing", color: "blue" },
+  "30": { label: "Booked", color: "blue" },
+  "40": { label: "Completed", color: "green" },
+  "50": { label: "Cancelled", color: "red" },
+  "60": { label: "On Hold", color: "amber" },
+  "70": { label: "Backordered", color: "amber" },
+  "80": { label: "Shipped", color: "green" },
+  "90": { label: "Closed", color: "gray" },
+
   completed: { label: "Completed", color: "green" },
   processing: { label: "Processing", color: "blue" },
   cancelled: { label: "Cancelled", color: "red" },
@@ -47,268 +40,870 @@ export const HOLD_CODE_MAP = {
   H4: "Inventory Hold",
   H5: "Approval Pending",
   IM: "IM Internal Hold",
-  SA: "Sales Auth Hold",
+  SA: "Sales Authorization Hold",
   VR: "Vendor Request Hold",
 };
 
-/**
- * fieldConfig.js  —  Single source of truth for order header fields.
- *
- * Uses ONLY the internal React keys produced by mapOrderResponse.js — no
- * DB2 column names or .NET property names appear here. If a field's
- * source changes on the backend, only mapOrderResponse.js needs updating;
- * this file (and every component using it) stays untouched.
- */
+/* -------------------------------------------------------------------------- */
+/* SUMMARY FIELDS                                                             */
+/* -------------------------------------------------------------------------- */
 
 export const SUMMARY_FIELDS = [
-  { key: "ordrNbr", label: "Order Number", icon: "Hash", copyable: true, type: "id" },
-  { key: "custOrdrNbr", label: "Customer Order Number", icon: "FileText", copyable: true, type: "id" },
-  { key: "companyCd", label: "Company Code", icon: "Building2", type: "text" },
-  { key: "branchNbr", label: "Branch Number", icon: "Building2", type: "text" },
-  { key: "billToCustNbr", label: "Bill-To Customer", icon: "CreditCard", copyable: true, type: "id" },
-  { key: "termId", label: "Terminal / Source", icon: "Globe", type: "text" },
-  { key: "terms", label: "Terms", icon: "DollarSign", type: "text" },
-  { key: "ccyCd", label: "Currency", icon: "DollarSign", type: "text" },
-  { key: "countryCode", label: "Country", icon: "MapPin", type: "text" },
-  { key: "resellerNbr", label: "Reseller Number", icon: "UserCheck", copyable: true, type: "id" },
-  { key: "endUserPoNbr", label: "End-User PO Number", icon: "FileText", copyable: true, type: "id" },
-  { key: "priorityCode", label: "Priority Code", icon: "Flag", type: "text" },
+  {
+    key: "imiAsgdOrdrNbr",
+    label: "Order Number",
+    icon: "Hash",
+    copyable: true,
+    type: "id",
+  },
+  {
+    key: "custPoNbr",
+    label: "Customer PO Number",
+    icon: "FileText",
+    copyable: true,
+    type: "id",
+  },
+  {
+    key: "custCoCd",
+    label: "Company Code",
+    icon: "Building2",
+    type: "text",
+  },
+  {
+    key: "custBr",
+    label: "Customer Branch",
+    icon: "Building2",
+    type: "text",
+  },
+  {
+    key: "billToCustNbr",
+    label: "Bill-To Customer",
+    icon: "CreditCard",
+    copyable: true,
+    type: "id",
+  },
+  {
+    key: "termId",
+    label: "Term ID",
+    icon: "Globe",
+    type: "text",
+  },
+  {
+    key: "ordrCcyCd",
+    label: "Currency",
+    icon: "DollarSign",
+    type: "text",
+  },
+  {
+    key: "countryCode",
+    label: "Country",
+    icon: "MapPin",
+    type: "text",
+  },
+  {
+    key: "resellerNbr",
+    label: "Reseller Number",
+    icon: "UserCheck",
+    copyable: true,
+    type: "id",
+  },
+  {
+    key: "endUserPoNbr",
+    label: "End-User PO Number",
+    icon: "FileText",
+    copyable: true,
+    type: "id",
+  },
+  {
+    key: "priorityCode",
+    label: "Priority Code",
+    icon: "Flag",
+    type: "text",
+  },
+  {
+    key: "ordrDt",
+    label: "Order Date",
+    icon: "Calendar",
+    type: "date",
+  },
 ];
 
+/* -------------------------------------------------------------------------- */
+/* FIELD GROUPS                                                               */
+/* -------------------------------------------------------------------------- */
+
 export const FIELD_GROUPS = [
+
+  /* ============================== ORDER ================================== */
+
   {
     id: "orderInfo",
     label: "Order Information",
-    icon: "Hash",
+    icon: "ShoppingCart",
     defaultOpen: true,
     fields: [
-      { key: "ordrNbr", label: "Order Number", copyable: true, type: "id" },
-      { key: "custOrdrNbr", label: "Customer Order Number", copyable: true, type: "id" },
-      { key: "ordRefNbr", label: "Order Reference Number", copyable: true, type: "id" },
-      { key: "bordrStus", label: "Border Status", type: "text" },
-      { key: "entyDt", label: "Entry Date", type: "date" },
-      { key: "entyTm", label: "Entry Time", type: "text" },
-      { key: "entyMthd", label: "Entry Method", type: "text" },
-      { key: "termId", label: "Terminal ID", type: "text" },
-      { key: "priorityCode", label: "Priority Code", type: "text" },
-      { key: "contract", label: "Contract", type: "text" },
-      { key: "campaign", label: "Campaign", type: "text" },
-      { key: "ackCode", label: "Acknowledgement Code", type: "text" },
-      { key: "sourceCode", label: "Source Code", type: "text" },
-      { key: "copyCode", label: "Copy Code", type: "text" },
+      {
+        key: "imiAsgdOrdrNbr",
+        label: "Order Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "custPoNbr",
+        label: "Customer PO Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "ordrDt",
+        label: "Order Date",
+        type: "date",
+      },
+      {
+        key: "ordRefNbr",
+        label: "Order Reference Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "bordrStus",
+        label: "Backorder Status",
+        type: "text",
+      },
+      {
+        key: "entyDt",
+        label: "Entry Date",
+        type: "date",
+      },
+      {
+        key: "entyTm",
+        label: "Entry Time",
+        type: "text",
+      },
+      {
+        key: "entyMthd",
+        label: "Entry Method",
+        type: "text",
+      },
+      {
+        key: "termId",
+        label: "Term ID",
+        type: "text",
+      },
+      {
+        key: "priorityCode",
+        label: "Priority Code",
+        type: "text",
+      },
+      {
+        key: "contract",
+        label: "Contract",
+        type: "text",
+      },
+      {
+        key: "campaign",
+        label: "Campaign",
+        type: "text",
+      },
+      {
+        key: "ackCode",
+        label: "Acknowledgement Code",
+        type: "text",
+      },
+      {
+        key: "sourceCode",
+        label: "Source Code",
+        type: "text",
+      },
+      {
+        key: "copyCode",
+        label: "Copy Code",
+        type: "text",
+      },
+      {
+        key: "wasBord",
+        label: "Was Backordered",
+        type: "flag",
+      },
     ],
   },
+
+  /* ============================ CUSTOMER ================================= */
+
   {
     id: "customerInfo",
     label: "Customer Information",
     icon: "User",
     defaultOpen: true,
     fields: [
-      { key: "companyCd", label: "Company Code", type: "text" },
-      { key: "branchNbr", label: "Branch Number", type: "text" },
-      { key: "custRefNbr", label: "Customer Reference Number", copyable: true, type: "id" },
-      { key: "custRefNbr2", label: "Customer Reference Number 2", copyable: true, type: "id" },
-      { key: "capsIdCd", label: "CAPS ID Code", type: "text" },
-      { key: "capsBuyer", label: "CAPS Buyer", type: "text" },
-      { key: "custType", label: "Customer Type", type: "text" },
+      {
+        key: "custCoCd",
+        label: "Customer Company Code",
+        type: "text",
+      },
+      {
+        key: "custBr",
+        label: "Customer Branch",
+        type: "text",
+      },
+      {
+        key: "billToCustNbr",
+        label: "Bill-To Customer Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "custRefNbr",
+        label: "Customer Reference Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "custRefNbr2",
+        label: "Customer Reference Number 2",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "custType",
+        label: "Customer Type",
+        type: "text",
+      },
+      {
+        key: "capsIdCd",
+        label: "CAPS ID Code",
+        type: "text",
+      },
+      {
+        key: "capsBuyer",
+        label: "CAPS Buyer",
+        type: "text",
+      },
     ],
   },
+
+  /* ============================= BILLING ================================= */
+
   {
     id: "billingInfo",
     label: "Billing Information",
     icon: "CreditCard",
     defaultOpen: false,
     fields: [
-      { key: "billToBranchNbr", label: "Bill-To Branch Number", type: "text" },
-      { key: "billToCustNbr", label: "Bill-To Customer Number", copyable: true, type: "id" },
-      { key: "billToSfx", label: "Bill-To Suffix", type: "text" },
-      { key: "splitBillToSw", label: "Split Bill-To Switch", type: "flag" },
-      { key: "summInvoiceCode", label: "Summary Invoice Code", type: "text" },
-      { key: "glOffsetNbr", label: "GL Offset Number", type: "text" },
-      { key: "glOffsetType", label: "GL Offset Type", type: "text" },
-      { key: "payeeNbr", label: "Payee Number", copyable: true, type: "id" },
-      { key: "payeeSuf", label: "Payee Suffix", type: "text" },
-      { key: "soldToSuffix", label: "Sold-To Suffix", type: "text" },
+      {
+        key: "billToBranchNbr",
+        label: "Bill-To Branch Number",
+        type: "text",
+      },
+      {
+        key: "billToCustNbr",
+        label: "Bill-To Customer Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "billToSfx",
+        label: "Bill-To Suffix",
+        type: "text",
+      },
+      {
+        key: "splitBillToSw",
+        label: "Split Bill-To Switch",
+        type: "flag",
+      },
+      {
+        key: "summInvoiceCode",
+        label: "Summary Invoice Code",
+        type: "text",
+      },
+      {
+        key: "glOffsetNbr",
+        label: "GL Offset Number",
+        type: "text",
+      },
+      {
+        key: "glOffsetType",
+        label: "GL Offset Type",
+        type: "text",
+      },
+      {
+        key: "payeeNbr",
+        label: "Payee Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "payeeSuf",
+        label: "Payee Suffix",
+        type: "text",
+      },
+      {
+        key: "soldToSuffix",
+        label: "Sold-To Suffix",
+        type: "text",
+      },
     ],
   },
+
+  /* ============================= SHIPPING ================================= */
+
   {
     id: "shippingInfo",
     label: "Shipping Information",
     icon: "Truck",
     defaultOpen: false,
     fields: [
-      { key: "shipToSfx", label: "Ship-To Suffix", type: "text" },
-      { key: "freightForwarder", label: "Freight Forwarder", type: "text" },
-      { key: "deliveryTerms", label: "Delivery Terms", type: "text" },
-      { key: "resdntlSw", label: "Residential Switch", type: "flag" },
-      { key: "fulmntSw", label: "Fulfillment Switch", type: "flag" },
-      { key: "lastShipmentNbr", label: "Last Shipment Number", copyable: true, type: "id" },
-      { key: "lastDistNbr", label: "Last Distribution Number", copyable: true, type: "id" },
-      { key: "cuaShipFrom", label: "CUA Ship From", type: "text" },
-      { key: "binTyp", label: "Bin Type", type: "text" },
-      { key: "ordrCmpltFillSw", label: "Complete Fill Switch", type: "flag" },
+      {
+        key: "shipToSfx",
+        label: "Ship-To Suffix",
+        type: "text",
+      },
+      {
+        key: "freightForwarder",
+        label: "Freight Forwarder",
+        type: "text",
+      },
+      {
+        key: "deliveryTerms",
+        label: "Delivery Terms",
+        type: "text",
+      },
+      {
+        key: "resdntlSw",
+        label: "Residential Switch",
+        type: "flag",
+      },
+      {
+        key: "fulmntSw",
+        label: "Fulfillment Switch",
+        type: "flag",
+      },
+      {
+        key: "lastShipmentNbr",
+        label: "Last Shipment Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "lastDistNbr",
+        label: "Last Distribution Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "cuaShipFrom",
+        label: "CUA Ship From",
+        type: "text",
+      },
+      {
+        key: "binTyp",
+        label: "Bin Type",
+        type: "text",
+      },
+      {
+        key: "ordrCmpltFillSw",
+        label: "Complete Fill Switch",
+        type: "flag",
+      },
     ],
   },
+
+  /* =============================== SALES ================================= */
+
   {
     id: "salesInfo",
     label: "Sales Information",
     icon: "Briefcase",
     defaultOpen: false,
     fields: [
-      { key: "osSlsmn", label: "Outside Salesman", type: "text" },
-      { key: "isSlsmn", label: "Inside Salesman", type: "text" },
-      { key: "userNam", label: "User Name", type: "text" },
-      { key: "ediCo", label: "EDI Company", type: "text" },
-      { key: "splitSw", label: "Split Switch", type: "flag" },
+      {
+        key: "osSlsmn",
+        label: "Outside Salesman",
+        type: "text",
+      },
+      {
+        key: "isSlsmn",
+        label: "Inside Salesman",
+        type: "text",
+      },
+      {
+        key: "userNam",
+        label: "User Name",
+        type: "text",
+      },
+      {
+        key: "ediCo",
+        label: "EDI Company",
+        type: "text",
+      },
+      {
+        key: "splitSw",
+        label: "Split Switch",
+        type: "flag",
+      },
     ],
   },
+
+  /* ============================= RESELLER ================================ */
+
   {
     id: "resellerInfo",
     label: "Reseller Information",
     icon: "UserCheck",
     defaultOpen: false,
     fields: [
-      { key: "resellerNbr", label: "Reseller Number", copyable: true, type: "id" },
-      { key: "vendorClaimNbr", label: "Vendor Claim Number", copyable: true, type: "id" },
-      { key: "resellerSplitPct", label: "Reseller Split %", type: "number" },
-      { key: "indiaGstOrderInd", label: "India GST Order Indicator", type: "flag" },
+      {
+        key: "resellerNbr",
+        label: "Reseller Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "vendorClaimNbr",
+        label: "Vendor Claim Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "resellerSplitPct",
+        label: "Reseller Split %",
+        type: "number",
+      },
+      {
+        key: "indiaGstOrderInd",
+        label: "India GST Order Indicator",
+        type: "flag",
+      },
     ],
   },
+
+  /* ============================= FINANCIAL =============================== */
+
   {
     id: "financialInfo",
     label: "Financial Information",
     icon: "DollarSign",
     defaultOpen: false,
     fields: [
-      { key: "terms", label: "Terms", type: "text" },
-      { key: "ccyCd", label: "Currency Code", type: "text" },
-      { key: "ccyRate", label: "Currency Rate", type: "number" },
-      { key: "orderValueAtAdd", label: "Order Value at Add", type: "currency" },
-      { key: "crRels", label: "Credit Release", type: "text" },
-      { key: "crCrdSw", label: "Credit Card Switch", type: "flag" },
-      { key: "priceRecalcSw", label: "Price Recalc Switch", type: "flag" },
+      {
+        key: "terms",
+        label: "Terms",
+        type: "text",
+      },
+      {
+        key: "ordrCcyCd",
+        label: "Order Currency",
+        type: "text",
+      },
+      {
+        key: "ccyRate",
+        label: "Currency Rate",
+        type: "number",
+      },
+      {
+        key: "orderValueAtAdd",
+        label: "Order Value at Add",
+        type: "currency",
+      },
+      {
+        key: "tradeDisc",
+        label: "Trade Discount",
+        type: "number",
+      },
+      {
+        key: "crRels",
+        label: "Credit Release",
+        type: "text",
+      },
+      {
+        key: "crCrdSw",
+        label: "Credit Card Switch",
+        type: "flag",
+      },
+      {
+        key: "priceRecalcSw",
+        label: "Price Recalculation Switch",
+        type: "flag",
+      },
+      {
+        key: "deliveryTerms",
+        label: "Delivery Terms",
+        type: "text",
+      },
     ],
   },
+
+  /* ============================= END USER ================================= */
+
   {
     id: "endUserInfo",
     label: "End User Information",
     icon: "Users",
     defaultOpen: false,
     fields: [
-      { key: "endUserPoNbr", label: "End-User PO Number", copyable: true, type: "id" },
-      { key: "endUserNbr", label: "End-User Number", copyable: true, type: "id" },
-      { key: "endUserDataSw", label: "End-User Data Switch", type: "flag" },
-      { key: "endUserAuthorization", label: "End-User Authorization", type: "text" },
-      { key: "endUserAddrSuffix", label: "End-User Address Suffix", type: "text" },
-      { key: "endUserVendorFlag", label: "End-User Vendor Flag", type: "flag" },
-      { key: "endUserContSuffix", label: "End-User Contact Suffix", type: "text" },
-      { key: "endUserOrderSw", label: "End-User Order Switch", type: "flag" },
+      {
+        key: "endUserPoNbr",
+        label: "End-User PO Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "endUserNbr",
+        label: "End-User Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "endUserDataSw",
+        label: "End-User Data Switch",
+        type: "flag",
+      },
+      {
+        key: "endUserAuthorization",
+        label: "End-User Authorization",
+        type: "text",
+      },
+      {
+        key: "endUserAddrSuffix",
+        label: "End-User Address Suffix",
+        type: "text",
+      },
+      {
+        key: "endUserVendorFlag",
+        label: "End-User Vendor Flag",
+        type: "flag",
+      },
+      {
+        key: "endUserContSuffix",
+        label: "End-User Contact Suffix",
+        type: "text",
+      },
+      {
+        key: "endUserOrderSw",
+        label: "End-User Order Switch",
+        type: "flag",
+      },
     ],
   },
+
+  /* ============================ END CUSTOMER ============================= */
+
   {
     id: "endCustomerInfo",
     label: "End Customer Information",
     icon: "UserCircle",
     defaultOpen: false,
     fields: [
-      { key: "endCustId", label: "End Customer ID", copyable: true, type: "id" },
-      { key: "endCustNum", label: "End Customer Number", copyable: true, type: "id" },
+      {
+        key: "endCustId",
+        label: "End Customer ID",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "endCustNum",
+        label: "End Customer Number",
+        copyable: true,
+        type: "id",
+      },
     ],
   },
+
+  /* ============================= GOVERNMENT ============================== */
+
   {
     id: "governmentInfo",
     label: "Government Information",
     icon: "Shield",
     defaultOpen: false,
     fields: [
-      { key: "govtBidFlg", label: "Government Bid Flag", type: "flag" },
-      { key: "govtEndUserZip", label: "Government End-User ZIP", type: "text" },
-      { key: "govtGsaInd", label: "GSA Indicator", type: "flag" },
-      { key: "govtEndUserTyp", label: "Government End-User Type", type: "text" },
+      {
+        key: "govtBidFlg",
+        label: "Government Bid Flag",
+        type: "flag",
+      },
+      {
+        key: "govtEndUserZip",
+        label: "Government End-User ZIP",
+        type: "text",
+      },
+      {
+        key: "govtGsaInd",
+        label: "GSA Indicator",
+        type: "flag",
+      },
+      {
+        key: "govtEndUserTyp",
+        label: "Government End-User Type",
+        type: "text",
+      },
     ],
   },
+
+  /* ============================== FLAGS ================================== */
+
   {
     id: "orderFlags",
     label: "Order Flags",
     icon: "Flag",
     defaultOpen: false,
     fields: [
-      { key: "allianceSw", label: "Alliance Switch", type: "flag" },
-      { key: "aodSw", label: "AOD Switch", type: "flag" },
-      { key: "specialHandleSw", label: "Special Handling Switch", type: "flag" },
-      { key: "configurationFlag", label: "Configuration Flag", type: "flag" },
-      { key: "enhcdRmaSw", label: "Enhanced RMA Switch", type: "flag" },
-      { key: "enhcdCrMemoSw", label: "Enhanced Credit Memo Switch", type: "flag" },
+      {
+        key: "allianceSw",
+        label: "Alliance Switch",
+        type: "flag",
+      },
+      {
+        key: "aodSw",
+        label: "AOD Switch",
+        type: "flag",
+      },
+      {
+        key: "specialHandleSw",
+        label: "Special Handling Switch",
+        type: "flag",
+      },
+      {
+        key: "imsDelFlg",
+        label: "IMS Delete Flag",
+        type: "flag",
+      },
+      {
+        key: "cfgFlg",
+        label: "Configuration Flag",
+        type: "flag",
+      },
+      {
+        key: "enhancedRmaSw",
+        label: "Enhanced RMA Switch",
+        type: "flag",
+      },
+      {
+        key: "enhancedCrMemoSw",
+        label: "Enhanced Credit Memo Switch",
+        type: "flag",
+      },
+      {
+        key: "poCrtedSw",
+        label: "PO Created Switch",
+        type: "flag",
+      },
+      {
+        key: "outsourceSkuInd",
+        label: "Outsource SKU Indicator",
+        type: "flag",
+      },
+      {
+        key: "deleteTodaySw",
+        label: "Delete Today Switch",
+        type: "flag",
+      },
+      {
+        key: "orderManagementSw",
+        label: "Order Management Switch",
+        type: "flag",
+      },
     ],
   },
+
+  /* ============================ CONFIGURATION ============================ */
+
   {
     id: "configuration",
     label: "Configuration",
     icon: "Settings",
     defaultOpen: false,
     fields: [
-      { key: "baseRateOrdrSw", label: "Base Rate Order Switch", type: "flag" },
-      { key: "extSoCode", label: "External SO Code", type: "text" },
-      { key: "jobAcctNbr", label: "Job Account Number", copyable: true, type: "id" },
+      {
+        key: "baseRateOrdrSw",
+        label: "Base Rate Order Switch",
+        type: "flag",
+      },
+      {
+        key: "extSoCode",
+        label: "External SO Code",
+        type: "text",
+      },
+      {
+        key: "jobAcctNbr",
+        label: "Job Account Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "gwmdImagApplyFlag",
+        label: "GWMD Image Apply Flag",
+        type: "flag",
+      },
     ],
   },
+
+  /* ============================= AUTHORIZATION =========================== */
+
   {
     id: "authorization",
     label: "Authorization",
     icon: "KeyRound",
     defaultOpen: false,
     fields: [
-      { key: "flrngAuthActnCd", label: "Floor-Ready Auth Action Code", type: "text" },
-      { key: "flrngAuthNbr", label: "Floor-Ready Auth Number", copyable: true, type: "id" },
+      {
+        key: "flrngAuthActnCd",
+        label: "Floor-Ready Authorization Action Code",
+        type: "text",
+      },
+      {
+        key: "flrngAuthNbr",
+        label: "Floor-Ready Authorization Number",
+        copyable: true,
+        type: "id",
+      },
+      {
+        key: "tnSpecCd",
+        label: "TN Specification Code",
+        type: "text",
+      },
     ],
   },
-  {
-    id: "processingInfo",
-    label: "Processing Information",
-    icon: "ToggleLeft",
-    defaultOpen: false,
-    fields: [
-      { key: "deleteTodaySw", label: "Delete Today Switch", type: "flag" },
-      { key: "outsourceSkuInd", label: "Outsource SKU Indicator", type: "flag" },
-      { key: "gwmdImagApplyFlag", label: "GWMD Image Apply Flag", type: "flag" },
-      { key: "orderManagementSw", label: "Order Management Switch", type: "flag" },
-      { key: "poCrtdSw", label: "PO Created Switch", type: "flag" },
-      { key: "bidQotFlg", label: "Bid/Quote Flag", type: "flag" },
-      { key: "bidExpDt", label: "Bid Expiration Date", type: "date" },
-    ],
-  },
+
+  /* ========================= CUSTOMER BUSINESS ========================== */
+
   {
     id: "customerBusinessInfo",
     label: "Customer Business Information",
     icon: "Building2",
     defaultOpen: false,
     fields: [
-      { key: "cuBusSgmt", label: "Customer Business Segment", type: "text" },
-      { key: "cuBusTyp", label: "Customer Business Type", type: "text" },
-      { key: "customersLanguageCode", label: "Customer Language Code", type: "text" },
-      { key: "cityCode", label: "City Code", type: "text" },
-      { key: "countyCode", label: "County Code", type: "text" },
-      { key: "countryCode", label: "Country Code", type: "text" },
-      { key: "stateCode", label: "State Code", type: "text" },
-      { key: "pstlCd", label: "Postal Code", type: "text" },
+      {
+        key: "cuBusSgmt",
+        label: "Customer Business Segment",
+        type: "text",
+      },
+      {
+        key: "cuBusTyp",
+        label: "Customer Business Type",
+        type: "text",
+      },
+      {
+        key: "customersLanguageCode",
+        label: "Customer Language Code",
+        type: "text",
+      },
+      {
+        key: "cityCode",
+        label: "City Code",
+        type: "text",
+      },
+      {
+        key: "countyCode",
+        label: "County Code",
+        type: "text",
+      },
+      {
+        key: "countryCode",
+        label: "Country Code",
+        type: "text",
+      },
+      {
+        key: "stateCd",
+        label: "State Code",
+        type: "text",
+      },
+      {
+        key: "postalCd",
+        label: "Postal Code",
+        type: "text",
+      },
     ],
   },
+
+  /* ============================== PROCESSING ============================= */
+
+  {
+    id: "processingInfo",
+    label: "Processing Information",
+    icon: "Cpu",
+    defaultOpen: false,
+    fields: [
+      {
+        key: "bidQotFlg",
+        label: "Bid / Quote Flag",
+        type: "flag",
+      },
+      {
+        key: "bidExpDt",
+        label: "Bid Expiration Date",
+        type: "date",
+      },
+      {
+        key: "odsLstUpdDt",
+        label: "ODS Last Updated",
+        type: "date",
+      },
+      {
+        key: "govtBidFlg",
+        label: "Government Bid Flag",
+        type: "flag",
+      },
+      {
+        key: "configurationFlag",
+        label: "Configuration Flag",
+        type: "flag",
+      },
+    ],
+  },
+
+  /* =============================== SYSTEM ================================ */
+
   {
     id: "systemInfo",
     label: "System Information",
     icon: "Cpu",
     defaultOpen: false,
-    technical: true,
     fields: [
-      { key: "odsLstUpdDt", label: "ODS Last Updated", type: "date" },
+      {
+        key: "ediCo",
+        label: "EDI Company",
+        type: "text",
+      },
+      {
+        key: "ackCode",
+        label: "Acknowledgement Code",
+        type: "text",
+      },
+      {
+        key: "sourceCode",
+        label: "Source Code",
+        type: "text",
+      },
+      {
+        key: "summInvoiceCode",
+        label: "Summary Invoice Code",
+        type: "text",
+      },
+      {
+        key: "gwmdImagApplyFlag",
+        label: "GWMD Image Apply Flag",
+        type: "flag",
+      },
     ],
   },
 ];
 
-/** Count how many fields on `order` are non-null / non-empty across all groups. */
+/**
+ * Count populated fields.
+ */
 export function countAvailableFields(order) {
   if (!order) return 0;
-  return FIELD_GROUPS.flatMap((g) => g.fields).filter(
-    (f) => order[f.key] != null && order[f.key] !== "",
-  ).length;
+
+  return FIELD_GROUPS
+    .flatMap((group) => group.fields)
+    .filter(
+      (field) =>
+        order[field.key] !== null &&
+        order[field.key] !== undefined &&
+        order[field.key] !== "",
+      )
+    .length;
 }
+
+export default FIELD_GROUPS;
