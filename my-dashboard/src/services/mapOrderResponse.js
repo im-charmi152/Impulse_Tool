@@ -116,142 +116,145 @@ export function mapOrderResponse(raw) {
   const order = {
     // ── Order Information ──
     // Preserve key ODS ORSHED fields for components that still read source keys.
-    custPoNbr: raw.custPoNbr ?? "—",
-    imiAsgdOrdrNbr: raw.imiAsgdOrdrNbr ?? "—",
-    custPoDt: raw.custPoDt ?? "—",
-    custCoCd: raw.custCoCd ?? "—",
-    ordSt: raw.ordSt ?? raw.ordrStatus ?? "—",
+    // Explicitly keep the new .NET response fields
+    custCoCd: raw.custCoCd ?? null,
+    custBr: raw.custBr ?? null,
+    imiAsgdOrdrNbr: raw.imiAsgdOrdrNbr ?? null,
+    ordrDt: raw.ordrDt ?? null,
+    custPoNbr: raw.custPoNbr ?? null,
 
-    ordrNbr: raw.imiAsgdOrdrNbr ?? "—",
-    custOrdrNbr: raw.custPoNbr ?? "—",
-    ordRefNbr: raw.ordRefNbr ?? "—",
-    bordrStus: raw.ordrStatus ?? "—",
-    entyDt: raw.entyDt ?? "—",
-    entyTm: raw.entyTm ?? "—",
-    entyMthd: raw.entyMthd ?? "—",
-    termId: raw.termId ?? "—",
-    priorityCode: raw.priorityCode ?? "—",
-    contract: raw.contract ?? "—",
-    campaign: raw.campaign ?? "—",
-    ackCode: raw.ackCode ?? "—",
-    sourceCode: raw.sourceCode ?? "—",
-    copyCode: raw.copyCode ?? "—",
+    billToBranchNbr: raw.billToBranchNbr ?? null,
+    billToCustNbr: raw.billToCustNbr ?? null,
+    billToSfx: raw.billToSfx ?? null,
+    shipToSfx: raw.shipToSfx ?? null,
 
-    // ── Customer Information ──
-    companyCd: raw.custCoCd ?? "—",
-    branchNbr: raw.custBr ?? "—",
-    custRefNbr: raw.custRefNbr ?? "—",
-    custRefNbr2: raw.custRefNbr2 ?? "—",
-    capsIdCd: raw.capsIdCd ?? "—",
-    capsBuyer: raw.capsBuyer ?? "—",
-    custType: raw.custType ?? "—",
+    capsIdCd: raw.capsIdCd ?? null,
+    terms: raw.terms ?? null,
+    resdntlSw: raw.resdntlSw ?? null,
+    bordrStus: raw.bordrStus ?? null,
+    ordrCmpltFillSw: raw.ordrCmpltFillSw ?? null,
+    crRels: raw.crRels ?? null,
+    entyDt: raw.entyDt ?? null,
+    termId: raw.termId ?? null,
 
-    // ── Billing Information ──
-    billToBranchNbr: raw.billToBranchNbr ?? "—",
-    billToCustNbr: raw.billToCustNbr ?? "—",
-    billToSfx: raw.billToSfx ?? "—",
-    splitBillToSw: raw.splitBillToSw ?? "N",
-    summInvoiceCode: raw.summInvoiceCode ?? "—",
-    glOffsetNbr: raw.glOffsetNbr ?? "—",
-    glOffsetType: raw.glOffsetType ?? "—",
-    payeeNbr: raw.payeeNbr ?? "—",
-    payeeSuf: raw.payeeSuf ?? "—",
-    soldToSuffix: raw.soldToSuffix ?? "—",
+    osSlsmn: raw.osSlsmn ?? null,
+    isSlsmn: raw.isSlsmn ?? null,
+    postalCd: raw.postalCd ?? null,
+    entyMthd: raw.entyMthd ?? null,
+    ediCo: raw.ediCo ?? null,
 
-    // ── Shipping Information ──
-    shipToSfx: raw.shipToSfx ?? "—",
-    freightForwarder: raw.freightForwarder ?? "—",
-    deliveryTerms: raw.deliveryTerms ?? "—",
-    resdntlSw: raw.resdntlSw ?? "N",
-    fulmntSw: raw.fulmntSw ?? "N",
-    lastShipmentNbr: raw.lastShipmentNbr ?? "—",
-    lastDistNbr: raw.lastDistNbr ?? "—",
-    cuaShipFrom: raw.cuaShipFrom ?? "—",
-    binTyp: raw.binTyp ?? "—",
-    ordrCmpltFillSw: raw.ordrCmpltFillSw ?? "N",
+    splitSw: raw.splitSw ?? null,
+    ordRefNbr: raw.ordRefNbr ?? null,
+    fulmntSw: raw.fulmntSw ?? null,
+    crCrdSw: raw.crCrdSw ?? null,
 
-    // ── Sales Information ──
-    osSlsmn: raw.osSlsmn ?? "—",
-    isSlsmn: raw.isSlsmn ?? "—",
-    userNam: raw.userNam ?? "—",
-    ediCo: raw.ediCo ?? "—",
-    splitSw: raw.splitSw ?? "N",
+    entyTm: raw.entyTm ?? null,
+    bidQotFlg: raw.bidQotFlg ?? null,
+    bidExpDt: raw.bidExpDt ?? null,
 
-    // ── Reseller Information ──
-    resellerNbr: raw.resellerNbr ?? "—",
-    vendorClaimNbr: raw.vendorClaimNbr ?? "—",
-    resellerSplitPct: raw.resellerSplitPct ?? null,
-    indiaGstOrderInd: raw.indiaGstOrderInd ?? "N",
-
-    // ── Financial Information ──
-    terms: raw.terms ?? "—",
-    ccyCd: raw.ordrCcyCd ?? "—",
+    ordrCcyCd: raw.ordrCcyCd ?? null,
     ccyRate: raw.ccyRate ?? null,
+
+    poCrtedSw: raw.poCrtedSw ?? null,
+    govtBidFlg: raw.govtBidFlg ?? null,
+    enhancedRmaSw: raw.enhancedRmaSw ?? null,
+
+    flrngAuthActnCd: raw.flrngAuthActnCd ?? null,
+
+    cuBusSgmt: raw.cuBusSgmt ?? null,
+    cuBusTyp: raw.cuBusTyp ?? null,
+    cuaShipFrom: raw.cuaShipFrom ?? null,
+
+    baseRateOrdrSw: raw.baseRateOrdrSw ?? null,
+    userNam: raw.userNam ?? null,
+
+    govtEndUserZip: raw.govtEndUserZip ?? null,
+    binTyp: raw.binTyp ?? null,
+    govtGsaInd: raw.govtGsaInd ?? null,
+    splitBillToSw: raw.splitBillToSw ?? null,
+    govtEndUserTyp: raw.govtEndUserTyp ?? null,
+
+    odsLstUpdDt: raw.odsLstUpdDt ?? null,
+    enhancedCrMemoSw: raw.enhancedCrMemoSw ?? null,
+
+    imsDelFlg: raw.imsDelFlg ?? null,
+    specialHandleSw: raw.specialHandleSw ?? null,
+    cfgFlg: raw.cfgFlg ?? null,
+
+    endUserPoNbr: raw.endUserPoNbr ?? null,
+    resellerNbr: raw.resellerNbr ?? null,
+    tnSpecCd: raw.tnSpecCd ?? null,
+
+    endUserDataSw: raw.endUserDataSw ?? null,
+    endUserAuthorization: raw.endUserAuthorization ?? null,
+    endUserAddrSuffix: raw.endUserAddrSuffix ?? null,
+    endUserVendorFlag: raw.endUserVendorFlag ?? null,
+    endUserNbr: raw.endUserNbr ?? null,
+
+    wasBord: raw.wasBord ?? null,
+
+    jobAcctNbr: raw.jobAcctNbr ?? null,
+    capsBuyer: raw.capsBuyer ?? null,
+    ackCode: raw.ackCode ?? null,
+    copyCode: raw.copyCode ?? null,
+    extSoCode: raw.extSoCode ?? null,
+
+    taxCode: raw.taxCode ?? null,
+    stateCd: raw.stateCd ?? null,
+    countyCode: raw.countyCode ?? null,
+    cityCode: raw.cityCode ?? null,
+
+    tradeDisc: raw.tradeDisc ?? null,
+
+    orderManagementSw: raw.orderManagementSw ?? null,
+    sourceCode: raw.sourceCode ?? null,
+    summInvoiceCode: raw.summInvoiceCode ?? null,
+    custType: raw.custType ?? null,
+
+    custRefNbr: raw.custRefNbr ?? null,
+    custRefNbr2: raw.custRefNbr2 ?? null,
+
     orderValueAtAdd: raw.orderValueAtAdd ?? null,
-    crRels: raw.crRels ?? "—",
-    crCrdSw: raw.crCrdSw ?? "N",
-    priceRecalcSw: raw.priceRecalcSw ?? "N",
 
-    // ── End User Information ──
-    endUserPoNbr: raw.endUserPoNbr ?? "—",
-    endUserNbr: raw.endUserNbr ?? "—",
-    endUserDataSw: raw.endUserDataSw ?? "N",
-    endUserAuthorization: raw.endUserAuthorization ?? "—",
-    endUserAddrSuffix: raw.endUserAddrSuffix ?? "—",
-    endUserVendorFlag: raw.endUserVendorFlag ?? "N",
-    endUserContSuffix: raw.endUserContSuffix ?? "—",
-    endUserOrderSw: raw.endUserOrderSw ?? "N",
+    gwmdImagApplyFlag: raw.gwmdImagApplyFlag ?? null,
+    customersLanguageCode: raw.customersLanguageCode ?? null,
 
-    // ── End Customer Information ──
-    endCustId: raw.endCustId ?? "—",
-    endCustNum: raw.endCustNum ?? "—",
+    glOffsetNbr: raw.glOffsetNbr ?? null,
+    glOffsetType: raw.glOffsetType ?? null,
 
-    // ── Government Information ──
-    govtBidFlg: raw.govtBidFlg ?? "N",
-    govtEndUserZip: raw.govtEndUserZip ?? "—",
-    govtGsaInd: raw.govtGsaInd ?? "N",
-    govtEndUserTyp: raw.govtEndUserTyp ?? "—",
+    endCustNum: raw.endCustNum ?? null,
+    flrngAuthNbr: raw.flrngAuthNbr ?? null,
 
-    // ── Order Flags ──
-    allianceSw: raw.allianceSw ?? "N",
-    aodSw: raw.aodSw ?? "N",
-    specialHandleSw: raw.specialHandleSw ?? "N",
-    configurationFlag: raw.configurationFlag ?? "N",
-    enhcdRmaSw: raw.enhancedRmaSw ?? "N",
-    enhcdCrMemoSw: raw.enhancedCrMemoSw ?? "N",
+    allianceSw: raw.allianceSw ?? null,
+    campaign: raw.campaign ?? null,
+    contract: raw.contract ?? null,
 
-    // ── Configuration ──
-    baseRateOrdrSw: raw.baseRateOrdrSw ?? "N",
-    extSoCode: raw.extSoCode ?? "—",
-    jobAcctNbr: raw.jobAcctNbr ?? "—",
+    endUserContSuffix: raw.endUserContSuffix ?? null,
+    freightForwarder: raw.freightForwarder ?? null,
+    endUserOrderSw: raw.endUserOrderSw ?? null,
 
-    // ── Authorization ──
-    flrngAuthActnCd: raw.flrngAuthActnCd ?? "—",
-    flrngAuthNbr: raw.flrngAuthNbr ?? "—",
+    aodSw: raw.aodSw ?? null,
+    countryCode: raw.countryCode ?? null,
+    soldToSuffix: raw.soldToSuffix ?? null,
 
-    // ── Processing Information ──
-    deleteTodaySw: raw.deleteTodaySw ?? "N",
-    outsourceSkuInd: raw.outsourceSkuInd ?? "N",
-    gwmdImagApplyFlag: raw.gwmdImagApplyFlag ?? "N",
-    orderManagementSw: raw.orderManagementSw ?? "N",
-    poCrtdSw: raw.poCrtedSw ?? "N",
-    bidQotFlg: raw.bidQotFlg ?? "N",
-    bidExpDt: raw.bidExpDt ?? "—",
+    payeeNbr: raw.payeeNbr ?? null,
+    payeeSuf: raw.payeeSuf ?? null,
 
-    // ── Customer Business Information ──
-    cuBusSgmt: raw.cuBusSgmt ?? "—",
-    cuBusTyp: raw.cuBusTyp ?? "—",
-    customersLanguageCode: raw.customersLanguageCode ?? "—",
-    cityCode: raw.cityCode ?? "—",
-    countyCode: raw.countyCode ?? "—",
-    countryCode: raw.countryCode ?? "—",
-    stateCode: raw.stateCd ?? "—",
-    pstlCd: raw.postalCd ?? "—",
+    resellerSplitPct: raw.resellerSplitPct ?? null,
+    deliveryTerms: raw.deliveryTerms ?? null,
 
-    // ── System Information ──
-    odsLstUpdDt: raw.odsLstUpdDt ?? "—",
+    endCustId: raw.endCustId ?? null,
+    vendorClaimNbr: raw.vendorClaimNbr ?? null,
 
-    retrievedAt: new Date().toISOString(),
+    indiaGstOrderInd: raw.indiaGstOrderInd ?? null,
+    lastDistNbr: raw.lastDistNbr ?? null,
+    lastShipmentNbr: raw.lastShipmentNbr ?? null,
+
+    priorityCode: raw.priorityCode ?? null,
+    outsourceSkuInd: raw.outsourceSkuInd ?? null,
+    deleteTodaySw: raw.deleteTodaySw ?? null,
+
+    priceRecalcSw: raw.priceRecalcSw ?? null,
   };
 
   

@@ -1,19 +1,7 @@
-/**
- * OrderHeaderDetails.jsx  —  Enterprise redesign
- *
- * Replaces the flat key-value list with:
- *   1. Summary Card  — top 12 fields in a responsive icon grid (always visible)
- *   2. New-tab details navigation for all fields (matches LineItems pattern)
- *
- * Drop-in replacement: the only prop is `order` (same shape as before).
- * The component is forward-compatible — unknown keys simply don't render.
- */
-
 import { useState, useCallback, useMemo } from "react";
 import {
   FileText,
   Hash,
-  Activity,
   User,
   Building2,
   Users,
@@ -23,58 +11,81 @@ import {
   Truck,
   Copy,
   Check,
-  Shield,
-  ExternalLink,
-  ChevronRight,
-  Building,
-  CreditCard,
-  UserCheck,
-  ToggleLeft,
-  MapPin,
   Globe,
   Flag,
+  Briefcase,
+  UserCheck,
+  Shield,
+  Settings,
+  KeyRound,
+  Cpu,
+  CreditCard,
+  MapPin,
+  ToggleLeft,
   Info,
 } from "lucide-react";
-import { SUMMARY_FIELDS, ORDER_STATUS_MAP, HOLD_CODE_MAP } from "./fieldConfig";
+
+import {
+  SUMMARY_FIELDS,
+  ORDER_STATUS_MAP,
+  HOLD_CODE_MAP,
+} from "./fieldConfig";
+
 import { formatDateTime } from "../../../utils/format";
 import SectionCard from "../../common/SectionCard";
 import { openOrderHeaderDetailsTab } from "../../../utils/detailsNavigation";
 
-// Icon map (string key → component)
-// import {
-//   Hash, CreditCard, Truck, Shield, UserCheck, DollarSign,
-//   ToggleLeft, MapPin, FileText, Globe, User, Flag, Building2,
-// } from "lucide-react";
-
 const ICON_MAP = {
-  Hash,
-  CreditCard,
-  Truck,
-  Shield,
-  UserCheck,
-  DollarSign,
-  ToggleLeft,
-  MapPin,
   FileText,
-  Globe,
+  Hash,
   User,
-  Flag,
   Building2,
+  Users,
+  Calendar,
+  DollarSign,
+  AlertCircle,
+  Truck,
+  Globe,
+  Flag,
+  Briefcase,
+  UserCheck,
+  Shield,
+  Settings,
+  KeyRound,
+  Cpu,
+  CreditCard,
+  MapPin,
+  ToggleLeft,
 };
-// ─── Status badge ─────────────────────────────────────────────────────────────
+
 function StatusBadge({ value }) {
-  if (!value) return <span className="text-gray-300 text-xs">—</span>;
+  if (value === null || value === undefined || value === "") {
+    return <span className="text-gray-300 text-xs">—</span>;
+  }
+
   const key = String(value).toLowerCase();
-  const cfg = ORDER_STATUS_MAP[key] ?? ORDER_STATUS_MAP[value] ?? null;
-  if (!cfg) return <span className="field-value text-xs">{value}</span>;
+
+  const config =
+    ORDER_STATUS_MAP[key] ??
+    ORDER_STATUS_MAP[String(value)] ??
+    null;
+
+  if (!config) {
+    return (
+      <span className="text-xs font-medium text-[#0F172A]">
+        {String(value)}
+      </span>
+    );
+  }
 
   const styles = {
     green: "bg-green-50 text-green-700 border-green-200",
-    blue: "bg-blue-50  text-blue-700  border-blue-200",
-    red: "bg-red-50   text-red-700   border-red-200",
+    blue: "bg-blue-50 text-blue-700 border-blue-200",
+    red: "bg-red-50 text-red-700 border-red-200",
     amber: "bg-amber-50 text-amber-700 border-amber-200",
-    gray: "bg-[#F8FAFC]  text-[#6B7280]  border-[#DBEAFE]",
+    gray: "bg-slate-50 text-slate-600 border-slate-200",
   };
+
   const dots = {
     green: "bg-green-500",
     blue: "bg-blue-500",
@@ -85,19 +96,24 @@ function StatusBadge({ value }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${styles[cfg.color]}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${styles[config.color]}`}
     >
       <span
-        className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dots[cfg.color]}`}
+        className={`w-1.5 h-1.5 rounded-full ${dots[config.color]}`}
       />
-      {cfg.label}
+      {config.label}
     </span>
   );
 }
 
-// ─── Hold badge ───────────────────────────────────────────────────────────────
 function HoldBadge({ value }) {
-  if (!value || value === "N" || value === "" || value === "0") {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === "N" ||
+    value === "0"
+  ) {
     return (
       <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-600">
         <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
@@ -105,181 +121,276 @@ function HoldBadge({ value }) {
       </span>
     );
   }
-  const desc = HOLD_CODE_MAP[value];
+
+  const description = HOLD_CODE_MAP[value];
+
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200">
       <AlertCircle size={9} />
-      {desc ? `${desc} (${value})` : `On Hold (${value})`}
+      {description
+        ? `${description} (${value})`
+        : `On Hold (${value})`}
     </span>
   );
 }
 
-// ─── Copy button ──────────────────────────────────────────────────────────────
 function CopyButton({ value }) {
   const [copied, setCopied] = useState(false);
-  const handle = useCallback(
-    (e) => {
-      e.stopPropagation();
-      navigator.clipboard?.writeText(String(value ?? "")).catch(() => {});
+
+  const handleCopy = useCallback(
+    (event) => {
+      event.stopPropagation();
+
+      navigator.clipboard
+        ?.writeText(String(value ?? ""))
+        .catch(() => {});
+
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 1500);
     },
     [value],
   );
 
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === "—"
+  ) {
+    return null;
+  }
+
   return (
     <button
-      onClick={handle}
-      aria-label="Copy to clipboard"
-      className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity
-        p-0.5 rounded text-gray-300 hover:text-blue-600 hover:bg-blue-50
-        focus:outline-none focus:ring-1 focus:ring-blue-400 flex-shrink-0"
+      type="button"
+      onClick={handleCopy}
+      aria-label="Copy value"
+      className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 rounded text-gray-400 hover:text-[#0F6CBD] hover:bg-blue-50"
     >
       {copied ? (
-        <Check size={10} className="text-green-500" />
+        <Check size={11} className="text-green-500" />
       ) : (
-        <Copy size={10} />
+        <Copy size={11} />
       )}
     </button>
   );
 }
 
-// ─── Single summary field ─────────────────────────────────────────────────────
-function SummaryField({ fieldDef, value }) {
-  const Icon = ICON_MAP[fieldDef.icon] ?? FileText;
-  const isEmpty = value == null || value === "";
+function FlagValue({ value }) {
+  const normalized = String(value ?? "").toUpperCase();
 
-  const rendered = useMemo(() => {
-    if (isEmpty) return <span className="text-gray-300 text-xs">—</span>;
-    if (fieldDef.type === "status") return <StatusBadge value={value} />;
-    if (fieldDef.type === "hold") return <HoldBadge value={value} />;
-    if (fieldDef.type === "date")
-      return (
-        <span className="field-value text-xs leading-tight">
-          {formatDateTime(value)}
-        </span>
-      );
-    if (fieldDef.type === "id")
-      return (
-        <span className="flex items-center gap-1 min-w-0 group/copy">
-          <span className="font-mono text-xs field-value truncate">
-            {value}
-          </span>
-          <CopyButton value={value} />
-        </span>
-      );
+  if (
+    normalized === "Y" ||
+    normalized === "1" ||
+    normalized === "TRUE" ||
+    normalized === "YES"
+  ) {
     return (
-      <span className="field-value text-xs leading-tight truncate">
-        {String(value)}
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700">
+        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+        Enabled
       </span>
     );
-  }, [fieldDef, value, isEmpty]);
+  }
+
+  if (
+    normalized === "N" ||
+    normalized === "0" ||
+    normalized === "FALSE" ||
+    normalized === "NO"
+  ) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+        Disabled
+      </span>
+    );
+  }
 
   return (
-    <div
-      className="group flex items-start gap-2.5 p-3 rounded-xl bg-white border border-[#DBEAFE]
-      hover:border-[#BFDBFE] hover:shadow-sm transition-all duration-150"
-    >
-      <div className="flex-shrink-0 w-7 h-7 rounded-md bg-[#EFF6FF] flex items-center justify-center mt-0.5">
-        <Icon size={13} className="text-[#2563EB]" />
+    <span className="text-xs text-[#0F172A]">
+      {String(value)}
+    </span>
+  );
+}
+
+function renderValue(field, value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === "—"
+  ) {
+    return <span className="text-gray-300 text-xs">—</span>;
+  }
+
+  if (field.type === "status") {
+    return <StatusBadge value={value} />;
+  }
+
+  if (field.type === "hold") {
+    return <HoldBadge value={value} />;
+  }
+
+  if (field.type === "flag") {
+    return <FlagValue value={value} />;
+  }
+
+  if (field.type === "date") {
+    return (
+      <span className="text-xs text-[#0F172A]">
+        {formatDateTime(value)}
+      </span>
+    );
+  }
+
+  if (field.type === "currency") {
+    const numberValue = Number(value);
+
+    if (Number.isNaN(numberValue)) {
+      return (
+        <span className="text-xs text-[#0F172A]">
+          {String(value)}
+        </span>
+      );
+    }
+
+    return (
+      <span className="text-xs font-medium text-[#0F172A]">
+        {new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(numberValue)}
+      </span>
+    );
+  }
+
+  return (
+    <span className="flex items-center gap-1 min-w-0 group">
+      <span
+        className={`text-xs text-[#0F172A] ${
+          field.type === "id" ? "font-mono" : ""
+        } truncate`}
+      >
+        {String(value)}
+      </span>
+
+      {field.copyable && <CopyButton value={value} />}
+    </span>
+  );
+}
+
+function SummaryField({ field, value }) {
+  const Icon = ICON_MAP[field.icon] ?? FileText;
+
+  return (
+    <div className="group flex items-start gap-3 p-3 rounded-xl bg-white border border-[#DBEAFE] hover:border-[#93C5FD] hover:shadow-sm transition-all">
+      <div className="w-8 h-8 rounded-lg bg-[#EFF6FF] flex items-center justify-center flex-shrink-0">
+        <Icon size={14} className="text-[#0F6CBD]" />
       </div>
+
       <div className="flex-1 min-w-0">
-        <p className="field-label text-[9px] uppercase tracking-wider mb-1">
-          {fieldDef.label}
+        <p className="text-[9px] uppercase tracking-wider text-[#64748B] mb-1">
+          {field.label}
         </p>
-        <div className="flex items-start">{rendered}</div>
+
+        <div className="min-h-[18px]">
+          {renderValue(field, value)}
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── Skeleton loading ─────────────────────────────────────────────────────────
 function SkeletonCard() {
   return (
-    <div className="enterprise-card p-0 overflow-hidden">
-      <div className="flex items-center px-5 py-3 border-b border-[#DBEAFE] bg-[#F8FAFC]">
-        <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
-      </div>
-      <div className="p-5 grid grid-cols-2 md:grid-cols-3 gap-3">
-        {Array.from({ length: 12 }).map((_, i) => (
+    <div className="enterprise-card p-5">
+      <div className="h-5 w-48 bg-gray-200 rounded animate-pulse mb-4" />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+        {Array.from({ length: 12 }).map((_, index) => (
           <div
-            key={i}
-            className="flex items-start gap-2.5 p-3 rounded-lg border border-gray-100"
-          >
-            <div className="w-7 h-7 rounded-md bg-gray-200 animate-pulse flex-shrink-0" />
-            <div className="flex-1 space-y-1.5 pt-0.5">
-              <div className="h-2 w-16 bg-gray-200 rounded animate-pulse" />
-              <div className="h-3 w-24 bg-gray-200 rounded animate-pulse" />
-            </div>
-          </div>
+            key={index}
+            className="h-20 rounded-xl bg-gray-100 animate-pulse"
+          />
         ))}
       </div>
     </div>
   );
 }
 
-// ─── Error state ──────────────────────────────────────────────────────────────
 function ErrorCard({ message }) {
   return (
     <div className="enterprise-card border-red-200 p-8 flex flex-col items-center text-center">
-      <AlertCircle size={28} className="text-red-400 mb-2" />
-      <p className="text-sm font-medium text-red-700 mb-1">
+      <AlertCircle
+        size={28}
+        className="text-red-400 mb-2"
+      />
+
+      <p className="text-sm font-semibold text-red-700">
         Failed to load order details
       </p>
-      <p className="text-xs text-[#6B7280]">
-        {message ?? "An unexpected error occurred."}
+
+      <p className="text-xs text-[#6B7280] mt-1">
+        {message || "An unexpected error occurred."}
       </p>
     </div>
   );
 }
 
-// ─── Main exported component ──────────────────────────────────────────────────
-/**
- * @param {{ order: object, loading?: boolean, error?: string }} props
- */
 export default function OrderHeaderDetails({
   order,
   loading = false,
   error = null,
 }) {
-  if (loading) return <SkeletonCard />;
-  if (error) return <ErrorCard message={error} />;
-  if (!order) return null;
+  if (loading) {
+    return <SkeletonCard />;
+  }
+
+  if (error) {
+    return <ErrorCard message={error} />;
+  }
+
+  if (!order) {
+    return null;
+  }
 
   return (
-    <>
-      {/* ── Summary Card ─────────────────────────────────────────────────── */}
-      <SectionCard
-        icon={FileText}
-        title="Order Header Details"
-        footer={
-          <div className="flex items-center gap-1.5 px-5 py-2.5 bg-[#F8FAFC]">
-            <Info size={11} className="text-[#6B7280]" />
-          </div>
-        }
-      >
-        {/* 12-field summary grid */}
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => openOrderHeaderDetailsTab(order)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              openOrderHeaderDetailsTab(order);
-            }
-          }}
-          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 cursor-pointer"
-        >
-          {SUMMARY_FIELDS.map((fieldDef) => (
-            <SummaryField
-              key={fieldDef.key}
-              fieldDef={fieldDef}
-              value={order[fieldDef.key]}
-            />
-          ))}
+    <SectionCard
+      icon={FileText}
+      title="Order Header Details"
+      footer={
+        <div className="flex items-center gap-2 px-5 py-2.5 bg-[#F8FAFC]">
+          <Info size={11} className="text-[#64748B]" />
+          <span className="text-[10px] text-[#64748B]">
+            Select the header card to open the complete order details.
+          </span>
         </div>
-      </SectionCard>
-    </>
+      }
+    >
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => openOrderHeaderDetailsTab(order)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openOrderHeaderDetailsTab(order);
+          }
+        }}
+        className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 cursor-pointer"
+      >
+        {SUMMARY_FIELDS.map((field) => (
+          <SummaryField
+            key={field.key}
+            field={field}
+            value={order[field.key]}
+          />
+        ))}
+      </div>
+    </SectionCard>
   );
 }
