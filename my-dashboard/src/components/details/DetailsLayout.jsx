@@ -13,7 +13,7 @@ export function SummaryTile({ label, value, icon: Icon }) {
       )}
       <div className="min-w-0 flex-1">
         <div className="field-label text-[10px] uppercase tracking-wide">{label}</div>
-        <div className="field-value mt-1 text-lg font-semibold leading-tight break-words">
+        <div className="field-value mt-1 text-lg leading-tight break-words">
           {value}
         </div>
       </div>
