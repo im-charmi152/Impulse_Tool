@@ -141,7 +141,7 @@ function SummaryInfoTile({ field, value }) {
       <div className="min-w-0 flex-1">
         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#64748B]">{field.label}</p>
         <div className="mt-1 flex items-center gap-1.5">
-          <div className="min-w-0 text-sm font-semibold text-[#0F172A] break-words">{formatDetailValue(field, value)}</div>
+          <div className="min-w-0 text-sm text-[#0F172A] break-words">{formatDetailValue(field, value)}</div>
           {field.copyable && <CopyButton value={value} />}
         </div>
       </div>
@@ -153,7 +153,7 @@ function HeroStat({ label, value }) {
   return (
     <div>
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-[#0F172A]">{value || "—"}</p>
+      <p className="mt-1 text-sm text-[#0F172A]">{value || "—"}</p>
     </div>
   );
 }
@@ -244,7 +244,7 @@ export default function LineItemDetailsPage({ searchParams }) {
         </div>
 
         <div className="mt-4 overflow-hidden rounded-2xl border border-[#D6E4F7] bg-white shadow-sm">
-          <div className="flex gap-1 overflow-x-auto border-b border-[#D6E4F7] bg-[#F8FAFC] px-3 pt-3">
+          <div className="flex flex-wrap gap-1 border-b border-[#D6E4F7] bg-[#F8FAFC] px-3 pt-3">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
