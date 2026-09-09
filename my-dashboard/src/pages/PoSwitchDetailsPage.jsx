@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   ArrowLeft,
-  SlidersHorizontal,
   Clock,
   Users,
   Settings,
@@ -16,8 +15,7 @@ import {
   Hash,
 } from "lucide-react";
 import { loadDetailsRecord } from "../utils/detailsNavigation";
-import { AccordionCard, DetailFieldRow, formatDetailValue } from "../components/details/DetailsLayout";
-import SectionCard from "../components/common/SectionCard";
+import { formatDetailValue } from "../components/details/DetailsLayout";
 
 const FIELD_GROUPS = [
   {
@@ -206,7 +204,7 @@ function SummaryInfoTile({ field, value }) {
   return (
     <div className="group flex items-start gap-3 rounded-xl border border-[#DBEAFE] bg-white p-3.5 hover:border-[#BFDBFE] hover:shadow-sm transition-all duration-150">
       <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF]">
-        <Icon size={16} className="text-[#2563EB]" />
+        <Icon size={16} className="text-[#0F6CBD]" />
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#64748B]">{field.label}</p>
@@ -228,6 +226,36 @@ function HeroStat({ label, value }) {
   );
 }
 
+function splitGroupIntoColumns(group) {
+  const midpoint = Math.ceil(group.fields.length / 2);
+
+  return [
+    { id: `${group.id}-left`, fields: group.fields.slice(0, midpoint) },
+    { id: `${group.id}-right`, fields: group.fields.slice(midpoint) },
+  ].filter((section) => section.fields.length > 0);
+}
+
+function CompactDetailField({ field, value }) {
+  return (
+    <div className="rounded-lg border border-[#DBEAFE] bg-[#FCFDFF] px-3 py-2.5">
+      <p className="field-label text-[10px] uppercase tracking-[0.12em] leading-tight">{field.label}</p>
+      <div className="mt-1 text-xs text-[#0F172A] break-words">{formatDetailValue(field, value)}</div>
+    </div>
+  );
+}
+
+function GroupColumn({ section, record }) {
+  return (
+    <div className="enterprise-card h-full p-4 md:p-5">
+      <div className="grid grid-cols-1 gap-2">
+        {section.fields.map((field) => (
+          <CompactDetailField key={field.key} field={field} value={record[field.key]} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function PoSwitchDetailsPage({ searchParams }) {
   const [activeTab, setActiveTab] = useState(FIELD_GROUPS[0]?.id || "identity");
   const record = resolveRecord(searchParams);
@@ -241,7 +269,10 @@ export default function PoSwitchDetailsPage({ searchParams }) {
     },
   ]));
 
-  const activeGroups = [groupsById[activeTab]].filter((group) => group && group.fields.length > 0);
+  const activeGroup = groupsById[activeTab];
+  const columns = activeGroup && activeGroup.fields.length > 0
+    ? splitGroupIntoColumns(activeGroup)
+    : [];
 
   const summaryFields = SUMMARY_FIELDS.map((field) => ({
     ...field,
@@ -326,23 +357,12 @@ export default function PoSwitchDetailsPage({ searchParams }) {
           </div>
 
           <div className="grid grid-cols-1 gap-4 p-4 xl:grid-cols-2 xl:p-5">
-            {activeGroups.map((group) => (
-              <AccordionCard
-                key={group.id}
-                title={group.label}
-                icon={group.iconComponent}
-                defaultOpen={group.defaultOpen}
-              >
-                <div>
-                  {group.fields.map((field) => (
-                    <DetailFieldRow
-                      key={field.key}
-                      label={field.label}
-                      value={formatDetailValue(field, record[field.key])}
-                    />
-                  ))}
-                </div>
-              </AccordionCard>
+            {columns.map((section) => (
+              <GroupColumn
+                key={section.id}
+                section={section}
+                record={record}
+              />
             ))}
           </div>
         </div>
