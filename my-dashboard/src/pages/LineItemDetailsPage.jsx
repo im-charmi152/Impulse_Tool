@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   ArrowLeft,
-  Layers,
   Hash,
   Package,
   BarChart2,
@@ -20,8 +19,7 @@ import {
 } from "lucide-react";
 import { LINE_ITEM_FIELD_GROUPS } from "../components/order/lineitem/lineItemFieldConfig";
 import { loadDetailsRecord } from "../utils/detailsNavigation";
-import { AccordionCard, DetailFieldRow, formatDetailValue } from "../components/details/DetailsLayout";
-import SectionCard from "../components/common/SectionCard";
+import { formatDetailValue } from "../components/details/DetailsLayout";
 
 const ICON_MAP = {
   Hash,
@@ -55,8 +53,38 @@ const SUMMARY_KEYS = new Set(SUMMARY_FIELDS.map((field) => field.key));
 const TABS = LINE_ITEM_FIELD_GROUPS.map((group) => ({
   id: group.id,
   label: group.label,
-  icon: ICON_MAP[group.icon] || Layers,
+  icon: ICON_MAP[group.icon] || FileText,
 }));
+
+function splitGroupIntoSections(group) {
+  const midpoint = Math.ceil(group.fields.length / 2);
+
+  return [
+    { id: `${group.id}-left`, fields: group.fields.slice(0, midpoint) },
+    { id: `${group.id}-right`, fields: group.fields.slice(midpoint) },
+  ].filter((section) => section.fields.length > 0);
+}
+
+function CompactDetailField({ field, value }) {
+  return (
+    <div className="rounded-lg border border-[#DBEAFE] bg-[#FCFDFF] px-3 py-2.5">
+      <p className="field-label text-[10px] uppercase tracking-[0.12em] leading-tight">{field.label}</p>
+      <div className="mt-1 text-xs text-[#0F172A] break-words">{formatDetailValue(field, value)}</div>
+    </div>
+  );
+}
+
+function GroupColumn({ section, item }) {
+  return (
+    <div className="enterprise-card h-full p-4 md:p-5">
+      <div className="grid grid-cols-1 gap-2">
+        {section.fields.map((field) => (
+          <CompactDetailField key={field.key} field={field} value={item[field.key]} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function parseFallbackFromParams(searchParams) {
   return {
@@ -108,7 +136,7 @@ function SummaryInfoTile({ field, value }) {
   return (
     <div className="group flex items-start gap-3 rounded-xl border border-[#DBEAFE] bg-white p-3.5 hover:border-[#BFDBFE] hover:shadow-sm transition-all duration-150">
       <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF]">
-        <Icon size={16} className="text-[#2563EB]" />
+        <Icon size={16} className="text-[#0F6CBD]" />
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#64748B]">{field.label}</p>
@@ -137,12 +165,15 @@ export default function LineItemDetailsPage({ searchParams }) {
     group.id,
     {
       ...group,
-      iconComponent: ICON_MAP[group.icon] || Layers,
+      iconComponent: ICON_MAP[group.icon] || FileText,
       fields: group.fields.filter((field) => !SUMMARY_KEYS.has(field.key)),
     },
   ]));
 
-  const activeGroups = [groupsById[activeTab]].filter((group) => group && group.fields.length > 0);
+  const activeGroup = groupsById[activeTab];
+  const columns = activeGroup && activeGroup.fields.length > 0
+    ? splitGroupIntoSections(activeGroup)
+    : [];
 
   const summaryTiles = SUMMARY_FIELDS.map((field) => ({
     ...field,
@@ -157,7 +188,7 @@ export default function LineItemDetailsPage({ searchParams }) {
             <div className="mb-2 inline-flex items-center rounded-full border border-[#DBEAFE] bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#0F6CBD]">
               Selected Line Item
             </div>
-            <h1 className="text-2xl font-black uppercase tracking-[0.18em] text-[#0033A0] md:text-3xl">
+            <h1 className="text-lg font-semibold uppercase text-[#0033A0]">
               ORDER LINE ITEMS DETAILS
             </h1>
           </div>
@@ -172,31 +203,39 @@ export default function LineItemDetailsPage({ searchParams }) {
         </div>
 
         <div className="mb-4 overflow-hidden rounded-2xl border border-[#D6E4F7] bg-white shadow-sm">
-          <div className="bg-gradient-to-r from-[#EFF6FF] via-white to-[#F8FAFC] px-5 py-5 md:px-6">
-            <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-              <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#0F6CBD]">Line Item Context</p>
-                <div className="mt-2 flex flex-wrap items-end gap-x-5 gap-y-3">
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">LINE_NBR</p>
-                    <p className="mt-1 text-3xl font-black tracking-tight text-[#0033A0]">{item.lineNbr || "—"}</p>
-                  </div>
-                  <div className="h-10 w-px bg-[#DBEAFE] hidden sm:block" />
-                  <HeroStat label="ORDER_NBR" value={item.ordrNbr} />
-                  <HeroStat label="COMPANY_CD" value={item.companyCd} />
-                  <HeroStat label="BRANCH_NBR" value={item.branchNbr} />
-                </div>
-              </div>
+  <div className="bg-gradient-to-r from-[#EFF6FF] via-white to-[#F8FAFC] px-5 py-5 md:px-6">
+    <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
 
-              <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4 xl:min-w-[520px]">
-                <HeroStat label="LINE_TYP" value={item.lineTyp} />
-                <HeroStat label="LINE_STUS" value={item.lineStus} />
-                <HeroStat label="UM" value={item.um} />
-                <HeroStat label="BASE_UM" value={item.baseUm} />
-              </div>
-            </div>
+      {/* Left Side */}
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
+
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">
+              LINE_NBR
+            </p>
+            <p className="mt-1 text-3xl font-black tracking-tight text-[#0033A0]">
+              {item.lineNbr || "—"}
+            </p>
           </div>
+
+          <div className="hidden h-10 w-px bg-[#DBEAFE] sm:block" />
+
+          <HeroStat label="ORDER_NBR" value={item.ordrNbr} />
+          <HeroStat label="COMPANY_CD" value={item.companyCd} />
+          <HeroStat label="BRANCH_NBR" value={item.branchNbr} />
+
         </div>
+      </div>
+
+      {/* Right Side - Only Line Type & Line Status */}
+      <div className="grid grid-cols-2 gap-x-6 gap-y-3 xl:min-w-[260px]">
+        <HeroStat label="LINE_TYP" value={item.lineTyp} />
+        <HeroStat label="LINE_STUS" value={item.lineStus} />
+      </div>
+      </div>
+      </div>
+      </div>
 
         <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {summaryTiles.map((field) => (
@@ -223,24 +262,13 @@ export default function LineItemDetailsPage({ searchParams }) {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 gap-4 p-4 xl:grid-cols-2 xl:p-5">
-            {activeGroups.map((group, index) => (
-              <AccordionCard
-                key={group.id}
-                title={group.label}
-                icon={group.iconComponent}
-                defaultOpen={index === 0 ? true : group.defaultOpen}
-              >
-                <div>
-                  {group.fields.map((field) => (
-                    <DetailFieldRow
-                      key={field.key}
-                      label={field.label}
-                      value={formatDetailValue(field, item[field.key])}
-                    />
-                  ))}
-                </div>
-              </AccordionCard>
+          <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 xl:p-5">
+            {columns.map((section) => (
+              <GroupColumn
+                key={section.id}
+                section={section}
+                item={item}
+              />
             ))}
           </div>
         </div>
