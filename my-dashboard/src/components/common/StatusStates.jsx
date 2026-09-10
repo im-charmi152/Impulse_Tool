@@ -52,8 +52,8 @@ export function ErrorState({ message, onRetry }) {
 
 export function IdleState() {
   return (
-    <div className="enterprise-card flex flex-col items-center justify-center py-24 text-center border-dashed">
-      <div className="text-sm font-medium text-[#6B7280]">
+    <div className="enterprise-card flex items-center justify-center px-4 py-3 text-center border-dashed">
+      <div className="text-xs font-medium text-[#6B7280]">
         Enter an identifier above and press Search to trace an order.
       </div>
     </div>

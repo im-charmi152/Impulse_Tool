@@ -12,7 +12,9 @@ import {
 
 import Header from "./components/layout/Header";
 import Sidebar from "./components/layout/Sidebar";
-import SearchBar from "./components/search/SearchBar";
+
+import DashboardSearch from "./components/search/DashboardSearch";
+import "./components/search/DashboardSearch.css";
 
 import OrderSummaryBanner from "./components/order/OrderSummaryBanner";
 import OrderHeaderDetails from "./components/order/header/OrderHeaderDetails";
@@ -42,32 +44,58 @@ import { useOrderSearch } from "./hooks/useOrderSearch";
 function downloadBlob(content, filename, mimeType) {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
+
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+
   document.body.appendChild(a);
   a.click();
+
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
 function exportAsJSON(data, filenameBase) {
-  downloadBlob(JSON.stringify(data, null, 2), `${filenameBase}.json`, "application/json");
+  downloadBlob(
+    JSON.stringify(data, null, 2),
+    `${filenameBase}.json`,
+    "application/json"
+  );
 }
 
 function exportAsCSV(rows, filenameBase) {
   if (!Array.isArray(rows) || rows.length === 0) return;
+
   const columns = Object.keys(rows[0]);
+
   const escapeCell = (val) => {
     const str = val == null ? "" : String(val);
-    return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+
+    return /[",\n]/.test(str)
+      ? `"${str.replace(/"/g, '""')}"`
+      : str;
   };
+
   const lines = [
     columns.join(","),
-    ...rows.map((row) => columns.map((col) => escapeCell(row[col])).join(",")),
+    ...rows.map((row) =>
+      columns
+        .map((col) => escapeCell(row[col]))
+        .join(",")
+    ),
   ];
-  downloadBlob(lines.join("\n"), `${filenameBase}.csv`, "text/csv");
+
+  downloadBlob(
+    lines.join("\n"),
+    `${filenameBase}.csv`,
+    "text/csv"
+  );
 }
+
+// ============================================================
+// MAIN DASHBOARD
+// ============================================================
 
 export default function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -127,19 +155,23 @@ export default function Dashboard() {
   ];
 
   // ============================================================
-  // TAB BADGE COUNTS + EXPORT (new)
+  // TAB BADGE COUNTS + EXPORT
   // ============================================================
 
   const setupRecords = Array.isArray(data?.setupConfig)
     ? data.setupConfig
-    : data?.setupConfig && typeof data.setupConfig === "object"
+    : data?.setupConfig &&
+        typeof data.setupConfig === "object"
       ? [data.setupConfig]
       : [];
 
   const flowRows = Array.isArray(data?.flowTrace)
     ? data.flowTrace
-    : data?.flowTrace && typeof data.flowTrace === "object"
-      ? Object.values(data.flowTrace).filter(Array.isArray).flat()
+    : data?.flowTrace &&
+        typeof data.flowTrace === "object"
+      ? Object.values(data.flowTrace)
+          .filter(Array.isArray)
+          .flat()
       : [];
 
   const tabCounts = {
@@ -152,22 +184,45 @@ export default function Dashboard() {
     logs: null,
   };
 
-  const orderIdentifier = data?.order?.ordrNbr || data?.order?.custOrdrNbr || "order";
+  const orderIdentifier =
+    data?.order?.ordrNbr ||
+    data?.order?.custOrdrNbr ||
+    "order";
 
   const handleExport = () => {
     switch (activeTab) {
       case "order":
-        exportAsJSON(data?.order, `${orderIdentifier}-header`);
+        exportAsJSON(
+          data?.order,
+          `${orderIdentifier}-header`
+        );
         break;
+
       case "lineItems":
-        if (data?.lineItems?.length) exportAsCSV(data.lineItems, `${orderIdentifier}-line-items`);
+        if (data?.lineItems?.length) {
+          exportAsCSV(
+            data.lineItems,
+            `${orderIdentifier}-line-items`
+          );
+        }
         break;
+
       case "flowTrace":
-        if (flowRows.length) exportAsCSV(flowRows, `${orderIdentifier}-flow-trace`);
+        if (flowRows.length) {
+          exportAsCSV(
+            flowRows,
+            `${orderIdentifier}-flow-trace`
+          );
+        }
         break;
+
       case "setup":
-        exportAsJSON(setupRecords, `${orderIdentifier}-partner-setup`);
+        exportAsJSON(
+          setupRecords,
+          `${orderIdentifier}-partner-setup`
+        );
         break;
+
       default:
         break;
     }
@@ -175,10 +230,19 @@ export default function Dashboard() {
 
   const exportDisabled =
     (activeTab === "order" && !data?.order) ||
-    (activeTab === "lineItems" && !data?.lineItems?.length) ||
-    (activeTab === "flowTrace" && !flowRows.length) ||
-    (activeTab === "setup" && !setupRecords.length) ||
-    ["processing", "poSwitch", "logs"].includes(activeTab);
+    (activeTab === "lineItems" &&
+      !data?.lineItems?.length) ||
+    (activeTab === "flowTrace" &&
+      !flowRows.length) ||
+    (activeTab === "setup" &&
+      !setupRecords.length) ||
+    ["processing", "poSwitch", "logs"].includes(
+      activeTab
+    );
+
+  // ============================================================
+  // RENDER
+  // ============================================================
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans">
@@ -188,7 +252,9 @@ export default function Dashboard() {
       ======================================================== */}
 
       <Header
-        toggleSidebar={() => setMobileOpen(!mobileOpen)}
+        toggleSidebar={() =>
+          setMobileOpen(!mobileOpen)
+        }
       />
 
       {/* ========================================================
@@ -217,29 +283,12 @@ export default function Dashboard() {
         <div className="p-4 md:p-5 max-w-[1400px] mx-auto">
 
           {/* ======================================================
-              PAGE HEADER
+              DASHBOARD SEARCH
           ====================================================== */}
 
-          <div className="mb-4">
-            <h1 className="text-xl font-bold text-[#1F2937]">
-              Order / Transaction Search
-            </h1>
-
-            <p className="text-xs text-[#6B7280] mt-1">
-              Production support console for order investigation,
-              processing status and issue resolution
-            </p>
-          </div>
-
-          {/* ======================================================
-              SEARCH
-          ====================================================== */}
-
-          <SearchBar
+          <DashboardSearch
             onSearch={search}
             loading={status === "loading"}
-            resultOrder={data?.order ?? null}
-            resultLineItems={data?.lineItems ?? []}
           />
 
           {/* ======================================================
@@ -248,18 +297,22 @@ export default function Dashboard() {
 
           <div className="mt-4">
 
+            {/* IDLE */}
             {status === "idle" && (
               <IdleState />
             )}
 
+            {/* LOADING */}
             {status === "loading" && (
               <LoadingState />
             )}
 
+            {/* EMPTY */}
             {status === "empty" && (
               <EmptyState />
             )}
 
+            {/* ERROR */}
             {status === "error" && (
               <ErrorState
                 message={error}
@@ -294,6 +347,8 @@ export default function Dashboard() {
 
                   <div className="bg-white border border-[#D6E4F7] rounded-t-xl shadow-sm flex items-center justify-between">
 
+                    {/* TAB LIST */}
+
                     <div className="flex items-center overflow-hidden">
 
                       {tabs.map((tab) => {
@@ -303,7 +358,8 @@ export default function Dashboard() {
                         const isActive =
                           activeTab === tab.id;
 
-                        const count = tabCounts[tab.id];
+                        const count =
+                          tabCounts[tab.id];
 
                         return (
                           <button
@@ -349,11 +405,28 @@ export default function Dashboard() {
 
                     </div>
 
+                    {/* EXPORT */}
+
                     <button
                       type="button"
                       onClick={handleExport}
                       disabled={exportDisabled}
-                      className="flex items-center gap-1.5 text-xs font-medium text-[#0F6CBD] px-3 py-2 mr-2 rounded-md hover:bg-[#EFF6FF] disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+                      className="
+                        flex
+                        items-center
+                        gap-1.5
+                        text-xs
+                        font-medium
+                        text-[#0F6CBD]
+                        px-3
+                        py-2
+                        mr-2
+                        rounded-md
+                        hover:bg-[#EFF6FF]
+                        disabled:opacity-30
+                        disabled:cursor-not-allowed
+                        flex-shrink-0
+                      "
                     >
                       <Download size={13} />
                       Export
@@ -361,13 +434,11 @@ export default function Dashboard() {
 
                   </div>
 
-
                   {/* =================================================
                       TAB CONTENT
                   ================================================= */}
 
                   <div className="mt-4">
-
 
                     {/* =================================================
                         1. ORDER DETAILS
@@ -383,7 +454,6 @@ export default function Dashboard() {
                       </div>
                     )}
 
-
                     {/* =================================================
                         2. LINE ITEMS
                     ================================================= */}
@@ -398,7 +468,6 @@ export default function Dashboard() {
                       </div>
                     )}
 
-
                     {/* =================================================
                         3. PROCESSING FLOW
                     ================================================= */}
@@ -410,7 +479,6 @@ export default function Dashboard() {
 
                       </div>
                     )}
-
 
                     {/* =================================================
                         4. FLOW TRACE STATUS
@@ -426,7 +494,6 @@ export default function Dashboard() {
                       </div>
                     )}
 
-
                     {/* =================================================
                         5. PO SWITCH
                     ================================================= */}
@@ -441,7 +508,6 @@ export default function Dashboard() {
                       </div>
                     )}
 
-
                     {/* =================================================
                         6. SETUP & CONFIGURATION
                     ================================================= */}
@@ -455,7 +521,6 @@ export default function Dashboard() {
 
                       </div>
                     )}
-
 
                     {/* =================================================
                         7. LOGS & MONITORING
@@ -480,7 +545,6 @@ export default function Dashboard() {
             )}
 
           </div>
-
 
           {/* ======================================================
               FOOTER

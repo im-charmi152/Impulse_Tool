@@ -13,17 +13,17 @@ import {
 } from "lucide-react";
 
 export const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
+  // { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
   { icon: Search, label: "Search", id: "search", active: true },
-  { icon: ShoppingCart, label: "Orders", id: "orders" },
-  { icon: ArrowLeftRight, label: "Transactions", id: "transactions" },
-  { icon: Activity, label: "Monitoring", id: "monitoring", expandable: true },
-  { icon: ListOrdered, label: "Queues", id: "queues" },
-  { icon: FileText, label: "Logs", id: "logs" },
-  { icon: BarChart2, label: "Reports", id: "reports" },
-  { icon: AlertTriangle, label: "Alerts", id: "alerts" },
-  { icon: Settings, label: "Configuration", id: "config", expandable: true },
-  { icon: Wrench, label: "Setup", id: "setup", expandable: true },
+  // { icon: ShoppingCart, label: "Orders", id: "orders" },
+  // { icon: ArrowLeftRight, label: "Transactions", id: "transactions" },
+  // { icon: Activity, label: "Monitoring", id: "monitoring", expandable: true },
+  // { icon: ListOrdered, label: "Queues", id: "queues" },
+  // { icon: FileText, label: "Logs", id: "logs" },
+  // { icon: BarChart2, label: "Reports", id: "reports" },
+  // { icon: AlertTriangle, label: "Alerts", id: "alerts" },
+  // { icon: Settings, label: "Configuration", id: "config", expandable: true },
+  // { icon: Wrench, label: "Setup", id: "setup", expandable: true },
 ];
 
 // Fields exposed on the search screen, per "Front-End Web Portal > Features".
@@ -34,13 +34,13 @@ export const NAV_ITEMS = [
 // Flip `supported` to true here the day the backend adds that endpoint;
 // no other file needs to change.
 export const SEARCH_FIELDS = [
-  { label: "CUST PO NBR", param: "poNumber", supported: true },
-  { label: "Country Code", param: "countryCode", supported: true },
-  { label: "Order Number", param: "orderNumber", supported: true },
-  { label: "Partner ID", param: "partnerId", supported: true },
-  { label: "Customer Number", param: "accountNumber", supported: true },
-  { label: "SKU", param: "sku", supported: true },
-  { label: "Transaction ID", param: "transactionId", supported: true },
+  { label: "CUST PO NBR", param: "poNumber", supported: true, maxLength:24 },
+  { label: "Country Code", param: "countryCode", supported: true , maxLength:2 },
+  { label: "Order Number", param: "orderNumber", supported: true , maxLength:5 },
+  // { label: "Partner ID", param: "partnerId", supported: true, maxLength:15 },
+  // { label: "Customer Number", param: "accountNumber", supported: true, maxLength: 6},
+  // { label: "SKU", param: "sku", supported: true, maxLength: 12 },
+  // { label: "Transaction ID", param: "transactionId", supported: true, maxLength: 7},
 ];
 
 // The three order-entry flows the tool must be able to trace, per
