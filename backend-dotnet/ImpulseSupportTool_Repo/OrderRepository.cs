@@ -947,7 +947,7 @@ namespace OrderManagement.API.Repositories
                     TRANS_AUTH_ID
                 FROM ODS.DB2_IE_IN_PO_SW
                 WHERE CO_CD = :companyCode
-                AND PARTNER_ID = :partnerid";
+                AND TRIM(PARTNER_ID) = :partnerid";
 
             //WHERE TRIM(CO_CD) = :companyCode
             //	AND TRIM(PARTNER_ID) = :partnerId";
@@ -964,7 +964,7 @@ namespace OrderManagement.API.Repositories
                 inPoSwCmd.BindByName = true;
 
                 inPoSwCmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = inPoSwCoCd;
-                inPoSwCmd.Parameters.Add("partnerid", OracleDbType.Varchar2).Value = inPoSwPartnerId.Trim();
+                inPoSwCmd.Parameters.Add("partnerid", OracleDbType.Varchar2).Value = inPoSwPartnerId;
                 //inPoSwCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = "470887";
 
                 Console.WriteLine($">>> EXECUTING ODS IE_IN_PO_SW QUERY...");
