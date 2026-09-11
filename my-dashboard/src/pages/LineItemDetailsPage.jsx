@@ -16,6 +16,7 @@ import {
   User,
   Check,
   Copy,
+  ChevronDown,
 } from "lucide-react";
 import { LINE_ITEM_FIELD_GROUPS } from "../components/order/lineitem/lineItemFieldConfig";
 import { loadDetailsRecord } from "../utils/detailsNavigation";
@@ -49,42 +50,6 @@ const SUMMARY_FIELDS = [
 ];
 
 const SUMMARY_KEYS = new Set(SUMMARY_FIELDS.map((field) => field.key));
-
-const TABS = LINE_ITEM_FIELD_GROUPS.map((group) => ({
-  id: group.id,
-  label: group.label,
-  icon: ICON_MAP[group.icon] || FileText,
-}));
-
-function splitGroupIntoSections(group) {
-  const midpoint = Math.ceil(group.fields.length / 2);
-
-  return [
-    { id: `${group.id}-left`, fields: group.fields.slice(0, midpoint) },
-    { id: `${group.id}-right`, fields: group.fields.slice(midpoint) },
-  ].filter((section) => section.fields.length > 0);
-}
-
-function CompactDetailField({ field, value }) {
-  return (
-    <div className="rounded-lg border border-[#DBEAFE] bg-[#FCFDFF] px-3 py-2.5">
-      <p className="field-label text-[10px] uppercase tracking-[0.12em] leading-tight">{field.label}</p>
-      <div className="mt-1 text-xs text-[#0F172A] break-words">{formatDetailValue(field, value)}</div>
-    </div>
-  );
-}
-
-function GroupColumn({ section, item }) {
-  return (
-    <div className="enterprise-card h-full p-4 md:p-5">
-      <div className="grid grid-cols-1 gap-2">
-        {section.fields.map((field) => (
-          <CompactDetailField key={field.key} field={field} value={item[field.key]} />
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function parseFallbackFromParams(searchParams) {
   return {
@@ -158,65 +123,185 @@ function HeroStat({ label, value }) {
   );
 }
 
-export default function LineItemDetailsPage({ searchParams }) {
-  const [activeTab, setActiveTab] = useState(LINE_ITEM_FIELD_GROUPS[0]?.id || "identity");
-  const item = resolveLineItem(searchParams);
-  const groupsById = Object.fromEntries(LINE_ITEM_FIELD_GROUPS.map((group) => [
-    group.id,
-    {
-      ...group,
-      iconComponent: ICON_MAP[group.icon] || FileText,
-      fields: group.fields.filter((field) => !SUMMARY_KEYS.has(field.key)),
-    },
-  ]));
+// ─────────────────────────────────────────────────────────────
+// Accordion Section
+// ─────────────────────────────────────────────────────────────
 
-  const activeGroup = groupsById[activeTab];
-  const columns = activeGroup && activeGroup.fields.length > 0
-    ? splitGroupIntoSections(activeGroup)
-    : [];
+function AccordionSection({ group, record, open, onToggle }) {
+  const filledCount = group.fields.filter(
+    (field) =>
+      record[field.key] !== null &&
+      record[field.key] !== undefined &&
+      record[field.key] !== "" &&
+      record[field.key] !== "—",
+  ).length;
+
+  return (
+    <div className="border border-[#E2E8F0] rounded-lg overflow-hidden bg-white">
+      {/* Accordion Header */}
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
+        aria-expanded={open}
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-7 h-7 rounded-md bg-blue-50 flex items-center justify-center flex-shrink-0">
+            <group.iconComponent size={13} className="text-[#0F6CBD]" />
+          </div>
+
+          <div className="text-left min-w-0">
+            <div className="text-sm font-semibold text-[#0F172A]">
+              {group.label}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className="text-[10px] text-[#64748B]">
+            {filledCount} fields
+          </span>
+
+          <ChevronDown
+            size={14}
+            className={`text-[#64748B] transition-transform ${
+              open ? "rotate-180" : ""
+            }`}
+          />
+        </div>
+      </button>
+
+      {/* Accordion Content */}
+      {open && (
+        <div className="px-4 pb-3 border-t border-[#E2E8F0]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+            {group.fields.map((field) => (
+              <div
+                key={field.key}
+                className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0 gap-3"
+              >
+                <span className="text-xs text-[#64748B] flex-shrink-0">
+                  {field.label}
+                </span>
+
+                <div className="text-right">
+                  {renderFieldValue(field, record[field.key])}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Main Page
+// ─────────────────────────────────────────────────────────────
+
+export default function LineItemDetailsPage({ searchParams }) {
+  const item = resolveLineItem(searchParams);
+
+  // ─────────────────────────────────────────
+  // TWO INDEPENDENT ACCORDION STATES
+  // ─────────────────────────────────────────
+
+  const [openLeftGroupId, setOpenLeftGroupId] = useState("identity");
+
+  const [openRightGroupId, setOpenRightGroupId] = useState("part");
+
+  // ─────────────────────────────────────────
+  // Create group lookup
+  // ─────────────────────────────────────────
+
+  const groupsById = Object.fromEntries(
+    LINE_ITEM_FIELD_GROUPS.map((g) => [
+      g.id,
+      {
+        ...g,
+        iconComponent: ICON_MAP[g.icon] || FileText,
+        fields: g.fields.filter((field) => !SUMMARY_KEYS.has(field.key)),
+      },
+    ]),
+  );
+
+  // ─────────────────────────────────────────
+  // Get all groups and split into columns
+  // ─────────────────────────────────────────
+
+  const allGroups = Object.values(groupsById);
+
+  const leftGroups = allGroups.filter((_, index) => index % 2 === 0);
+
+  const rightGroups = allGroups.filter((_, index) => index % 2 !== 0);
+
+  // ─────────────────────────────────────────
+  // Summary tiles
+  // ─────────────────────────────────────────
 
   const summaryTiles = SUMMARY_FIELDS.map((field) => ({
     ...field,
     value: item[field.key],
   }));
 
+  // ─────────────────────────────────────────
+  // Render
+  // ─────────────────────────────────────────
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans text-[#0F172A]">
-      <main className="mx-auto max-w-[1440px] p-4 md:p-6">
-        <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+      <main className="max-w-[1440px] mx-auto p-4 md:p-6">
+        {/* ═══════════════════════════════════════
+            TITLE & CLOSE BUTTON
+        ═══════════════════════════════════════ */}
+
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <div>
             <div className="mb-2 inline-flex items-center rounded-full border border-[#DBEAFE] bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#0F6CBD]">
               Selected Line Item
             </div>
-            <h1 className="text-lg font-semibold uppercase text-[#0033A0]">
-              ORDER LINE ITEMS DETAILS
+
+            <h1 className="text-lg font-bold text-[#0033A0]">
+              Order Line Item Details
             </h1>
+
+            <p className="text-xs text-[#64748B] mt-0.5">
+              Detailed information for the selected line item record
+            </p>
           </div>
-          <button
-            type="button"
-            onClick={() => window.close()}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[#D6E4F7] bg-white px-3.5 py-2 text-xs font-medium text-[#0F6CBD] shadow-sm hover:bg-[#EFF6FF]"
-          >
-            <ArrowLeft size={13} />
-            Close Tab
-          </button>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => window.close()}
+              className="flex items-center gap-1.5 text-xs font-medium text-white bg-[#0033A0] rounded-md px-3 py-2 hover:bg-[#002580]"
+            >
+              <ArrowLeft size={13} />
+              Close Tab
+            </button>
+          </div>
         </div>
 
-        <div className="mb-4 overflow-hidden rounded-2xl border border-[#D6E4F7] bg-white shadow-sm">
-  <div className="bg-gradient-to-r from-[#EFF6FF] via-white to-[#F8FAFC] px-5 py-5 md:px-6">
-    <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+        {/* ═══════════════════════════════════════
+            LINE ITEM HERO
+        ═══════════════════════════════════════ */}
 
-      {/* Left Side */}
-      <div className="min-w-0">
-        <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
+        <div className="bg-white border border-[#E2E8F0] rounded-lg p-4 mb-4 flex flex-wrap items-center gap-x-8 gap-y-3 bg-gradient-to-r from-[#EFF6FF] via-white to-[#F8FAFC] px-5 py-5 md:px-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <Package size={18} className="text-[#0033A0]" />
+            </div>
 
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">
-              LINE_NBR
-            </p>
-            <p className="mt-1 text-3xl font-black tracking-tight text-[#0033A0]">
-              {item.lineNbr || "—"}
-            </p>
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-[#64748B]">
+                Line Item
+              </p>
+
+              <p className="text-xl font-bold text-[#0F172A] leading-tight">
+                {item.lineNbr ?? "—"}
+              </p>
+            </div>
           </div>
 
           <div className="hidden h-10 w-px bg-[#DBEAFE] sm:block" />
@@ -224,50 +309,66 @@ export default function LineItemDetailsPage({ searchParams }) {
           <HeroStat label="ORDER_NBR" value={item.ordrNbr} />
           <HeroStat label="COMPANY_CD" value={item.companyCd} />
           <HeroStat label="BRANCH_NBR" value={item.branchNbr} />
-
+          <HeroStat label="LINE_TYP" value={item.lineTyp} />
+          <HeroStat label="LINE_STUS" value={item.lineStus} />
         </div>
-      </div>
 
-      {/* Right Side - Only Line Type & Line Status */}
-      <div className="grid grid-cols-2 gap-x-6 gap-y-3 xl:min-w-[260px]">
-        <HeroStat label="LINE_TYP" value={item.lineTyp} />
-        <HeroStat label="LINE_STUS" value={item.lineStus} />
-      </div>
-      </div>
-      </div>
-      </div>
+        {/* ═══════════════════════════════════════
+            SUMMARY TILES
+        ═══════════════════════════════════════ */}
 
-        <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {summaryTiles.map((field) => (
-            <SummaryInfoTile key={field.key} field={field} value={field.value} />
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mb-4">
+          {summaryTiles.map((t) => (
+            <SummaryInfoTile
+              key={t.key}
+              field={t}
+              value={t.value}
+            />
           ))}
         </div>
 
-        <div className="mt-4 overflow-hidden rounded-2xl border border-[#D6E4F7] bg-white shadow-sm">
-          <div className="flex flex-wrap gap-1 border-b border-[#D6E4F7] bg-[#F8FAFC] px-3 pt-3">
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`inline-flex items-center gap-1.5 rounded-t-xl border-b-2 px-3 py-2 text-xs font-semibold transition-colors whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "border-[#0F6CBD] bg-white text-[#0F6CBD]"
-                    : "border-transparent text-[#64748B] hover:text-[#0F172A]"
-                }`}
-              >
-                <tab.icon size={13} />
-                {tab.label}
-              </button>
+        {/* ═══════════════════════════════════════
+            ACCORDION SECTIONS
+            TWO INDEPENDENT COLUMNS
+        ═══════════════════════════════════════ */}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* ─────────────────────────────────────
+              LEFT COLUMN
+          ───────────────────────────────────── */}
+
+          <div className="flex flex-col gap-2">
+            {leftGroups.map((group) => (
+              <AccordionSection
+                key={group.id}
+                group={group}
+                record={item}
+                open={openLeftGroupId === group.id}
+                onToggle={() => {
+                  setOpenLeftGroupId((currentId) =>
+                    currentId === group.id ? null : group.id,
+                  );
+                }}
+              />
             ))}
           </div>
 
-          <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 xl:p-5">
-            {columns.map((section) => (
-              <GroupColumn
-                key={section.id}
-                section={section}
-                item={item}
+          {/* ─────────────────────────────────────
+              RIGHT COLUMN
+          ───────────────────────────────────── */}
+
+          <div className="flex flex-col gap-2">
+            {rightGroups.map((group) => (
+              <AccordionSection
+                key={group.id}
+                group={group}
+                record={item}
+                open={openRightGroupId === group.id}
+                onToggle={() => {
+                  setOpenRightGroupId((currentId) =>
+                    currentId === group.id ? null : group.id,
+                  );
+                }}
               />
             ))}
           </div>
