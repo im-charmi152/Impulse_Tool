@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
-import { Download, ChevronLeft, ChevronRight, Layers } from "lucide-react";
+import { ChevronLeft, ChevronRight, Layers } from "lucide-react";
 import SectionCard from "../../common/SectionCard";
-import { recordEvent } from "../../../utils/auditLog";
 import { openLineItemDetailsTab } from "../../../utils/detailsNavigation";
 import { LINE_ITEM_FIELD_GROUPS } from "./lineItemFieldConfig";
 
@@ -29,15 +28,6 @@ function LineItemDetails({ items }) {
     <SectionCard
       icon={Layers}
       title="Line-Item Details"
-      actions={
-        <button
-          onClick={() => recordEvent("export", { type: "line-items" })}
-          className="flex items-center gap-1.5 text-xs text-[#0F6CBD] hover:text-[#0A5CA6] border border-[#D6E4F7] rounded-xl px-2.5 py-1 hover:bg-[#EFF6FF]"
-        >
-          <Download size={11} />
-          Export
-        </button>
-      }
     >
       <div className="overflow-x-auto -mx-1">
         <table className="w-full text-xs min-w-[760px]">
