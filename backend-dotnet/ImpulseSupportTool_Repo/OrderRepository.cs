@@ -2,6 +2,8 @@
 using ImpulseSupportTool_Repo;
 using OrderManagement.API.Helpers;
 using Oracle.ManagedDataAccess.Client;
+using OrderManagement.API.Helpers;
+
 
 
 namespace OrderManagement.API.Repositories
@@ -157,7 +159,7 @@ namespace OrderManagement.API.Repositories
             cmd.BindByName = true;
 
             cmd.Parameters.Add("poNumber", OracleDbType.Varchar2).Value = request.PoNumber.Trim();
-            cmd.Parameters.Add("orderNumber", OracleDbType.Varchar2).Value = request.OrderNumber.Trim();
+            //cmd.Parameters.Add("orderNumber", OracleDbType.Varchar2).Value = request.OrderNumber.Trim();
 
             cmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = request.CountryCode.Trim();
 
@@ -760,11 +762,54 @@ namespace OrderManagement.API.Repositories
             }
 
             Console.WriteLine($">>> ODS STATUS CHANGES FOUND: {response.StatusChanges.Count}");
-            string combinedValue =
-                                        $"{response.CustCoCd?.Trim()}" +
-                                        $"{response.BillToBranchNbr?.Trim()}" +
-                                        $"{response.BillToCustNbr?.Trim()}" +
-                                        $"{response.BillToSfx?.Trim()}";
+
+
+            string eoheaderQuery = @"
+            SELECT 
+                PARTNER_ID, 
+                STATE_CD
+            FROM ODS.DB2_EO_ORDR_HDR_INFO 
+            WHERE CUST_CO_CD = :companyCode
+            AND CUST_PO_NBR = :custPoNbr";
+
+            try
+            {
+                await using OracleCommand eoheaderCmd = new OracleCommand(eoheaderQuery, conn);
+                eoheaderCmd.BindByName = true;
+
+                eoheaderCmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = response.CustCoCd?.Trim();
+                eoheaderCmd.Parameters.Add("custPoNbr", OracleDbType.Varchar2).Value = response.CustPoNbr?.Trim();
+
+                Console.WriteLine($">>> EXECUTING ODS EO HEADER QUERY...");
+                Console.WriteLine($">>> EO HEADER PARAMS: COMPANY_CODE='{response.CustCoCd}', CUST_PO_NBR='{response.CustPoNbr}'");
+
+                using OracleDataReader eohreader = (OracleDataReader)await eoheaderCmd.ExecuteReaderAsync();
+                Console.WriteLine($">>> READER HAS ROWS: {eohreader.HasRows}");
+
+                if (await eohreader.ReadAsync())
+                {
+                    response.EoPartnerId =eohreader["PARTNER_ID"]?.ToString()?.Trim();
+                    response.EoStateCd =eohreader["STATE_CD"]?.ToString()?.Trim();
+
+                    Console.WriteLine($">>> EO HEADER FOUND: PartnerId='{response.EoPartnerId}', " +$"StateCd='{response.EoStateCd}'");
+                }
+                else
+                {
+                    Console.WriteLine($">>> NO EO HEADER FOUND FOR COMPANY_CODE='{response.CustCoCd}', CUST_PO_NBR='{response.CustPoNbr}'");
+                }
+
+
+            }
+            catch (OracleException ex)
+            {
+                Console.WriteLine($">>> ODS EO HEADER QUERY FAILED: {ex.Message}");
+            }
+
+            //string combinedValue =
+            //                            $"{ response.CustCoCd?.Trim()}" +
+            //                            $"{response.BillToBranchNbr?.Trim()}" +
+            //                            $"{response.BillToCustNbr?.Trim()}" +
+            //                            $"{response.BillToSfx?.Trim()}";
 
             string partnerQuery = @"
             SELECT
@@ -800,7 +845,8 @@ namespace OrderManagement.API.Repositories
                 ODS_ISRT_TS,
                 ODS_UPD_TS
              FROM ODS.DB2_IE_PARTNER_SETUP
-             WHERE TRIM(SRCE_SYS_KEY_ID) = :combinedValue";
+             WHERE CO_CD = :pco_cd
+             AND TRIM(PARTNER_ID) = :ppartner_id";
 
             //WHERE CO_CD = :companyCode
             // AND SRCE_SYS_KEY_ID = :combinedValue";
@@ -809,26 +855,27 @@ namespace OrderManagement.API.Repositories
             string partnerCoCd = response.CustCoCd?.Trim() switch { "MD" => "US", "FT" => "CA", _ => response.CustCoCd?.Trim() };
             Console.WriteLine($">>> PARTNER SETUP CO_CD: Incoming={response.CustCoCd}, QueryValue={partnerCoCd}");
 
-            string inPoSwCoCd = null;
-            string inPoSwPartnerId = null;
+            //string inPoSwCoCd = response.EoPartnerId;
+            //string inPoSwPartnerId = response.EoPartnerId;
 
             try
             {
                 await using OracleCommand partnerCmd = new OracleCommand(partnerQuery, conn);
                 partnerCmd.BindByName = true;
-                partnerCmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = partnerCoCd;
+                partnerCmd.Parameters.Add("pco_cd", OracleDbType.Varchar2).Value = partnerCoCd;
 
                 // CHANGED: was response.PartnerId?.Trim()
                 //    partnerCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = response.PartnerId?.Trim();
-                partnerCmd.Parameters.Add("combinedValue", OracleDbType.Varchar2).Value = combinedValue;
+                partnerCmd.Parameters.Add("ppartner_id", OracleDbType.Varchar2).Value = response.EoPartnerId?.Trim();
                 //partnerCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = "470887";
 
                 Console.WriteLine($">>> EXECUTING ODS PARTNER SETUP QUERY...");
-                Console.WriteLine($">>> PARTNER CO_CD PARAMETER: {partnerCoCd}");
+                Console.WriteLine($">>> PARTNER CO_CD PARAMETER: {response.CustCoCd}");
+
                 //Console.WriteLine($">>> PARTNER ID PARAMETER: {response.PartnerId1?.Trim()}");
-                Console.WriteLine($"CombinedValue   : [{combinedValue}]");
-                Console.WriteLine($"CombinedValue : [{combinedValue}]");
-                Console.WriteLine($"Length        : {combinedValue.ToString().Length}");
+                //Console.WriteLine($"CombinedValue   : [{combinedValue}]");
+                //Console.WriteLine($"CombinedValue : [{combinedValue}]");
+                //Console.WriteLine($"Length        : {combinedValue.ToString().Length}");
 
 
 
@@ -836,18 +883,18 @@ namespace OrderManagement.API.Repositories
 
                 Console.WriteLine($">>> ODS PARTNER SETUP READER HAS ROWS: {partnerReader.HasRows}");
 
-                if (await partnerReader.ReadAsync())
+                while (await partnerReader.ReadAsync())
                 {
-                    inPoSwCoCd = partnerReader["CO_CD"]?.ToString()?.Trim();
-                    inPoSwPartnerId = partnerReader["PARTNER_ID"]?.ToString()?.Trim();
+                    //inPoSwCoCd = partnerReader["CO_CD"]?.ToString()?.Trim();
+                    //inPoSwPartnerId = partnerReader["PARTNER_ID"]?.ToString()?.Trim();
 
-                    Console.WriteLine($">>> PARTNER CO_CD: {inPoSwCoCd}");
-                    Console.WriteLine($">>> PARTNER ID: {inPoSwPartnerId}");
+                    Console.WriteLine($">>> PARTNER CO_CD: {response.CustCoCd}");
+                    Console.WriteLine($">>> PARTNER ID: {response.EoPartnerId}");
 
                     response.PartnerSetup.Add(new OrderPartnerSetup
                     {
-                        CoCd = inPoSwCoCd,
-                        PartnerId = inPoSwPartnerId,
+                        CoCd = partnerReader["CO_CD"]?.ToString()?.Trim(),
+                        PartnerId = partnerReader["PARTNER_ID"]?.ToString()?.Trim(),
                         PartnerTypeCd = partnerReader["PARTNER_TYPE_CD"]?.ToString()?.Trim(),
                         SrceSysId = partnerReader["SRCE_SYS_ID"]?.ToString()?.Trim(),
                         SrceSysKeyId = partnerReader["SRCE_SYS_KEY_ID"]?.ToString()?.Trim(),
@@ -872,12 +919,17 @@ namespace OrderManagement.API.Repositories
                         CycStrtTm = partnerReader["CYC_STRT_TM"]?.ToString()?.Trim()
                     });
 
+                    //response.PartnerSetup.Add(partnerSetup);
+
+
                 }
             }
+
             catch (OracleException ex)
             {
                 Console.WriteLine($">>> PARTNER SETUP ORACLE ERROR: {ex.Message}");
             }
+            Console.WriteLine($">>> ODS IE_PARTNER_SETUP ROW COUNT: {response.PartnerSetup.Count}");
             string inPoSwQuery = @"
                 SELECT
                     CO_CD,
@@ -963,13 +1015,13 @@ namespace OrderManagement.API.Repositories
                 await using OracleCommand inPoSwCmd = new OracleCommand(inPoSwQuery, conn);
                 inPoSwCmd.BindByName = true;
 
-                inPoSwCmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = inPoSwCoCd;
-                inPoSwCmd.Parameters.Add("partnerid", OracleDbType.Varchar2).Value = inPoSwPartnerId;
+                inPoSwCmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = partnerCoCd;
+                inPoSwCmd.Parameters.Add("partnerid", OracleDbType.Varchar2).Value = response.EoPartnerId?.Trim();
                 //inPoSwCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = "470887";
 
                 Console.WriteLine($">>> EXECUTING ODS IE_IN_PO_SW QUERY...");
-                Console.WriteLine($">>> IE_IN_PO_SW CO_CD PARAMETER: {inPoSwCoCd}");
-                Console.WriteLine($">>> IE_IN_PO_SW PARTNER_ID PARAMETER: {inPoSwPartnerId}");
+                Console.WriteLine($">>> IE_IN_PO_SW CO_CD PARAMETER: {response.CustCoCd?.Trim()}");
+                Console.WriteLine($">>> IE_IN_PO_SW PARTNER_ID PARAMETER: {response.EoPartnerId?.Trim()}");
 
                 await using OracleDataReader inPoSwReader = await inPoSwCmd.ExecuteReaderAsync();
 
