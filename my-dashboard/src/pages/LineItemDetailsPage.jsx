@@ -123,6 +123,58 @@ function HeroStat({ label, value }) {
   );
 }
 
+function FlagValue({ value }) {
+  const normalized = String(value ?? "").toUpperCase();
+
+  if (["Y", "1", "TRUE", "YES"].includes(normalized)) {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700">
+        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+        Enabled
+      </span>
+    );
+  }
+
+  if (["N", "0", "FALSE", "NO", ""].includes(normalized)) {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-400">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+        Disabled
+      </span>
+    );
+  }
+
+  return <span className="text-xs text-[#0F172A]">{value}</span>;
+}
+
+function renderFieldValue(field, value) {
+  if (value == null || value === "") {
+    return <span className="text-slate-300 text-xs">—</span>;
+  }
+
+  if (field.type === "flag") {
+    return <FlagValue value={value} />;
+  }
+
+  if (field.type === "date") {
+    return <span className="text-xs text-[#0F172A]">{formatDetailValue(field, value)}</span>;
+  }
+
+  if (field.type === "number") {
+    return <span className="text-xs text-[#0F172A]">{value}</span>;
+  }
+
+  return (
+    <span className="flex items-center gap-1 group">
+      <span className={`text-xs text-[#0F172A] ${field.type === "id" ? "font-mono" : ""}`}>
+        {String(value)}
+      </span>
+
+      {field.copyable && <CopyButton value={value} />}
+    </span>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────
 // Accordion Section
 // ─────────────────────────────────────────────────────────────
