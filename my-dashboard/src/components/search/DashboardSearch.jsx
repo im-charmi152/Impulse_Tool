@@ -51,37 +51,45 @@ const COUNTRY_CODES = [
 ];
 
 /* =========================================================
-   COUNTRY NAMES
-   ========================================================= */
+ *   COUNTRY NAMES
+ * ========================================================= */
 
 const COUNTRY_NAMES = {
   AT: "Austria",
-  AX: "Åland Islands",
-  BI: "Burundi",
+  AX: "Singapore - obsolete",
+  BI: "India",
   BL: "Saint Barthélemy",
+  BP: "Brazil - Sao Paulo",
   BR: "Brazil",
   CH: "Switzerland",
   CN: "China",
+  CP: "Pan Europe",
   DE: "Germany",
-  DK: "Denmark",
-  EH: "Western Sahara",
+  DK: "Denmark - obsolete",
+  EH: "China",
   ES: "Spain",
-  FI: "Finland",
+  FI: "Finland - obsolete",
   FR: "France",
-  HK: "Hong Kong",
+  FT: "Canada",
+  HK: "China - Hong Kong",
   HU: "Hungary",
-  IN: "India",
+  IA: "India",
+  IN: "Singapore - India Export obsolete",
   IT: "Italy",
-  MD: "Moldova",
+  MD: "United States",
   MX: "Mexico",
-  MY: "Malaysia",
-  NO: "Norway",
+  MY: "Malaysia - obsolete",
+  NO: "Norway - obsolete",
   PT: "Portugal",
   SE: "Sweden",
-  SG: "Singapore",
+  SG: "Singapore - obsolete",
   TH: "Thailand",
-  TW: "Taiwan",
-  UK: "United Kingdom",
+  TW: "China - Hong Kong 2",
+  UK: "Great Britain",
+  X5: "X5",
+  X6: "X6",
+  YM: "China",
+  Z3: "Latin America",
 };
 
 /*
