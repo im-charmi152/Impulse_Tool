@@ -4,6 +4,7 @@ import {
   CalendarDays,
   Flag,
   CircleCheck,
+  Building2,
 } from "lucide-react";
 import Badge from "../common/Badge";
 import { formatDateTime } from "../../utils/format";
@@ -37,6 +38,12 @@ function OrderSummaryBanner({ order }) {
       icon: Hash,
     },
     {
+      key: "branchNo",
+      label: "Branch Number",
+      value: val(order?.branchNbr) ?? "—",
+      icon: Building2,
+    },
+    {
       key: "custPoDate",
       label: "Customer PO Date",
       value: firstValue(order, ["custPoDt", "entyDt"])
@@ -67,7 +74,7 @@ function OrderSummaryBanner({ order }) {
 
   return (
   <div className="enterprise-card border border-[#D6E4F7] rounded-xl shadow-sm bg-white overflow-hidden">
-    <div className="grid grid-cols-[1.5fr_1.4fr_1.6fr_1fr_1.2fr_1fr] divide-x divide-[#D6E4F7]">
+    <div className="grid grid-cols-[1.5fr_1.4fr_1.1fr_1.6fr_1fr_1.2fr_1fr] divide-x divide-[#D6E4F7]">
 
       {tiles.map((tile) => {
         const Icon = tile.icon;

@@ -241,8 +241,8 @@ function FlagValue({ value }) {
 
   if (["N", "0", "FALSE", "NO", ""].includes(v)) {
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-400">
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700">
+        <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
         Disabled
       </span>
     );
