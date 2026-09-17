@@ -1,4 +1,5 @@
 import { Bell, HelpCircle, ChevronDown, Menu } from "lucide-react";
+import radiusLogo from "../../assets/radius-logo.svg";
 
 function Header({ toggleSidebar }) {
   return (
@@ -11,7 +12,12 @@ function Header({ toggleSidebar }) {
         >
           <Menu size={20} />
         </button>
-        <div className="flex items-center gap-0.5 select-none">
+        <div className="flex items-center gap-2 select-none">
+          <img
+            src={radiusLogo}
+            alt="RADIUS Logo"
+            className="h-8 w-auto"
+          />
           <span className="text-white font-black text-xl tracking-tight">
             IMPULSE
           </span>

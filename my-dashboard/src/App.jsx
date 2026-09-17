@@ -16,6 +16,8 @@ import Sidebar from "./components/layout/Sidebar";
 import DashboardSearch from "./components/search/DashboardSearch";
 import "./components/search/DashboardSearch.css";
 
+import radiusWatermark from "./assets/radius-watermark.svg";
+
 import OrderSummaryBanner from "./components/order/OrderSummaryBanner";
 import OrderHeaderDetails from "./components/order/header/OrderHeaderDetails";
 import LineItemDetails from "./components/order/lineitem/LineItemDetails";
@@ -280,7 +282,24 @@ export default function Dashboard() {
         }`}
       >
 
-        <div className="p-4 md:p-5 max-w-[1400px] mx-auto">
+        <div className="p-4 md:p-5 max-w-[1400px] mx-auto relative z-10">
+
+          {/* ======================================================
+              RADIUS WATERMARK
+          ====================================================== */}
+
+          {status === "idle" && (
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0 opacity-10 w-full h-screen flex items-center justify-center"
+              aria-hidden="true"
+            >
+              <img
+                src={radiusWatermark}
+                alt=""
+                className="w-96 h-96 object-contain"
+              />
+            </div>
+          )}
 
           {/* ======================================================
               DASHBOARD SEARCH
