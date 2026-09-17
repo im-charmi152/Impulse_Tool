@@ -10,29 +10,29 @@ export const PARTNER_SETUP_FIELD_GROUPS = [
       { key: "partnerTypeCd", label: "PARTNER_TYPE_CD", type: "text" },
     ],
   },
-  {
-    id: "source",
-    label: "Source Information",
-    icon: "Package",
-    defaultOpen: true,
-    fields: [
-      { key: "srceSysId", label: "SRCE_SYS_ID", type: "text" },
-      { key: "srceSysKeyId", label: "SRCE_SYS_KEY_ID", type: "text" },
-      { key: "formatId", label: "FORMAT_ID", type: "text" },
-      { key: "docId", label: "DOC_ID", type: "text" },
-    ],
-  },
-  {
-    id: "communication",
-    label: "Communication",
-    icon: "BarChart2",
-    fields: [
-      { key: "commuId", label: "COMMU_ID", type: "text" },
-      { key: "internetAddrTxt", label: "INTERNET_ADDR_TXT", type: "text" },
-      { key: "dirFlgCd", label: "DIR_FLG_CD", type: "text" },
-      { key: "sendThruId", label: "SEND_THRU_ID", type: "text" },
-    ],
-  },
+  // {
+  //   id: "source",
+  //   label: "Source Information",
+  //   icon: "Package",
+  //   defaultOpen: true,
+  //   fields: [
+  //     { key: "srceSysId", label: "SRCE_SYS_ID", type: "text" },
+  //     { key: "srceSysKeyId", label: "SRCE_SYS_KEY_ID", type: "text" },
+  //     { key: "formatId", label: "FORMAT_ID", type: "text" },
+  //     { key: "docId", label: "DOC_ID", type: "text" },
+  //   ],
+  // },
+  // {
+  //   id: "communication",
+  //   label: "Communication",
+  //   icon: "BarChart2",
+  //   fields: [
+  //     { key: "commuId", label: "COMMU_ID", type: "text" },
+  //     { key: "internetAddrTxt", label: "INTERNET_ADDR_TXT", type: "text" },
+  //     { key: "dirFlgCd", label: "DIR_FLG_CD", type: "text" },
+  //     { key: "sendThruId", label: "SEND_THRU_ID", type: "text" },
+  //   ],
+  // },
   {
     id: "processing",
     label: "Processing",

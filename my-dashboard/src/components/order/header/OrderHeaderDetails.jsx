@@ -25,11 +25,7 @@ import {
   Info,
 } from "lucide-react";
 
-import {
-  SUMMARY_FIELDS,
-  ORDER_STATUS_MAP,
-  HOLD_CODE_MAP,
-} from "./fieldConfig";
+import { SUMMARY_FIELDS, ORDER_STATUS_MAP, HOLD_CODE_MAP } from "./fieldConfig";
 
 import { formatDateTime } from "../../../utils/format";
 import SectionCard from "../../common/SectionCard";
@@ -66,9 +62,7 @@ function StatusBadge({ value }) {
   const key = String(value).toLowerCase();
 
   const config =
-    ORDER_STATUS_MAP[key] ??
-    ORDER_STATUS_MAP[String(value)] ??
-    null;
+    ORDER_STATUS_MAP[key] ?? ORDER_STATUS_MAP[String(value)] ?? null;
 
   if (!config) {
     return (
@@ -98,9 +92,7 @@ function StatusBadge({ value }) {
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${styles[config.color]}`}
     >
-      <span
-        className={`w-1.5 h-1.5 rounded-full ${dots[config.color]}`}
-      />
+      <span className={`w-1.5 h-1.5 rounded-full ${dots[config.color]}`} />
       {config.label}
     </span>
   );
@@ -127,9 +119,7 @@ function HoldBadge({ value }) {
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200">
       <AlertCircle size={9} />
-      {description
-        ? `${description} (${value})`
-        : `On Hold (${value})`}
+      {description ? `${description} (${value})` : `On Hold (${value})`}
     </span>
   );
 }
@@ -141,9 +131,7 @@ function CopyButton({ value }) {
     (event) => {
       event.stopPropagation();
 
-      navigator.clipboard
-        ?.writeText(String(value ?? ""))
-        .catch(() => {});
+      navigator.clipboard?.writeText(String(value ?? "")).catch(() => {});
 
       setCopied(true);
 
@@ -154,12 +142,7 @@ function CopyButton({ value }) {
     [value],
   );
 
-  if (
-    value === null ||
-    value === undefined ||
-    value === "" ||
-    value === "—"
-  ) {
+  if (value === null || value === undefined || value === "" || value === "—") {
     return null;
   }
 
@@ -210,20 +193,11 @@ function FlagValue({ value }) {
     );
   }
 
-  return (
-    <span className="text-xs text-[#0F172A]">
-      {String(value)}
-    </span>
-  );
+  return <span className="text-xs text-[#0F172A]">{String(value)}</span>;
 }
 
 function renderValue(field, value) {
-  if (
-    value === null ||
-    value === undefined ||
-    value === "" ||
-    value === "—"
-  ) {
+  if (value === null || value === undefined || value === "" || value === "—") {
     return <span className="text-gray-300 text-xs">—</span>;
   }
 
@@ -241,9 +215,7 @@ function renderValue(field, value) {
 
   if (field.type === "date") {
     return (
-      <span className="text-xs text-[#0F172A]">
-        {formatDateTime(value)}
-      </span>
+      <span className="text-xs text-[#0F172A]">{formatDateTime(value)}</span>
     );
   }
 
@@ -251,11 +223,7 @@ function renderValue(field, value) {
     const numberValue = Number(value);
 
     if (Number.isNaN(numberValue)) {
-      return (
-        <span className="text-xs text-[#0F172A]">
-          {String(value)}
-        </span>
-      );
+      return <span className="text-xs text-[#0F172A]">{String(value)}</span>;
     }
 
     return (
@@ -297,9 +265,7 @@ function SummaryField({ field, value }) {
           {field.label}
         </p>
 
-        <div className="min-h-[18px]">
-          {renderValue(field, value)}
-        </div>
+        <div className="min-h-[18px]">{renderValue(field, value)}</div>
       </div>
     </div>
   );
@@ -325,10 +291,7 @@ function SkeletonCard() {
 function ErrorCard({ message }) {
   return (
     <div className="enterprise-card border-red-200 p-8 flex flex-col items-center text-center">
-      <AlertCircle
-        size={28}
-        className="text-red-400 mb-2"
-      />
+      <AlertCircle size={28} className="text-red-400 mb-2" />
 
       <p className="text-sm font-semibold text-red-700">
         Failed to load order details

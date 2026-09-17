@@ -60,7 +60,7 @@ function exportAsJSON(data, filenameBase) {
   downloadBlob(
     JSON.stringify(data, null, 2),
     `${filenameBase}.json`,
-    "application/json"
+    "application/json",
   );
 }
 
@@ -72,25 +72,15 @@ function exportAsCSV(rows, filenameBase) {
   const escapeCell = (val) => {
     const str = val == null ? "" : String(val);
 
-    return /[",\n]/.test(str)
-      ? `"${str.replace(/"/g, '""')}"`
-      : str;
+    return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
   };
 
   const lines = [
     columns.join(","),
-    ...rows.map((row) =>
-      columns
-        .map((col) => escapeCell(row[col]))
-        .join(",")
-    ),
+    ...rows.map((row) => columns.map((col) => escapeCell(row[col])).join(",")),
   ];
 
-  downloadBlob(
-    lines.join("\n"),
-    `${filenameBase}.csv`,
-    "text/csv"
-  );
+  downloadBlob(lines.join("\n"), `${filenameBase}.csv`, "text/csv");
 }
 
 // ============================================================
@@ -104,13 +94,7 @@ export default function Dashboard() {
   // Default tab after successful search
   const [activeTab, setActiveTab] = useState("order");
 
-  const {
-    data,
-    status,
-    error,
-    search,
-    reset,
-  } = useOrderSearch();
+  const { data, status, error, search, reset } = useOrderSearch();
 
   // ============================================================
   // TABS
@@ -160,18 +144,14 @@ export default function Dashboard() {
 
   const setupRecords = Array.isArray(data?.setupConfig)
     ? data.setupConfig
-    : data?.setupConfig &&
-        typeof data.setupConfig === "object"
+    : data?.setupConfig && typeof data.setupConfig === "object"
       ? [data.setupConfig]
       : [];
 
   const flowRows = Array.isArray(data?.flowTrace)
     ? data.flowTrace
-    : data?.flowTrace &&
-        typeof data.flowTrace === "object"
-      ? Object.values(data.flowTrace)
-          .filter(Array.isArray)
-          .flat()
+    : data?.flowTrace && typeof data.flowTrace === "object"
+      ? Object.values(data.flowTrace).filter(Array.isArray).flat()
       : [];
 
   const tabCounts = {
@@ -185,42 +165,28 @@ export default function Dashboard() {
   };
 
   const orderIdentifier =
-    data?.order?.ordrNbr ||
-    data?.order?.custOrdrNbr ||
-    "order";
+    data?.order?.ordrNbr || data?.order?.custOrdrNbr || "order";
 
   const handleExport = () => {
     switch (activeTab) {
       case "order":
-        exportAsJSON(
-          data?.order,
-          `${orderIdentifier}-header`
-        );
+        exportAsJSON(data?.order, `${orderIdentifier}-header`);
         break;
 
       case "lineItems":
         if (data?.lineItems?.length) {
-          exportAsCSV(
-            data.lineItems,
-            `${orderIdentifier}-line-items`
-          );
+          exportAsCSV(data.lineItems, `${orderIdentifier}-line-items`);
         }
         break;
 
       case "flowTrace":
         if (flowRows.length) {
-          exportAsCSV(
-            flowRows,
-            `${orderIdentifier}-flow-trace`
-          );
+          exportAsCSV(flowRows, `${orderIdentifier}-flow-trace`);
         }
         break;
 
       case "setup":
-        exportAsJSON(
-          setupRecords,
-          `${orderIdentifier}-partner-setup`
-        );
+        exportAsJSON(setupRecords, `${orderIdentifier}-partner-setup`);
         break;
 
       default:
@@ -230,15 +196,10 @@ export default function Dashboard() {
 
   const exportDisabled =
     (activeTab === "order" && !data?.order) ||
-    (activeTab === "lineItems" &&
-      !data?.lineItems?.length) ||
-    (activeTab === "flowTrace" &&
-      !flowRows.length) ||
-    (activeTab === "setup" &&
-      !setupRecords.length) ||
-    ["processing", "poSwitch", "logs"].includes(
-      activeTab
-    );
+    (activeTab === "lineItems" && !data?.lineItems?.length) ||
+    (activeTab === "flowTrace" && !flowRows.length) ||
+    (activeTab === "setup" && !setupRecords.length) ||
+    ["processing", "poSwitch", "logs"].includes(activeTab);
 
   // ============================================================
   // RENDER
@@ -246,16 +207,11 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans">
-
       {/* ========================================================
           HEADER
       ======================================================== */}
 
-      <Header
-        toggleSidebar={() =>
-          setMobileOpen(!mobileOpen)
-        }
-      />
+      <Header toggleSidebar={() => setMobileOpen(!mobileOpen)} />
 
       {/* ========================================================
           SIDEBAR
@@ -274,50 +230,33 @@ export default function Dashboard() {
 
       <main
         className={`pt-14 transition-all duration-300 hidden-mobile-margin ${
-          sidebarCollapsed
-            ? "md:ml-[60px]"
-            : "md:ml-[200px]"
+          sidebarCollapsed ? "md:ml-[60px]" : "md:ml-[200px]"
         }`}
       >
-
         <div className="p-4 md:p-5 max-w-[1400px] mx-auto">
-
           {/* ======================================================
               DASHBOARD SEARCH
           ====================================================== */}
 
-          <DashboardSearch
-            onSearch={search}
-            loading={status === "loading"}
-          />
+          <DashboardSearch onSearch={search} loading={status === "loading"} />
 
           {/* ======================================================
               STATUS
           ====================================================== */}
 
           <div className="mt-4">
-
             {/* IDLE */}
-            {status === "idle" && (
-              <IdleState />
-            )}
+            {status === "idle" && <IdleState />}
 
             {/* LOADING */}
-            {status === "loading" && (
-              <LoadingState />
-            )}
+            {status === "loading" && <LoadingState />}
 
             {/* EMPTY */}
-            {status === "empty" && (
-              <EmptyState />
-            )}
+            {status === "empty" && <EmptyState />}
 
             {/* ERROR */}
             {status === "error" && (
-              <ErrorState
-                message={error}
-                onRetry={reset}
-              />
+              <ErrorState message={error} onRetry={reset} />
             )}
 
             {/* ====================================================
@@ -326,48 +265,37 @@ export default function Dashboard() {
 
             {status === "success" && data && (
               <>
-
                 {/* ==================================================
                     ORDER SUMMARY
                 ================================================== */}
 
-                <OrderSummaryBanner
-                  order={data.order}
-                />
+                <OrderSummaryBanner order={data.order} />
 
                 {/* ==================================================
                     TAB CONTAINER
                 ================================================== */}
 
                 <div className="mt-4">
-
                   {/* =================================================
                       TAB HEADER
                   ================================================= */}
 
                   <div className="bg-white border border-[#D6E4F7] rounded-t-xl shadow-sm flex items-center justify-between">
-
                     {/* TAB LIST */}
 
                     <div className="flex items-center overflow-hidden">
-
                       {tabs.map((tab) => {
-
                         const Icon = tab.icon;
 
-                        const isActive =
-                          activeTab === tab.id;
+                        const isActive = activeTab === tab.id;
 
-                        const count =
-                          tabCounts[tab.id];
+                        const count = tabCounts[tab.id];
 
                         return (
                           <button
                             key={tab.id}
                             type="button"
-                            onClick={() =>
-                              setActiveTab(tab.id)
-                            }
+                            onClick={() => setActiveTab(tab.id)}
                             className={`
                               relative
                               flex
@@ -387,7 +315,6 @@ export default function Dashboard() {
                               }
                             `}
                           >
-
                             <Icon size={14} />
 
                             {tab.label}
@@ -397,12 +324,9 @@ export default function Dashboard() {
                                 {count}
                               </span>
                             )}
-
                           </button>
                         );
-
                       })}
-
                     </div>
 
                     {/* EXPORT */}
@@ -431,7 +355,6 @@ export default function Dashboard() {
                       <Download size={13} />
                       Export
                     </button>
-
                   </div>
 
                   {/* =================================================
@@ -439,18 +362,13 @@ export default function Dashboard() {
                   ================================================= */}
 
                   <div className="mt-4">
-
                     {/* =================================================
                         1. ORDER DETAILS
                     ================================================= */}
 
                     {activeTab === "order" && (
                       <div className="space-y-4">
-
-                        <OrderHeaderDetails
-                          order={data.order}
-                        />
-
+                        <OrderHeaderDetails order={data.order} />
                       </div>
                     )}
 
@@ -460,11 +378,7 @@ export default function Dashboard() {
 
                     {activeTab === "lineItems" && (
                       <div className="space-y-4">
-
-                        <LineItemDetails
-                          items={data.lineItems}
-                        />
-
+                        <LineItemDetails items={data.lineItems} />
                       </div>
                     )}
 
@@ -474,9 +388,7 @@ export default function Dashboard() {
 
                     {activeTab === "processing" && (
                       <div className="space-y-4">
-
-                        <ProcessFlowSection />
-
+                        <ProcessFlowSection eoStateCd={data?.order?.eoStateCd} />
                       </div>
                     )}
 
@@ -486,11 +398,7 @@ export default function Dashboard() {
 
                     {activeTab === "flowTrace" && (
                       <div className="space-y-4">
-
-                        <FlowTraceStatus
-                          flowTrace={data.flowTrace}
-                        />
-
+                        <FlowTraceStatus flowTrace={data.flowTrace} />
                       </div>
                     )}
 
@@ -500,11 +408,7 @@ export default function Dashboard() {
 
                     {activeTab === "poSwitch" && (
                       <div className="space-y-4">
-
-                        <PoSwitchSection
-                          inPoSw={data.inPoSw}
-                        />
-
+                        <PoSwitchSection inPoSw={data.inPoSw} />
                       </div>
                     )}
 
@@ -514,11 +418,7 @@ export default function Dashboard() {
 
                     {activeTab === "setup" && (
                       <div className="space-y-4">
-
-                        <SetupConfigDetails
-                          config={data.setupConfig}
-                        />
-
+                        <SetupConfigDetails config={data.setupConfig} />
                       </div>
                     )}
 
@@ -528,22 +428,16 @@ export default function Dashboard() {
 
                     {activeTab === "logs" && (
                       <div className="space-y-4">
-
                         <DatadogPanel
                           logs={data.logs}
                           alerts={data.datadogAlerts}
                         />
-
                       </div>
                     )}
-
                   </div>
-
                 </div>
-
               </>
             )}
-
           </div>
 
           {/* ======================================================
@@ -551,29 +445,16 @@ export default function Dashboard() {
           ====================================================== */}
 
           <div className="mt-6 pb-4 text-center text-[10px] text-[#6B7280] flex items-center justify-between">
-
-            <span>
-              © 2024 Ingram Micro Inc. All Rights Reserved.
-            </span>
+            <span>© 2024 Ingram Micro Inc. All Rights Reserved.</span>
 
             <div className="flex gap-4">
+              <button className="hover:text-[#0F6CBD]">Privacy Policy</button>
 
-              <button className="hover:text-[#0F6CBD]">
-                Privacy Policy
-              </button>
-
-              <button className="hover:text-[#0F6CBD]">
-                Terms of Use
-              </button>
-
+              <button className="hover:text-[#0F6CBD]">Terms of Use</button>
             </div>
-
           </div>
-
         </div>
-
       </main>
-
     </div>
   );
 }

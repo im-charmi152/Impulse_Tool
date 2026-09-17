@@ -551,3 +551,95 @@
   }
 
 }
+.partner-hover-anchor {
+  position: relative;
+  width: 100%;
+}
+
+.partner-hover-card {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 9999;
+  width: 320px;
+  max-height: 360px;
+  overflow-y: auto;
+
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.partner-hover-card::-webkit-scrollbar {
+  width: 6px;
+}
+.partner-hover-card::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.partner-hover-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #edf2f7;
+  background: #f8fbff;
+  border-radius: 12px 12px 0 0;
+  position: sticky;
+  top: 0;
+}
+
+.partner-hover-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.partner-hover-card-body {
+  padding: 6px 14px 10px;
+}
+
+.partner-hover-group {
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.partner-hover-group:last-child {
+  border-bottom: none;
+}
+
+.partner-hover-group-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.partner-hover-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 3px 0;
+}
+
+.partner-hover-field-label {
+  font-size: 10px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.partner-hover-field-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: right;
+  word-break: break-word;
+}

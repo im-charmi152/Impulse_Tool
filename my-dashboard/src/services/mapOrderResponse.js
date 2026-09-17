@@ -105,18 +105,17 @@ export function mapOrderResponse(raw) {
   });
 
   // ─── Maps the .NET GetOrder response into the shape the UI expects ────────
-//
-// IMPORTANT: the left side of each line below (`raw.xxx`) is the REAL JSON
-// key — camelCase of the C# property name, per ASP.NET Core's default
-// serializer. The right side (`companyCd:`, etc.) is the internal/UI key
-// used everywhere else in the app. For most fields these are identical;
-// for 11 fields they intentionally differ — see the table in chat history
-// for the full list of renames and why.
+  //
+  // IMPORTANT: the left side of each line below (`raw.xxx`) is the REAL JSON
+  // key — camelCase of the C# property name, per ASP.NET Core's default
+  // serializer. The right side (`companyCd:`, etc.) is the internal/UI key
+  // used everywhere else in the app. For most fields these are identical;
+  // for 11 fields they intentionally differ — see the table in chat history
+  // for the full list of renames and why.
 
   const order = {
-    // ── Order Information ──
-    // Preserve key ODS ORSHED fields for components that still read source keys.
-    // Explicitly keep the new .NET response fields
+    // ── Order Information ──────────────────────────────────────
+
     custCoCd: raw.custCoCd ?? null,
     custBr: raw.custBr ?? null,
     imiAsgdOrdrNbr: raw.imiAsgdOrdrNbr ?? null,
@@ -131,9 +130,15 @@ export function mapOrderResponse(raw) {
     capsIdCd: raw.capsIdCd ?? null,
     terms: raw.terms ?? null,
     resdntlSw: raw.resdntlSw ?? null,
-    bordrStus: raw.bordrStus ?? null,
+
+    // IMPORTANT:
+    // Backend property is OrdrStatus
+    // Therefore JSON key is ordrStatus
+    ordrStatus: raw.ordrStatus ?? null,
+
     ordrCmpltFillSw: raw.ordrCmpltFillSw ?? null,
     crRels: raw.crRels ?? null,
+
     entyDt: raw.entyDt ?? null,
     termId: raw.termId ?? null,
 
@@ -171,14 +176,16 @@ export function mapOrderResponse(raw) {
     govtEndUserZip: raw.govtEndUserZip ?? null,
     binTyp: raw.binTyp ?? null,
     govtGsaInd: raw.govtGsaInd ?? null,
+
     splitBillToSw: raw.splitBillToSw ?? null,
     govtEndUserTyp: raw.govtEndUserTyp ?? null,
 
     odsLstUpdDt: raw.odsLstUpdDt ?? null,
-    enhancedCrMemoSw: raw.enhancedCrMemoSw ?? null,
 
+    enhancedCrMemoSw: raw.enhancedCrMemoSw ?? null,
     imsDelFlg: raw.imsDelFlg ?? null,
     specialHandleSw: raw.specialHandleSw ?? null,
+
     cfgFlg: raw.cfgFlg ?? null,
 
     endUserPoNbr: raw.endUserPoNbr ?? null,
@@ -192,27 +199,33 @@ export function mapOrderResponse(raw) {
     endUserNbr: raw.endUserNbr ?? null,
 
     wasBord: raw.wasBord ?? null,
-
     jobAcctNbr: raw.jobAcctNbr ?? null,
     capsBuyer: raw.capsBuyer ?? null,
+
     ackCode: raw.ackCode ?? null,
     copyCode: raw.copyCode ?? null,
     extSoCode: raw.extSoCode ?? null,
-
     taxCode: raw.taxCode ?? null,
+
+    // ── Processing Flow ────────────────────────────────────────
+    // Used by ProcessFlowSection
     stateCd: raw.stateCd ?? null,
+
+    // ── Location ───────────────────────────────────────────────
+
     countyCode: raw.countyCode ?? null,
     cityCode: raw.cityCode ?? null,
+
+    // ── Financial / Order Controls ─────────────────────────────
 
     tradeDisc: raw.tradeDisc ?? null,
 
     orderManagementSw: raw.orderManagementSw ?? null,
     sourceCode: raw.sourceCode ?? null,
     summInvoiceCode: raw.summInvoiceCode ?? null,
-    custType: raw.custType ?? null,
 
+    custType: raw.custType ?? null,
     custRefNbr: raw.custRefNbr ?? null,
-    custRefNbr2: raw.custRefNbr2 ?? null,
 
     orderValueAtAdd: raw.orderValueAtAdd ?? null,
 
@@ -223,42 +236,47 @@ export function mapOrderResponse(raw) {
     glOffsetType: raw.glOffsetType ?? null,
 
     endCustNum: raw.endCustNum ?? null,
-    flrngAuthNbr: raw.flrngAuthNbr ?? null,
 
+    flrngAuthNbr: raw.flrngAuthNbr ?? null,
     allianceSw: raw.allianceSw ?? null,
+
+    custRefNbr2: raw.custRefNbr2 ?? null,
+
     campaign: raw.campaign ?? null,
     contract: raw.contract ?? null,
 
     endUserContSuffix: raw.endUserContSuffix ?? null,
+
     freightForwarder: raw.freightForwarder ?? null,
     endUserOrderSw: raw.endUserOrderSw ?? null,
-
     aodSw: raw.aodSw ?? null,
+
     countryCode: raw.countryCode ?? null,
+
     soldToSuffix: raw.soldToSuffix ?? null,
 
     payeeNbr: raw.payeeNbr ?? null,
     payeeSuf: raw.payeeSuf ?? null,
 
     resellerSplitPct: raw.resellerSplitPct ?? null,
+
     deliveryTerms: raw.deliveryTerms ?? null,
 
     endCustId: raw.endCustId ?? null,
     vendorClaimNbr: raw.vendorClaimNbr ?? null,
 
     indiaGstOrderInd: raw.indiaGstOrderInd ?? null,
+
     lastDistNbr: raw.lastDistNbr ?? null,
     lastShipmentNbr: raw.lastShipmentNbr ?? null,
 
     priorityCode: raw.priorityCode ?? null,
+
     outsourceSkuInd: raw.outsourceSkuInd ?? null,
     deleteTodaySw: raw.deleteTodaySw ?? null,
-
     priceRecalcSw: raw.priceRecalcSw ?? null,
+    eoStateCd: raw.eoStateCd ?? null,
   };
-
-  
-
 
   const lineItems = Array.isArray(raw.lineItems) ? raw.lineItems : [];
 
@@ -292,14 +310,26 @@ export function mapOrderResponse(raw) {
     raw.statusChanges ?? raw.orderStatusChanges ?? raw.orOrderStusChgs ?? [];
   const statusChanges = Array.isArray(rawStatusChanges)
     ? rawStatusChanges
-      .filter((entry) => entry && typeof entry === "object" && !Array.isArray(entry))
-      .map((entry) => toStatusChangeRecord(entry))
+        .filter(
+          (entry) =>
+            entry && typeof entry === "object" && !Array.isArray(entry),
+        )
+        .map((entry) => toStatusChangeRecord(entry))
     : [];
 
   const rawPartnerSetup =
-    raw.partnerSetup ?? raw.partnerSetups ?? raw.partnerSetupDetails ?? raw.setupConfig ?? [];
+    raw.partnerSetup ??
+    raw.partnerSetups ??
+    raw.partnerSetupDetails ??
+    raw.setupConfig ??
+    [];
   const setupConfig = Array.isArray(rawPartnerSetup)
-    ? rawPartnerSetup.filter((entry) => entry && typeof entry === "object" && !Array.isArray(entry)).map(toPartnerSetupRecord)
+    ? rawPartnerSetup
+        .filter(
+          (entry) =>
+            entry && typeof entry === "object" && !Array.isArray(entry),
+        )
+        .map(toPartnerSetupRecord)
     : rawPartnerSetup && typeof rawPartnerSetup === "object"
       ? [toPartnerSetupRecord(rawPartnerSetup)]
       : [];
@@ -307,8 +337,11 @@ export function mapOrderResponse(raw) {
   const rawInPoSw = raw.inPoSw ?? raw.ieInPoSw ?? raw.poSwitch ?? [];
   const inPoSw = Array.isArray(rawInPoSw)
     ? rawInPoSw
-      .filter((entry) => entry && typeof entry === "object" && !Array.isArray(entry))
-      .map((entry) => toInPoSwRecord(entry))
+        .filter(
+          (entry) =>
+            entry && typeof entry === "object" && !Array.isArray(entry),
+        )
+        .map((entry) => toInPoSwRecord(entry))
     : rawInPoSw && typeof rawInPoSw === "object"
       ? [toInPoSwRecord(rawInPoSw)]
       : [];
