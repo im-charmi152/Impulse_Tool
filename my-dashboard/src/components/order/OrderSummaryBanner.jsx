@@ -38,9 +38,9 @@ function OrderSummaryBanner({ order }) {
       icon: Hash,
     },
     {
-      key: "branchNo",
+      key: "custBr",
       label: "Branch Number",
-      value: val(order?.branchNbr) ?? "—",
+      value: val(order?.custBr) ?? "—",
       icon: Building2,
     },
     {
