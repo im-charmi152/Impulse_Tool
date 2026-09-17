@@ -148,7 +148,7 @@ function HeroStat({ label, value }) {
   return (
     <div>
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">{label}</p>
-      <p className="mt-1 text-sm text-[#0F172A]">{value || "—"}</p>
+      <p className="mt-1 text-sm font-medium text-[#0F172A]">{value || "—"}</p>
     </div>
   );
 }
