@@ -286,7 +286,7 @@
    SOURCE KEY ICON
    ========================================================= */
 
-.partner-source-key-icon {
+/* .partner-source-key-icon {
   width: 28px;
   height: 28px;
 
@@ -300,7 +300,7 @@
 
   background: #eff6ff;
   color: #2563eb;
-}
+} */
 
 
 /* =========================================================
@@ -315,7 +315,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 
-  color: #0f172a;
+  color: #1143b8;
+  text-decoration: underline;
 
   font-size: 12px;
   font-weight: 700;

@@ -86,7 +86,7 @@ function SetupTableCell({ column, value }) {
     return (
       <div className="partner-source-key">
         <span className="partner-source-key-icon">
-          <Icon size={12} />
+          {/* <Icon size={12} /> */}
         </span>
         <span
           className={column.key === "srceSysKeyId" ? "partner-source-key-value" : "partner-table-value"}
