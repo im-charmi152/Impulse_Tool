@@ -32,6 +32,8 @@ import {
   Users,
   ShoppingCart,
   Truck,
+  File,
+  Info,
 } from "lucide-react";
 
 import {
@@ -83,7 +85,7 @@ const TAB_GROUP_MAP = {
 
   shipping: ["shippingInfo"],
 
-  technical: [
+  governmentInfo: [
     "governmentInfo",
     "orderFlags",
     "configuration",
@@ -91,7 +93,7 @@ const TAB_GROUP_MAP = {
     "processingInfo",
   ],
 
-  system: ["customerBusinessInfo", "systemInfo"],
+  miscellaneous: ["miscellaneous"],
 };
 
 const TABS = [
@@ -111,14 +113,14 @@ const TABS = [
     icon: Truck,
   },
   {
-    id: "technical",
-    label: "Technical",
-    icon: Cpu,
+    id: "governmentInfo",
+    label: "Compliance",
+    icon: File,
   },
   {
-    id: "system",
-    label: "System",
-    icon: Globe,
+    id: "miscellaneous",
+    label: "Miscellaneous",
+    icon: Info,
   },
 ];
 
@@ -477,11 +479,11 @@ export default function OrderHeaderDetailsPage({ searchParams }) {
       key: "terms",
       icon: DollarSign,
     },
-    {
-      label: "Country",
-      key: "custCoCd",
-      icon: MapPin,
-    },
+    // {
+    //   label: "Country",
+    //   key: "custCoCd",
+    //   icon: MapPin,
+    // },
     {
       label: "Priority Code",
       key: "priorityCode",

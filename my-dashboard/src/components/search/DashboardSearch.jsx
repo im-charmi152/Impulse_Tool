@@ -8,6 +8,7 @@ import {
   Sparkles,
   ChevronDown,
   Check,
+  X,
 } from "lucide-react";
 
 const RECENT_SEARCH_KEY = "impulse_recent_searches";
@@ -150,6 +151,16 @@ function saveRecentSearch(searchItem) {
     return updated;
   } catch {
     return [];
+  }
+}
+
+function clearRecentSearches() {
+  try {
+    localStorage.removeItem(
+      RECENT_SEARCH_KEY
+    );
+  } catch {
+    // Ignore storage failures so the UI stays responsive.
   }
 }
 
@@ -568,6 +579,15 @@ export default function DashboardSearch({
     }
   };
 
+  const handleClearPoNumber = () => {
+    setPoNumber("");
+  };
+
+  const handleClearRecentSearches = () => {
+    clearRecentSearches();
+    setRecentSearches([]);
+  };
+
 
   return (
     <section className="dashboard-search-area">
@@ -668,6 +688,17 @@ export default function DashboardSearch({
                 autoComplete="off"
               />
 
+              {poNumber && (
+                <button
+                  type="button"
+                  className="dashboard-input-clear"
+                  onClick={handleClearPoNumber}
+                  aria-label="Clear PO number"
+                >
+                  <X size={12} />
+                </button>
+              )}
+
             </div>
 
           </div>
@@ -731,13 +762,26 @@ export default function DashboardSearch({
 
         <div className="dashboard-recent">
 
-          <div className="dashboard-recent-label">
+          <div className="dashboard-recent-header">
 
-            <Clock3 size={14} />
+            <div className="dashboard-recent-label">
 
-            <span>
-              Recent Searches
-            </span>
+              <Clock3 size={14} />
+
+              <span>
+                Recent Searches
+              </span>
+
+            </div>
+
+            <button
+              type="button"
+              className="dashboard-recent-clear"
+              onClick={handleClearRecentSearches}
+              disabled={recentSearches.length === 0}
+            >
+              Clear Search
+            </button>
 
           </div>
 
