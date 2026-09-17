@@ -356,6 +356,15 @@ namespace ImpulseSupportTool_Repo
         public string CycleLstRunTs { get; set; }
         public string BatchSplitCnt { get; set; }
         public string CycStrtTm { get; set; }
+
+        // Additional columns
+        public string CycEndTm { get; set; }
+        public string OvrdApplBatchId { get; set; }
+        public string TransAuthId { get; set; }
+        public string CorrelId { get; set; }
+        public string PlanNam { get; set; }
+        public string OdsIsrtTs { get; set; }
+        public string OdsUpdTs { get; set; }
     }
     public class OrderInPoSw
     {
