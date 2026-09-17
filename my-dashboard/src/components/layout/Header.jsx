@@ -15,7 +15,7 @@ function Header({ toggleSidebar }) {
         <img
           src={radiusHeaderLogo}
           alt="RADIUS and IMPULSE Logo"
-          className="h-11 w-auto"
+          className="h-13 w-auto"
         />
       </div>
       <div className="flex items-center gap-1">
