@@ -376,6 +376,59 @@
   color: #94a3b8;
 }
 
+.dashboard-input-clear {
+  width: 20px;
+
+  height: 20px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  border: none;
+
+  border-radius: 999px;
+
+  background: transparent;
+
+  color: #94a3b8;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.dashboard-input-clear:hover {
+  background: #eff6ff;
+
+  color: #2563eb;
+}
+
+.dashboard-input-clear:focus-visible {
+  outline: none;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+
+  box-shadow:
+    0 0 0 2px rgba(59, 130, 246, 0.12);
+}
+
+.dashboard-input-clear svg {
+  width: 12px;
+
+  height: 12px;
+}
+
 
 /* =========================================================
    COUNTRY DROPDOWN
@@ -1073,7 +1126,7 @@
 .dashboard-recent {
   display: flex;
 
-  align-items: center;
+  align-items: flex-start;
 
   gap: 14px;
 
@@ -1082,6 +1135,16 @@
   padding-top: 12px;
 
   border-top: 1px solid #e7eef7;
+}
+
+.dashboard-recent-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  flex-shrink: 0;
 }
 
 .dashboard-recent-label {
@@ -1098,6 +1161,53 @@
   font-size: 10px;
 
   font-weight: 700;
+}
+
+.dashboard-recent-clear {
+  height: 27px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 0 10px;
+
+  white-space: nowrap;
+
+  border: 1px solid #e1eaf5;
+
+  border-radius: 13px;
+
+  background: #ffffff;
+
+  color: #64748b;
+
+  font-size: 9.5px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.dashboard-recent-clear:hover:not(:disabled) {
+  background: #f8fbff;
+
+  border-color: #bfdbfe;
+
+  color: #2563eb;
+}
+
+.dashboard-recent-clear:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
 }
 
 .dashboard-recent-label svg {
@@ -1240,6 +1350,12 @@
     flex-direction: column;
 
     gap: 7px;
+  }
+
+  .dashboard-recent-header {
+    width: 100%;
+
+    justify-content: space-between;
   }
 
   .dashboard-recent-list {

@@ -18,7 +18,7 @@ export function EmptyState() {
         <SearchX size={22} className="text-[#6B7280]" />
       </div>
       <div className="text-sm font-semibold text-[#1F2937] mb-1">
-        No matching order found
+        Order Not found
       </div>
       <div className="text-xs text-[#6B7280] max-w-xs">
         Double-check the value and try another identifier — Order Number,
