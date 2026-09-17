@@ -299,13 +299,13 @@ export default function Dashboard() {
 
           {status === "idle" && (
             <div
-              className="relative -mt-20 mb-8 pointer-events-none z-0 flex justify-center opacity-20"
+              className="flex justify-center items-center mt-12 mb-20 pointer-events-none"
               aria-hidden="true"
             >
               <img
                 src={radiusWatermark}
                 alt=""
-                className="w-64 h-64 object-contain"
+                className="w-[500px] h-[500px] object-contain opacity-80"
               />
             </div>
           )}
