@@ -3,6 +3,10 @@ import { GitBranch, Check, AlertTriangle, X, Clock3 } from "lucide-react";
 
 import SectionCard from "../common/SectionCard";
 
+/* ============================================================
+   FLOW STEPS
+============================================================ */
+
 const FLOW_STEPS = [
   {
     id: 1,
@@ -14,7 +18,7 @@ const FLOW_STEPS = [
   },
   {
     id: 4,
-    name: "C : E",
+    name: "C:E / MQ",
   },
   {
     id: 5,
@@ -25,6 +29,10 @@ const FLOW_STEPS = [
     name: "Processed at EDI",
   },
 ];
+
+/* ============================================================
+   STATUS CONFIG
+============================================================ */
 
 const STATUS = {
   success: {
@@ -48,7 +56,13 @@ const STATUS = {
   },
 };
 
-const EDI_SUCCESS_STATES = new Set(["75EDP799"]);
+/* ============================================================
+   EDI STATES
+============================================================ */
+
+const EDI_SUCCESS_STATES = new Set([
+  "75EDP799",
+]);
 
 const EDI_WARNING_STATES = new Set([
   "05EDP555",
@@ -62,12 +76,18 @@ const EDI_WARNING_STATES = new Set([
   "9999OMIT",
 ]);
 
+/* ============================================================
+   GET EDI STATUS
+============================================================ */
+
 function getEdiStatus(eoStateCd) {
   if (!eoStateCd) {
     return "pending";
   }
 
-  const normalizedState = String(eoStateCd).trim().toUpperCase();
+  const normalizedState = String(eoStateCd)
+    .trim()
+    .toUpperCase();
 
   if (EDI_SUCCESS_STATES.has(normalizedState)) {
     return "success";
@@ -80,15 +100,25 @@ function getEdiStatus(eoStateCd) {
   return "pending";
 }
 
+/* ============================================================
+   LEGEND
+============================================================ */
+
 function LegendItem({ color, label }) {
   return (
     <div className="flex items-center gap-1.5">
       <span className={`w-2.5 h-2.5 rounded-full ${color}`} />
 
-      <span className="text-[11px] text-[#6B7280]">{label}</span>
+      <span className="text-[11px] text-[#6B7280]">
+        {label}
+      </span>
     </div>
   );
 }
+
+/* ============================================================
+   MAIN COMPONENT
+============================================================ */
 
 export default function ProcessFlowSection({ eoStateCd }) {
   const ediStatus = getEdiStatus(eoStateCd);
@@ -106,9 +136,10 @@ export default function ProcessFlowSection({ eoStateCd }) {
    */
   const [currentStep, setCurrentStep] = useState(-1);
 
-  /*
-   * Start the journey again whenever eoStateCd changes.
-   */
+  /* ==========================================================
+     RESTART ANIMATION WHEN STATE CHANGES
+  ========================================================== */
+
   useEffect(() => {
     setCurrentStep(-1);
 
@@ -117,18 +148,19 @@ export default function ProcessFlowSection({ eoStateCd }) {
     }
 
     /*
-     * Small delay before starting.
+     * Small initial delay.
      */
     const startTimer = setTimeout(() => {
       setCurrentStep(0);
-    }, 500);
+    }, 300);
 
     return () => clearTimeout(startTimer);
   }, [eoStateCd, ediStatus]);
 
-  /*
-   * Move from one step to the next.
-   */
+  /* ==========================================================
+     MOVE TO NEXT STEP
+  ========================================================== */
+
   useEffect(() => {
     if (currentStep < 0) {
       return;
@@ -149,36 +181,42 @@ export default function ProcessFlowSection({ eoStateCd }) {
      *
      * Continue until final step.
      */
-    if (ediStatus === "success" && currentStep >= FLOW_STEPS.length - 1) {
+    if (
+      ediStatus === "success" &&
+      currentStep >= FLOW_STEPS.length - 1
+    ) {
       return;
     }
 
     /*
-     * Slowly move to the next step.
+     * Move quickly to next step.
+     *
+     * 600ms gives a fast progress-bar
+     * feeling without being instant.
      */
     const timer = setTimeout(() => {
       setCurrentStep((prev) => prev + 1);
-    }, 1800);
+    }, 600);
 
     return () => clearTimeout(timer);
   }, [currentStep, ediStatus]);
 
-  /*
-   * Determine status of each circle.
-   */
+  /* ============================================================
+     STEP STATUS
+  ============================================================ */
+
   function getStepStatus(index) {
     /*
-     * Before animation starts
+     * Animation has not started.
      */
     if (currentStep < 0) {
       return "pending";
     }
 
-    /*
-     * SUCCESS:
-     *
-     * Steps already reached = green
-     */
+    /* ----------------------------------------------------------
+       SUCCESS
+    ---------------------------------------------------------- */
+
     if (ediStatus === "success") {
       if (index <= currentStep) {
         return "success";
@@ -187,43 +225,44 @@ export default function ProcessFlowSection({ eoStateCd }) {
       return "pending";
     }
 
-    /*
-     * WARNING:
-     *
-     * Steps before warning point = green
-     * Warning point = amber
-     * After warning point = pending
-     */
+    /* ----------------------------------------------------------
+       WARNING
+    ---------------------------------------------------------- */
+
     if (ediStatus === "warning") {
+      /*
+       * Steps before warning point become green.
+       */
       if (index < 3 && index <= currentStep) {
         return "success";
       }
 
+      /*
+       * Warning node.
+       */
       if (index === 3 && currentStep >= 3) {
         return "warning";
       }
 
+      /*
+       * Final step stays pending.
+       */
       return "pending";
     }
 
     return "pending";
   }
 
-  /*
-   * Determine connector status.
-   */
-  function getConnectorStatus(index) {
-    /*
-     * Connector is between:
-     *
-     * index -> index + 1
-     */
+  /* ============================================================
+     CONNECTOR STATUS
+  ============================================================ */
 
+  function getConnectorStatus(index) {
     /*
      * SUCCESS
      *
-     * Connector becomes green only
-     * after the destination step is reached.
+     * Connector becomes permanently green
+     * after destination step is reached.
      */
     if (ediStatus === "success") {
       if (index < currentStep) {
@@ -236,8 +275,8 @@ export default function ProcessFlowSection({ eoStateCd }) {
     /*
      * WARNING
      *
-     * Connectors up to Not Processed
-     * become green as the journey progresses.
+     * Connectors before warning point
+     * become green as the flow progresses.
      */
     if (ediStatus === "warning") {
       if (index < 3 && index < currentStep) {
@@ -250,25 +289,32 @@ export default function ProcessFlowSection({ eoStateCd }) {
     return "pending";
   }
 
-  /*
-   * Determine which connector currently
-   * contains the moving particle.
-   */
+  /* ============================================================
+     CURRENT ANIMATING CONNECTOR
+  ============================================================ */
+
   function isAnimatingConnector(index) {
     if (ediStatus === "pending") {
       return false;
     }
 
     /*
-     * Particle travels from current step
-     * toward the next step.
+     * Current connector is the connector
+     * immediately after the current step.
      */
     return (
       index === currentStep &&
       currentStep < FLOW_STEPS.length - 1 &&
-      !(ediStatus === "warning" && currentStep >= 3)
+      !(
+        ediStatus === "warning" &&
+        currentStep >= 3
+      )
     );
   }
+
+  /* ============================================================
+     RENDER
+  ============================================================ */
 
   return (
     <SectionCard
@@ -276,35 +322,59 @@ export default function ProcessFlowSection({ eoStateCd }) {
       title="Processing Flow Status"
       actions={
         <div className="flex items-center gap-5">
-          <LegendItem color="bg-green-500" label="Success" />
+          <LegendItem
+            color="bg-green-500"
+            label="Success"
+          />
 
-          <LegendItem color="bg-amber-400" label="Warning" />
+          <LegendItem
+            color="bg-amber-400"
+            label="Warning"
+          />
 
-          <LegendItem color="bg-red-500" label="Failed" />
+          <LegendItem
+            color="bg-red-500"
+            label="Failed"
+          />
 
-          <LegendItem color="bg-gray-400" label="Pending" />
+          <LegendItem
+            color="bg-gray-400"
+            label="Pending"
+          />
         </div>
       }
     >
       <div className="overflow-x-auto">
         <div className="flex justify-between items-start min-w-[900px] px-4 py-5">
+
           {FLOW_STEPS.map((step, index) => {
             const stepStatus = getStepStatus(index);
+
             const cfg = STATUS[stepStatus];
+
             const Icon = cfg.icon;
 
-            const connectorStatus = getConnectorStatus(index);
+            const connectorStatus =
+              getConnectorStatus(index);
 
-            const connectorAnimating = isAnimatingConnector(index);
+            const connectorAnimating =
+              isAnimatingConnector(index);
 
             return (
               <div
                 key={step.id}
-                className="relative flex flex-col items-center flex-1"
+                className="
+                  relative
+                  flex
+                  flex-col
+                  items-center
+                  flex-1
+                "
               >
-                {/* =========================
+
+                {/* =================================================
                     CONNECTOR
-                   ========================= */}
+                ================================================= */}
 
                 {index !== FLOW_STEPS.length - 1 && (
                   <div
@@ -313,29 +383,37 @@ export default function ProcessFlowSection({ eoStateCd }) {
                       top-4
                       left-1/2
                       w-full
-                      h-[3px]
+                      h-[4px]
                       rounded-full
                       overflow-hidden
                       transition-colors
-                      duration-700
+                      duration-200
+
                       ${
                         connectorStatus === "success"
                           ? "bg-green-500"
                           : "bg-gray-300"
                       }
                     `}
-                    style={{ zIndex: 0 }}
+                    style={{
+                      zIndex: 0,
+                    }}
                   >
-                    {/* Moving particle */}
+
+                    {/* ------------------------------------------------
+                        GREEN PROGRESS BAR
+                    ------------------------------------------------ */}
+
                     {connectorAnimating && (
                       <span className="flow-travel-particle" />
                     )}
+
                   </div>
                 )}
 
-                {/* =========================
+                {/* =================================================
                     CIRCLE
-                   ========================= */}
+                ================================================= */}
 
                 <div
                   className={`
@@ -349,25 +427,39 @@ export default function ProcessFlowSection({ eoStateCd }) {
                     justify-center
                     shadow-sm
                     transition-all
-                    duration-700
+                    duration-200
+
                     ${cfg.bg}
-                    ${stepStatus === "success" ? "flow-success-pop" : ""}
-                    ${stepStatus === "warning" ? "flow-warning-pop" : ""}
+
+                    ${
+                      stepStatus === "success"
+                        ? "flow-success-pop"
+                        : ""
+                    }
+
+                    ${
+                      stepStatus === "warning"
+                        ? "flow-warning-pop"
+                        : ""
+                    }
                   `}
                 >
                   <Icon
                     size={15}
                     className={
-                      stepStatus === "pending" ? "text-gray-500" : "text-white"
+                      stepStatus === "pending"
+                        ? "text-gray-500"
+                        : "text-white"
                     }
                   />
                 </div>
 
-                {/* =========================
+                {/* =================================================
                     LABEL
-                   ========================= */}
+                ================================================= */}
 
                 <div className="mt-4 text-center">
+
                   <div
                     className="
                       text-[11px]
@@ -392,72 +484,86 @@ export default function ProcessFlowSection({ eoStateCd }) {
                         ? "Not Processed"
                         : ""}
                   </div>
+
                 </div>
+
               </div>
             );
           })}
+
         </div>
       </div>
 
-      {/* =========================
+      {/* ============================================================
           ANIMATION CSS
-         ========================= */}
+      ============================================================ */}
 
       <style>
         {`
-          /*
-           * Moving particle.
-           *
-           * It starts from the LEFT
-           * and slowly travels to the RIGHT.
-           */
+
+          /* ==========================================================
+             GREEN PROGRESS BAR
+          ========================================================== */
+
           @keyframes flowTravel {
+
             0% {
-              left: -6px;
-              opacity: 0;
-            }
-
-            15% {
-              opacity: 1;
-            }
-
-            85% {
+              width: 0%;
               opacity: 1;
             }
 
             100% {
-              left: calc(100% - 6px);
-              opacity: 0;
+              width: 100%;
+              opacity: 1;
             }
+
           }
+
+
+          /*
+           * This is no longer a white moving dot.
+           *
+           * It behaves like a progress bar:
+           *
+           * LEFT → RIGHT
+           *
+           * 0% → 100%
+           */
 
           .flow-travel-particle {
+
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
 
-            width: 10px;
-            height: 10px;
+            top: 0;
+            left: 0;
 
-            border-radius: 50%;
+            width: 0%;
+            height: 100%;
 
-            background: white;
+            border-radius: 999px;
+
+            background: #22c55e;
 
             box-shadow:
-              0 0 4px rgba(255,255,255,0.9),
-              0 0 10px rgba(255,255,255,0.8),
-              0 0 16px rgba(255,255,255,0.5);
+              0 0 5px rgba(34, 197, 94, 0.9),
+              0 0 10px rgba(34, 197, 94, 0.65),
+              0 0 16px rgba(34, 197, 94, 0.35);
 
             animation:
-              flowTravel 1.8s
+              flowTravel
+              0.6s
               cubic-bezier(0.4, 0, 0.2, 1)
               forwards;
+
           }
 
-          /*
-           * Small pop when a step becomes successful.
-           */
+
+          /* ==========================================================
+             SUCCESS NODE POP
+          ========================================================== */
+
           @keyframes successPop {
+
             0% {
               transform: scale(0.75);
               opacity: 0.5;
@@ -465,24 +571,33 @@ export default function ProcessFlowSection({ eoStateCd }) {
 
             60% {
               transform: scale(1.12);
+              opacity: 1;
             }
 
             100% {
               transform: scale(1);
               opacity: 1;
             }
+
           }
+
 
           .flow-success-pop {
+
             animation:
-              successPop 0.5s
+              successPop
+              0.25s
               ease-out;
+
           }
 
-          /*
-           * Small pop for warning node.
-           */
+
+          /* ==========================================================
+             WARNING NODE POP
+          ========================================================== */
+
           @keyframes warningPop {
+
             0% {
               transform: scale(0.75);
               opacity: 0.5;
@@ -490,19 +605,26 @@ export default function ProcessFlowSection({ eoStateCd }) {
 
             60% {
               transform: scale(1.12);
+              opacity: 1;
             }
 
             100% {
               transform: scale(1);
               opacity: 1;
             }
+
           }
 
+
           .flow-warning-pop {
+
             animation:
-              warningPop 0.5s
+              warningPop
+              0.25s
               ease-out;
+
           }
+
         `}
       </style>
     </SectionCard>

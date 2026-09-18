@@ -32,17 +32,18 @@ function OrderSummaryBanner({ order }) {
       icon: FileText,
     },
     {
+      key: "custBr",
+      label: "Branch Number",
+      value: val(order?.custBr) ?? "—",
+      icon: Building2,
+    },
+    {
       key: "orderNo",
       label: "Order Number",
       value: firstValue(order, ["ordrNbr", "imiAsgdOrdrNbr"]) ?? "—",
       icon: Hash,
     },
-    {
-      key: "branchNo",
-      label: "Branch Number",
-      value: val(order?.branchNbr) ?? "—",
-      icon: Building2,
-    },
+    
     {
       key: "custPoDate",
       label: "Customer PO Date",
