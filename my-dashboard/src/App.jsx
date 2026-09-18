@@ -266,16 +266,19 @@ export default function Dashboard() {
           ====================================================== */}
 
           {status === "idle" && (
-            <div
-              className="flex justify-center items-center -mt-32 mb-4 pointer-events-none"
-              aria-hidden="true"
-            >
-              <img
-                src={radiusWatermark}
-                alt=""
-                className="w-[500px] h-[500px] object-contain opacity-80"
-              />
-            </div>
+              <div
+    className="pointer-events-none relative -mt-20 h-[420px] overflow-visible"
+    aria-hidden="true"
+  >
+    <img
+      src={radiusWatermark}
+      alt=""
+      className="absolute left-1/2 top-1/2
+                 -translate-x-1/2 -translate-y-1/2
+                 w-[600px] h-[600px]
+                 object-contain opacity-50"
+    />
+  </div>
           )}
 
           {/* ======================================================

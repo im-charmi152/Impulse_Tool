@@ -640,7 +640,7 @@ export default function DashboardSearch({
           <div>
 
             <h2>
-              Search Investigation
+            Hey Good day! Let's analyze, diagnose, and resolve.
             </h2>
 
             <p>
@@ -788,13 +788,7 @@ export default function DashboardSearch({
 
           <div className="dashboard-recent-list">
 
-            {recentSearches.length === 0 ? (
-
-              <span className="dashboard-no-recent">
-                Recent investigations will appear here
-              </span>
-
-            ) : (
+            {
 
               recentSearches
                 .slice(0, 5)
@@ -825,7 +819,7 @@ export default function DashboardSearch({
 
                 ))
 
-            )}
+            }
 
           </div>
 
