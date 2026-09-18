@@ -247,7 +247,25 @@ export default function Dashboard() {
   // ============================================================
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans">
+    <div className="min-h-screen font-sans" style={{
+      background: `
+        radial-gradient(
+          circle at 5% 20%,
+          rgba(59, 130, 246, 0.07),
+          transparent 25%
+        ),
+        radial-gradient(
+          circle at 95% 20%,
+          rgba(96, 165, 250, 0.06),
+          transparent 25%
+        ),
+        linear-gradient(
+          135deg,
+          #f7fbff 0%,
+          #ffffff 50%,
+          #f5f9ff 100%
+        )`
+    }}>
 
       {/* ========================================================
           HEADER
@@ -299,7 +317,7 @@ export default function Dashboard() {
 
           {status === "idle" && (
             <div
-              className="flex justify-center items-center mt-12 mb-20 pointer-events-none"
+              className="flex justify-center items-center -mt-32 mb-4 pointer-events-none"
               aria-hidden="true"
             >
               <img
