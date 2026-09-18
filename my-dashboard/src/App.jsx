@@ -208,7 +208,6 @@ export default function Dashboard() {
   // ============================================================
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen font-sans" style={{
       background: `
         radial-gradient(
@@ -229,9 +228,6 @@ export default function Dashboard() {
         )`
     }}>
 
-=======
-    <div className="min-h-screen bg-[#F8FAFC] font-sans">
->>>>>>> f34b6bd7917e1c0745dd7d5920a6b734930f31f2
       {/* ========================================================
           HEADER
       ======================================================== */}
