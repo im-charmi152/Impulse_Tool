@@ -182,7 +182,7 @@ export default function ProcessFlowSection({ eoStateCd }) {
               text-[#374151]
             "
           >
-            No data present in ODS
+            No data Available
           </div>
 
           <div
