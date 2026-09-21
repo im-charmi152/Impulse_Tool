@@ -56,16 +56,14 @@ const TAB_GROUP_MAP = {
   business: ["identity", "part", "quantities", "routing"],
   financial: ["pricing", "taxes", "promotion"],
   shipping: ["dates", "warehouse"],
-  technical: ["configuration", "acop", "allocation"],
-  system: ["flags", "advanced"],
+  miscellaneous: ["configuration", "acop", "allocation", "flags", "advanced"],
 };
 
 const TABS = [
   { id: "business", label: "Business", icon: ShoppingCart },
   { id: "financial", label: "Financial", icon: DollarSign },
   { id: "shipping", label: "Shipping", icon: Truck },
-  { id: "technical", label: "Technical", icon: Cpu },
-  { id: "system", label: "System", icon: Globe },
+  { id: "miscellaneous", label: "Miscellaneous", icon: Settings },
 ];
 
 const KEY_INFO_FIELDS = [
@@ -134,7 +132,7 @@ function KeyInfoTile({ field, value }) {
       <div className="min-w-0 flex-1">
         <p className="text-[9px] uppercase tracking-wide text-[#64748B] mb-0.5">{field.label}</p>
         <div className="flex items-center gap-1">
-          <div className="min-w-0 text-sm font-semibold text-[#0F172A] truncate">
+          <div className="min-w-0 text-sm font-bold text-black truncate">
             {formatDetailValue(field, value)}
           </div>
           {field.copyable && <CopyButton value={value} />}

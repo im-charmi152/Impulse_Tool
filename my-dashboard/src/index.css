@@ -53,8 +53,8 @@ body {
 }
 
 .field-value {
-	color: var(--text-primary);
-	font-weight: 400;
+	color: #000000;
+	font-weight: 700;
 }
 
 button,
