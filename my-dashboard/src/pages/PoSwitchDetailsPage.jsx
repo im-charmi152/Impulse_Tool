@@ -300,7 +300,7 @@ function SummaryInfoTile({ field, value }) {
       <div className="min-w-0 flex-1">
         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#64748B]">{field.label}</p>
         <div className="mt-1 flex items-center gap-1.5">
-          <div className="min-w-0 text-sm font-semibold text-[#0F172A] break-words">{formatDetailValue(field, value)}</div>
+          <div className="min-w-0 text-sm font-bold text-black break-words">{formatDetailValue(field, value)}</div>
           {field.copyable && <CopyButton value={value} />}
         </div>
       </div>

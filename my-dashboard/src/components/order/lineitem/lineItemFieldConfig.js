@@ -347,14 +347,12 @@ export const LINE_ITEM_TAB_GROUP_MAP = {
   business: ["identity", "part", "quantities", "routing"],
   financial: ["pricing", "taxes", "promotion"],
   shipping: ["dates", "warehouse"],
-  technical: ["configuration", "acop", "allocation"],
-  system: ["flags", "advanced"],
+  miscellaneous: ["configuration", "acop", "allocation", "flags", "advanced"],
 };
 
 export const LINE_ITEM_TABS = [
   { id: "business", label: "Business", icon: "ShoppingCart" },
   { id: "financial", label: "Financial", icon: "DollarSign" },
   { id: "shipping", label: "Shipping", icon: "Truck" },
-  { id: "technical", label: "Technical", icon: "Cpu" },
-  { id: "system", label: "System", icon: "Globe" },
+  { id: "miscellaneous", label: "Miscellaneous", icon: "Settings" },
 ];
