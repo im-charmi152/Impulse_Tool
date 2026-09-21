@@ -812,85 +812,81 @@ namespace OrderManagement.API.Repositories
             //                            $"{response.BillToSfx?.Trim()}";
 
             string partnerQuery = @"
-            SELECT
-                CO_CD,
-                PARTNER_ID,
-                PARTNER_TYPE_CD,
-                SRCE_SYS_ID,
-                SRCE_SYS_KEY_ID,
-                FORMAT_ID,
-                DIR_FLG_CD,
-                DOC_ID,
-                FREQ_ID,
-                DATA_STORE_MECH_ID,
-                COMMU_ID,
-                INTERNET_ADDR_TXT,
-                ACTV_DT,
-                DEACTV_DT,
-                HOLD_CD,
-                SETUP_NOTES_TXT,
-                SEND_THRU_ID,
-                LST_CHG_TS,
-                LST_CHG_NAM,
-                PRCS_OPTN_FLG,
-                CYCLE_INTVL,
-                CYCLE_LST_RUN_TS,
-                BATCH_SPLIT_CNT,
-                CYC_STRT_TM,
-                CYC_END_TM,
-                OVRD_APPL_BATCH_ID,
-                TRANS_AUTH_ID,
-                CORREL_ID,
-                PLAN_NAM,
-                ODS_ISRT_TS,
-                ODS_UPD_TS
-             FROM ODS.DB2_IE_PARTNER_SETUP
-             WHERE CO_CD = :pco_cd
-             AND TRIM(PARTNER_ID) = :ppartner_id";
+                SELECT
+                    CO_CD,
+                    PARTNER_ID,
+                    PARTNER_TYPE_CD,
+                    SRCE_SYS_ID,
+                    SRCE_SYS_KEY_ID,
+                    FORMAT_ID,
+                    DIR_FLG_CD,
+                    DOC_ID,
+                    FREQ_ID,
+                    DATA_STORE_MECH_ID,
+                    COMMU_ID,
+                    INTERNET_ADDR_TXT,
+                    ACTV_DT,
+                    DEACTV_DT,
+                    HOLD_CD,
+                    SETUP_NOTES_TXT,
+                    SEND_THRU_ID,
+                    LST_CHG_TS,
+                    LST_CHG_NAM,
+                    PRCS_OPTN_FLG,
+                    CYCLE_INTVL,
+                    CYCLE_LST_RUN_TS,
+                    BATCH_SPLIT_CNT,
+                    CYC_STRT_TM,
+                    CYC_END_TM,
+                    OVRD_APPL_BATCH_ID,
+                    TRANS_AUTH_ID,
+                    CORREL_ID,
+                    PLAN_NAM,
+                    ODS_ISRT_TS,
+                    ODS_UPD_TS
+                FROM ODS.DB2_IE_PARTNER_SETUP
+                WHERE CO_CD = :pco_cd
+                  AND TRIM(PARTNER_ID) = :ppartner_id";
 
-            //WHERE CO_CD = :companyCode
-            // AND SRCE_SYS_KEY_ID = :combinedValue";
+            string partnerCoCd = response.CustCoCd?.Trim() switch
+            {
+                "MD" => "US",
+                "FT" => "CA",
+                _ => response.CustCoCd?.Trim()
+            };
 
-
-            string partnerCoCd = response.CustCoCd?.Trim() switch { "MD" => "US", "FT" => "CA", _ => response.CustCoCd?.Trim() };
-            Console.WriteLine($">>> PARTNER SETUP CO_CD: Incoming={response.CustCoCd}, QueryValue={partnerCoCd}");
-
-            //string inPoSwCoCd = response.EoPartnerId;
-            //string inPoSwPartnerId = response.EoPartnerId;
+            Console.WriteLine(
+                $">>> PARTNER SETUP CO_CD: Incoming={response.CustCoCd}, QueryValue={partnerCoCd}");
 
             try
             {
-                await using OracleCommand partnerCmd = new OracleCommand(partnerQuery, conn);
+                await using OracleCommand partnerCmd =
+                    new OracleCommand(partnerQuery, conn);
+
                 partnerCmd.BindByName = true;
-                partnerCmd.Parameters.Add("pco_cd", OracleDbType.Varchar2).Value = partnerCoCd;
 
-                // CHANGED: was response.PartnerId?.Trim()
-                //    partnerCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = response.PartnerId?.Trim();
-                partnerCmd.Parameters.Add("ppartner_id", OracleDbType.Varchar2).Value = response.EoPartnerId?.Trim();
-                //partnerCmd.Parameters.Add("partnerId", OracleDbType.Varchar2).Value = "470887";
+                partnerCmd.Parameters.Add(
+                    "pco_cd",
+                    OracleDbType.Varchar2
+                ).Value = partnerCoCd ?? (object)DBNull.Value;
 
-                Console.WriteLine($">>> EXECUTING ODS PARTNER SETUP QUERY...");
-                Console.WriteLine($">>> PARTNER CO_CD PARAMETER: {response.CustCoCd}");
+                partnerCmd.Parameters.Add(
+                    "ppartner_id",
+                    OracleDbType.Varchar2
+                ).Value = response.EoPartnerId?.Trim() ?? (object)DBNull.Value;
 
-                //Console.WriteLine($">>> PARTNER ID PARAMETER: {response.PartnerId1?.Trim()}");
-                //Console.WriteLine($"CombinedValue   : [{combinedValue}]");
-                //Console.WriteLine($"CombinedValue : [{combinedValue}]");
-                //Console.WriteLine($"Length        : {combinedValue.ToString().Length}");
+                Console.WriteLine(">>> EXECUTING ODS PARTNER SETUP QUERY...");
+                Console.WriteLine($">>> PARTNER CO_CD PARAMETER: {partnerCoCd}");
+                Console.WriteLine($">>> PARTNER ID PARAMETER: {response.EoPartnerId?.Trim()}");
 
+                await using OracleDataReader partnerReader =
+                    await partnerCmd.ExecuteReaderAsync();
 
-
-                await using OracleDataReader partnerReader = await partnerCmd.ExecuteReaderAsync();
-
-                Console.WriteLine($">>> ODS PARTNER SETUP READER HAS ROWS: {partnerReader.HasRows}");
+                Console.WriteLine(
+                    $">>> ODS PARTNER SETUP READER HAS ROWS: {partnerReader.HasRows}");
 
                 while (await partnerReader.ReadAsync())
                 {
-                    //inPoSwCoCd = partnerReader["CO_CD"]?.ToString()?.Trim();
-                    //inPoSwPartnerId = partnerReader["PARTNER_ID"]?.ToString()?.Trim();
-
-                    Console.WriteLine($">>> PARTNER CO_CD: {response.CustCoCd}");
-                    Console.WriteLine($">>> PARTNER ID: {response.EoPartnerId}");
-
                     response.PartnerSetup.Add(new OrderPartnerSetup
                     {
                         CoCd = partnerReader["CO_CD"]?.ToString()?.Trim(),
@@ -916,19 +912,23 @@ namespace OrderManagement.API.Repositories
                         CycleIntvl = partnerReader["CYCLE_INTVL"]?.ToString()?.Trim(),
                         CycleLstRunTs = partnerReader["CYCLE_LST_RUN_TS"]?.ToString()?.Trim(),
                         BatchSplitCnt = partnerReader["BATCH_SPLIT_CNT"]?.ToString()?.Trim(),
-                        CycStrtTm = partnerReader["CYC_STRT_TM"]?.ToString()?.Trim()
+                        CycStrtTm = partnerReader["CYC_STRT_TM"]?.ToString()?.Trim(),
+                        CycEndTm = partnerReader["CYC_END_TM"]?.ToString()?.Trim(),
+                        OvrdApplBatchId = partnerReader["OVRD_APPL_BATCH_ID"]?.ToString()?.Trim(),
+                        TransAuthId = partnerReader["TRANS_AUTH_ID"]?.ToString()?.Trim(),
+                        CorrelId = partnerReader["CORREL_ID"]?.ToString()?.Trim(),
+                        PlanNam = partnerReader["PLAN_NAM"]?.ToString()?.Trim(),
+                        OdsIsrtTs = partnerReader["ODS_ISRT_TS"]?.ToString()?.Trim(),
+                        OdsUpdTs = partnerReader["ODS_UPD_TS"]?.ToString()?.Trim()
                     });
-
-                    //response.PartnerSetup.Add(partnerSetup);
-
-
                 }
             }
-
             catch (OracleException ex)
             {
-                Console.WriteLine($">>> PARTNER SETUP ORACLE ERROR: {ex.Message}");
+                Console.WriteLine($">>> ODS PARTNER SETUP ERROR: {ex.Message}");
+                throw;
             }
+
             Console.WriteLine($">>> ODS IE_PARTNER_SETUP ROW COUNT: {response.PartnerSetup.Count}");
             string inPoSwQuery = @"
                 SELECT
