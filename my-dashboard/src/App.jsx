@@ -487,7 +487,7 @@ export default function Dashboard() {
               FOOTER
           ====================================================== */}
 
-          <div className="mt-6 pb-4 text-center text-[10px] text-[#6B7280] flex items-center justify-between">
+          {/* <div className="mt-6 pb-4 text-center text-[10px] text-[#6B7280] flex items-center justify-between">
             <span>© 2024 Ingram Micro Inc. All Rights Reserved.</span>
 
             <div className="flex gap-4">
@@ -495,7 +495,7 @@ export default function Dashboard() {
 
               <button className="hover:text-[#0F6CBD]">Terms of Use</button>
             </div>
-          </div>
+          </div> */}
         </div>
       </main>
     </div>
