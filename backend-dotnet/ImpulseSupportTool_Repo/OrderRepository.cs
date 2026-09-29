@@ -11,34 +11,38 @@ namespace OrderManagement.API.Repositories
     public class OrderRepository : IOrderRepository
     {
         private readonly IConfiguration _configuration;
-        private object combinedValue;
 
         public OrderRepository(IConfiguration configuration)
         {
             _configuration = configuration;
         }
+
         public async Task<OrderResponse> GetOrder(OrderRequest request)
         {
-            Console.WriteLine($">>> QUERY PARAMS: PoNumber='{request.PoNumber}' CountryCode='{request.CountryCode}'");
-            // Resolve ODS schema zone from country code (Z1/Z2/Z3/Z4)
-            //string zone = ZoneMapper.GetZone(request.CountryCode);
-            //Console.WriteLine($">>> RESOLVED ZONE: {zone} for CountryCode='{request.CountryCode}'");
-            // Get Oracle ODS connection string
-            string connectionString = _configuration.GetConnectionString("ODSConnection");
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                throw new InvalidOperationException(
-                    "ODSConnection is not configured.");
-            }
+            Console.WriteLine(
+                $">>> QUERY PARAMS: " +
+                $"PoNumber='{request.PoNumber}' " +
+                $"CountryCode='{request.CountryCode}' " +
+                $"Environment='{request.Environment}'");
+
+            // Get ODS connection string based on incoming environment
+            string connectionString =
+                new EnviormentMapper(_configuration)
+                    .GetOdsConnectionString(request.Environment);
+
+            Console.WriteLine(
+                $">>> ODS ENVIRONMENT: {request.Environment}");
+
             // Create Oracle connection
-            await using OracleConnection conn = new OracleConnection(connectionString);
+            await using OracleConnection conn =
+                new OracleConnection(connectionString);
 
             await conn.OpenAsync();
 
-            Console.WriteLine(">>> ODS ORACLE CONNECTION OPENED OK");
+            Console.WriteLine(
+                ">>> ODS ORACLE CONNECTION OPENED OK");
 
             OrderResponse response = null;
-
 
             string headerQuery = @"
                     SELECT
