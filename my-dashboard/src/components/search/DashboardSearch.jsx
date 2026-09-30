@@ -332,6 +332,7 @@ function CountryDropdown({
 
       <button
         type="button"
+        id="dashboard-environment"
         className={`dashboard-country-trigger ${
           open ? "is-open" : ""
         }`}
@@ -500,6 +501,173 @@ function CountryDropdown({
 
 
 /* =========================================================
+   ENVIRONMENT DROPDOWN
+   ========================================================= */
+
+function EnvironmentDropdown({
+  value,
+  onChange,
+  options,
+}) {
+  const [open, setOpen] = useState(false);
+
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(
+          event.target
+        )
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener(
+      "mousedown",
+      handleOutsideClick
+    );
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleOutsideClick
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener(
+      "keydown",
+      handleEscape
+    );
+
+    return () => {
+      document.removeEventListener(
+        "keydown",
+        handleEscape
+      );
+    };
+  }, []);
+
+  const selectedEnvironment = options.find(
+    (environment) => environment === value
+  );
+
+  const handleSelect = (environment) => {
+    onChange(environment);
+
+    setOpen(false);
+  };
+
+  const handleTriggerKeyDown = (event) => {
+    if (
+      event.key === "Enter" ||
+      event.key === " "
+    ) {
+      event.preventDefault();
+
+      setOpen((current) => !current);
+    }
+  };
+
+  return (
+    <div
+      ref={dropdownRef}
+      className="dashboard-country-dropdown"
+    >
+      <button
+        type="button"
+        className={`dashboard-country-trigger ${
+          open ? "is-open" : ""
+        }`}
+        onClick={() =>
+          setOpen((current) => !current)
+        }
+        onKeyDown={handleTriggerKeyDown}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="dashboard-country-trigger-icon">
+          <Server size={15} />
+        </span>
+
+        {selectedEnvironment ? (
+          <span className="dashboard-country-name">
+            {selectedEnvironment}
+          </span>
+        ) : (
+          <span className="dashboard-country-placeholder">
+            Select Environment
+          </span>
+        )}
+
+        <ChevronDown
+          size={15}
+          className={`dashboard-country-chevron ${
+            open ? "is-open" : ""
+          }`}
+        />
+      </button>
+
+      {open && (
+        <div className="dashboard-country-menu">
+          <div
+            className="dashboard-country-options"
+            role="listbox"
+          >
+            {options.map((environment) => {
+              const isSelected =
+                environment === value;
+
+              return (
+                <button
+                  key={environment}
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  className={`dashboard-country-option ${
+                    isSelected
+                      ? "is-selected"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    handleSelect(environment)
+                  }
+                >
+                  <span className="dashboard-country-option-code">
+                    ENV
+                  </span>
+
+                  <span className="dashboard-country-option-name">
+                    {environment}
+                  </span>
+
+                  {isSelected && (
+                    <span className="dashboard-country-check">
+                      <Check size={11} />
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+/* =========================================================
    DASHBOARD SEARCH
    ========================================================= */
 
@@ -517,18 +685,7 @@ export default function DashboardSearch({
     useState(DEFAULT_ENVIRONMENT);
 
   const [recentSearches, setRecentSearches] =
-    useState([]);
-
-
-  /* =======================================================
-     LOAD RECENT SEARCHES
-     ======================================================= */
-
-  useEffect(() => {
-    setRecentSearches(
-      getRecentSearches()
-    );
-  }, []);
+    useState(() => getRecentSearches());
 
 
   /* =======================================================
@@ -750,32 +907,11 @@ export default function DashboardSearch({
               Environment
             </label>
 
-            <div className="dashboard-input dashboard-select">
-
-              <Server size={15} />
-
-              <select
-                id="dashboard-environment"
-                value={environment}
-                onChange={(event) =>
-                  setEnvironment(
-                    event.target.value
-                  )
-                }
-              >
-                {ENVIRONMENTS.map((env) => (
-                  <option key={env} value={env}>
-                    {env}
-                  </option>
-                ))}
-              </select>
-
-              <ChevronDown
-                size={15}
-                className="dashboard-select-chevron"
-              />
-
-            </div>
+            <EnvironmentDropdown
+              value={environment}
+              onChange={setEnvironment}
+              options={ENVIRONMENTS}
+            />
 
           </div>
 
