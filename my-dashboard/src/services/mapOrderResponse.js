@@ -276,6 +276,7 @@ export function mapOrderResponse(raw) {
     deleteTodaySw: raw.deleteTodaySw ?? null,
     priceRecalcSw: raw.priceRecalcSw ?? null,
     eoStateCd: raw.eoStateCd ?? null,
+    environment:raw.environment ?? null,
   };
 
   const lineItems = Array.isArray(raw.lineItems) ? raw.lineItems : [];
