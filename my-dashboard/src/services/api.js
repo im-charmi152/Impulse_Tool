@@ -22,6 +22,7 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK_API === "false";
  * @param {Object} params
  * @param {string} [params.poNumber]
  * @param {string} [params.countryCode]
+ * @param {string} [params.environment]
  * @param {AbortSignal} [signal]
  */
 export async function searchOrder(params, signal) {
@@ -43,21 +44,23 @@ export async function searchOrder(params, signal) {
     // today (see services/orderApi.js). Other search fields in the UI stay
     // disabled until the backend exposes them — see data/navigation.js.
     throw new ApiError(
-      "PO Number and Country Code are both required.",
+      "PO Number and Country Code and Env are required.",
       "VALIDATION",
     );
   }
 
   try {
     const raw = await getOrderDetails(
-      poNumber,
-      countryCode,
-      environment,
-      orderNumber,
-      partnerId,
-      accountNumber,
-      sku,
-      transactionId,
+      {
+        poNumber,
+        countryCode,
+        environment,
+        orderNumber,
+        partnerId,
+        accountNumber,
+        sku,
+        transactionId,
+      },
       signal,
     );
     if (!raw) return null;
