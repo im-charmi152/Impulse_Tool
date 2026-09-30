@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Oracle.ManagedDataAccess.Client;
 
 namespace ImpulseSupportTool_Repo
 {
-    public class EnviormentMapper
+    public class EnvironmentMapper
     {
         private readonly IConfiguration _configuration;
 
-        public EnviormentMapper(IConfiguration configuration)
+        public EnvironmentMapper(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -30,16 +31,44 @@ namespace ImpulseSupportTool_Repo
                     "Expected Prod, Dev, or Qa.")
             };
 
-            string? connectionString =
+            // Get the non-secret connection details from appsettings.json
+            string? baseConnectionString =
                 _configuration.GetConnectionString(connectionName);
 
-            if (string.IsNullOrWhiteSpace(connectionString))
+            if (string.IsNullOrWhiteSpace(baseConnectionString))
             {
                 throw new InvalidOperationException(
                     $"ODS connection string '{connectionName}' is not configured.");
             }
 
-            return connectionString;
+            // Get password from User Secrets:
+            // ODSConnectionQa:Password
+            // ODSConnectionDev:Password
+            // ODSConnectionProd:Password
+            string? password =
+                _configuration[$"{connectionName}:Password"];
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new InvalidOperationException(
+                    $"ODS User Secret '{connectionName}:Password' is not configured.");
+            }
+
+            var connectionBuilder =
+                new OracleConnectionStringBuilder(baseConnectionString);
+
+            connectionBuilder.Password = password;
+
+            Console.WriteLine(
+                $">>> ODS CONNECTION SELECTED: {connectionName}");
+
+            Console.WriteLine(
+                $">>> ODS USER: {connectionBuilder.UserID}");
+
+            Console.WriteLine(
+                $">>> ODS PASSWORD FOUND: {!string.IsNullOrWhiteSpace(password)}");
+
+            return connectionBuilder.ConnectionString;
         }
     }
 }

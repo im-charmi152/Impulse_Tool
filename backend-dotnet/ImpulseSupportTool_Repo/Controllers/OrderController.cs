@@ -28,6 +28,7 @@ namespace ImpulseSupportTool_Repo.Controllers
             Console.WriteLine($">>> CustomerNumber: '{request.CustomerNumber}'");
             Console.WriteLine($">>> Sku: '{request.Sku}'");
             Console.WriteLine($">>> TransactionId: '{request.TransactionId}'");
+            Console.WriteLine($">>> Eviorment: '{request.Environment}'");
             var result = await _service.GetOrderDetails(request);
 
             if (result == null)

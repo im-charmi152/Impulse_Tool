@@ -10,11 +10,11 @@ namespace OrderManagement.API.Repositories
 {
     public class OrderRepository : IOrderRepository
     {
-        private readonly IConfiguration _configuration;
+        private readonly EnvironmentMapper _environmentMapper;
 
-        public OrderRepository(IConfiguration configuration)
+        public OrderRepository(EnvironmentMapper environmentMapper)
         {
-            _configuration = configuration;
+            _environmentMapper = environmentMapper;
         }
 
         public async Task<OrderResponse> GetOrder(OrderRequest request)
@@ -25,15 +25,13 @@ namespace OrderManagement.API.Repositories
                 $"CountryCode='{request.CountryCode}' " +
                 $"Environment='{request.Environment}'");
 
-            // Get ODS connection string based on incoming environment
             string connectionString =
-                new EnviormentMapper(_configuration)
-                    .GetOdsConnectionString(request.Environment);
+                _environmentMapper.GetOdsConnectionString(
+                    request.Environment);
 
             Console.WriteLine(
                 $">>> ODS ENVIRONMENT: {request.Environment}");
 
-            // Create Oracle connection
             await using OracleConnection conn =
                 new OracleConnection(connectionString);
 
