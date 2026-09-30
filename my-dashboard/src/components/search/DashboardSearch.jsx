@@ -9,9 +9,13 @@ import {
   ChevronDown,
   Check,
   X,
+  Server,
 } from "lucide-react";
 
 const RECENT_SEARCH_KEY = "impulse_recent_searches";
+
+const ENVIRONMENTS = ["Prod", "Qa", "Dev"];
+const DEFAULT_ENVIRONMENT = "Prod";
 
 const COUNTRY_CODES = [
   "AT",
@@ -131,7 +135,9 @@ function saveRecentSearch(searchItem) {
       (item) =>
         !(
           item.poNumber === searchItem.poNumber &&
-          item.countryCode === searchItem.countryCode
+          item.countryCode === searchItem.countryCode &&
+          (item.environment || DEFAULT_ENVIRONMENT) ===
+            searchItem.environment
         )
     );
 
@@ -507,6 +513,9 @@ export default function DashboardSearch({
   const [countryCode, setCountryCode] =
     useState("");
 
+  const [environment, setEnvironment] =
+    useState(DEFAULT_ENVIRONMENT);
+
   const [recentSearches, setRecentSearches] =
     useState([]);
 
@@ -547,6 +556,8 @@ export default function DashboardSearch({
       poNumber: poNumber.trim(),
       countryCode:
         countryCode.trim().toUpperCase(),
+      // Sent to the API as: "environment": "Prod" | "Qa" | "Dev"
+      environment,
     };
 
     const updated =
@@ -571,10 +582,16 @@ export default function DashboardSearch({
 
     setCountryCode(item.countryCode);
 
+    const itemEnvironment =
+      item.environment || DEFAULT_ENVIRONMENT;
+
+    setEnvironment(itemEnvironment);
+
     if (onSearch) {
       await onSearch({
         poNumber: item.poNumber,
         countryCode: item.countryCode,
+        environment: itemEnvironment,
       });
     }
   };
@@ -724,6 +741,46 @@ export default function DashboardSearch({
 
 
           {/* =================================================
+              ENVIRONMENT
+              ================================================= */}
+
+          <div className="dashboard-search-field">
+
+            <label htmlFor="dashboard-environment">
+              Environment
+            </label>
+
+            <div className="dashboard-input dashboard-select">
+
+              <Server size={15} />
+
+              <select
+                id="dashboard-environment"
+                value={environment}
+                onChange={(event) =>
+                  setEnvironment(
+                    event.target.value
+                  )
+                }
+              >
+                {ENVIRONMENTS.map((env) => (
+                  <option key={env} value={env}>
+                    {env}
+                  </option>
+                ))}
+              </select>
+
+              <ChevronDown
+                size={15}
+                className="dashboard-select-chevron"
+              />
+
+            </div>
+
+          </div>
+
+
+          {/* =================================================
               SEARCH BUTTON
               ================================================= */}
 
@@ -795,7 +852,7 @@ export default function DashboardSearch({
                 .map((item, index) => (
 
                   <button
-                    key={`${item.poNumber}-${item.countryCode}-${index}`}
+                    key={`${item.poNumber}-${item.countryCode}-${item.environment || DEFAULT_ENVIRONMENT}-${index}`}
                     type="button"
                     className="dashboard-recent-chip"
                     onClick={() =>
@@ -813,6 +870,10 @@ export default function DashboardSearch({
 
                     <span className="dashboard-recent-country">
                       {item.countryCode}
+                    </span>
+
+                    <span className="dashboard-recent-country">
+                      {item.environment || DEFAULT_ENVIRONMENT}
                     </span>
 
                   </button>

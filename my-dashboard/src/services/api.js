@@ -35,9 +35,10 @@ export async function searchOrder(params, signal) {
   accountNumber,
   sku,
   transactionId,
+  environment,
   } = params || {};
 
-  if (!poNumber || !countryCode) {
+  if (!poNumber || !countryCode || !environment) {
     // The live backend only supports lookup by PO Number + Country Code
     // today (see services/orderApi.js). Other search fields in the UI stay
     // disabled until the backend exposes them — see data/navigation.js.
@@ -48,6 +49,7 @@ export async function searchOrder(params, signal) {
     const raw = await getOrderDetails(
     poNumber,
     countryCode,
+    environment,
     orderNumber,
     partnerId,
     accountNumber,
