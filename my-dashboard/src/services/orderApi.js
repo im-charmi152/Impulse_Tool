@@ -30,6 +30,7 @@ export const getOrderDetails = async (
   sku,
   transactionId,
   signal,
+  environment,
 ) => {
   try {
     const response = await client.post(
@@ -37,6 +38,7 @@ export const getOrderDetails = async (
       {
         poNumber: toNullableString(poNumber),
         countryCode: toNullableString(countryCode),
+        environment:toNullableString(environment),
         orderNumber: toNullableString(orderNumber),
         partnerId: toNullableString(partnerId),
         customerNumber: toNullableString(accountNumber),
