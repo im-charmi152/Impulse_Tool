@@ -453,11 +453,11 @@ export default function OrderHeaderDetailsPage({ searchParams }) {
       icon: FileText,
       copyable: true,
     },
-    {
-      label: "Company Code",
-      key: "custCoCd",
-      icon: Building2,
-    },
+    // {
+    //   label: "Company Code",
+    //   key: "custCoCd",
+    //   icon: Building2,
+    // },
     {
       label: "Branch Number",
       key: "custBr",

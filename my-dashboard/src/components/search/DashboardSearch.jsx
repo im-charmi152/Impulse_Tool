@@ -15,7 +15,7 @@ import {
 const RECENT_SEARCH_KEY = "impulse_recent_searches";
 
 const ENVIRONMENTS = ["Prod", "Qa", "Dev"];
-const DEFAULT_ENVIRONMENT = "Prod";
+const DEFAULT_ENVIRONMENT = " ";
 
 const COUNTRY_CODES = [
   "AT",
