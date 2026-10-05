@@ -818,7 +818,7 @@ export default function DashboardSearch({
             </h2>
 
             <p>
-              Search by Customer PO Number and Country Code
+              Search by Customer PO Number, Country Code and Environment
             </p>
 
           </div>
