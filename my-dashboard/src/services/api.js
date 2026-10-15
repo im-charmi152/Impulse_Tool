@@ -16,7 +16,7 @@ export class ApiError extends Error {
   }
 }
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK_API === "false";
+const USE_MOCK = import.meta.env.VITE_USE_MOCK_API === "true";
 
 /**
  * @param {Object} params
