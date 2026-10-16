@@ -358,4 +358,78 @@ public sealed class AnalyticsController : ControllerBase
         return Path.Combine(
             _logDirectory, $"radius-usage-{date}.jsonl");
     }
+
+    [HttpGet("recent-tabs")]
+    public async Task<IActionResult> GetRecentTabs()
+    {
+        if (!Directory.Exists(_logDirectory))
+        {
+            return Ok(new
+            {
+                count = 0,
+                recentTabs = Array.Empty<object>()
+            });
+        }
+
+        var events = new List<AnalyticsEvent>();
+
+        var logFiles = Directory.GetFiles(
+            _logDirectory,
+            "radius-usage-*.jsonl");
+
+        var jsonOptions = new System.Text.Json.JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        foreach (var file in logFiles)
+        {
+            var lines = await System.IO.File.ReadAllLinesAsync(file);
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                try
+                {
+                    var analyticsEvent =
+                        System.Text.Json.JsonSerializer
+                            .Deserialize<AnalyticsEvent>(
+                                line, jsonOptions);
+
+                    if (analyticsEvent != null &&
+                        string.Equals(
+                            analyticsEvent.EventType,
+                            "tab_view",
+                            StringComparison.OrdinalIgnoreCase) &&
+                        !string.IsNullOrWhiteSpace(analyticsEvent.Tab))
+                    {
+                        events.Add(analyticsEvent);
+                    }
+                }
+                catch (System.Text.Json.JsonException)
+                {
+                    // Skip malformed log entries.
+                }
+            }
+        }
+
+        var recentTabs = events
+            .OrderByDescending(e => e.TimestampUtc)
+            .Take(5)
+            .Select(e => new
+            {
+                tab = e.Tab,
+                sessionId = e.SessionId,
+                timestampUtc = e.TimestampUtc
+            })
+            .ToList();
+
+        return Ok(new
+        {
+            count = recentTabs.Count,
+            recentTabs
+        });
+    }
 }
