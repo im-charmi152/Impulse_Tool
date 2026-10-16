@@ -45,10 +45,10 @@ function OrderSummaryBanner({ order }) {
     },
     
     {
-      key: "custPoDate",
+      key: "ordrDt",
       label: "Customer PO Date",
-      value: firstValue(order, ["custPoDt", "entyDt"])
-        ? formatDateTime(firstValue(order, ["custPoDt", "entyDt"]))
+      value: firstValue(order, ["ordrDt", "entyDt"])
+        ? formatDateTime(firstValue(order, ["ordrDt", "entyDt"]))
         : "—",
       icon: CalendarDays,
     },
