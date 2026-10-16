@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useCallback } from "react";
+import { getAnalyticsSessionId } from "../../utils/analyticsTracking";
 import {
   ChartNoAxesColumnIncreasing,
   Eye,
@@ -12,6 +13,8 @@ import {
   Activity,
   ArrowUpRight,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock3,
   CircleDot,
 } from "lucide-react";
@@ -56,6 +59,20 @@ const RANGES = [
 
 const formatNumber = (value) =>
   Number(value || 0).toLocaleString("en-US");
+
+const toDateInputValue = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const todayDate = () => toDateInputValue(new Date());
+const daysAgoDate = (days) => {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return toDateInputValue(date);
+};
 
 async function fetchAnalyticsJson(url, signal) {
   const response = await fetch(url, {
@@ -541,8 +558,65 @@ function RecentActivity({ activities = [], loading, error, onRetry }) {
   );
 }
 
+
+function CustomDatePicker({ label, value, onChange, minDate, maxDate }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [visibleMonth, setVisibleMonth] = useState(() => {
+    const initial = value ? new Date(`${value}T12:00:00`) : new Date();
+    return new Date(initial.getFullYear(), initial.getMonth(), 1);
+  });
+  const year = visibleMonth.getFullYear();
+  const month = visibleMonth.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = todayDate();
+  const formatDate = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  const disabled = (date) => Boolean((minDate && date < minDate) || (maxDate && date > maxDate));
+  const cells = [...Array(firstDay).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)];
+  while (cells.length % 7) cells.push(null);
+
+  return (
+    <div className="relative flex min-w-0 flex-col gap-1.5">
+      <span className="text-[10px] font-semibold text-[#6480A7]">{label}</span>
+      <button type="button" onClick={() => setIsOpen((open) => !open)} className="flex h-10 w-[158px] items-center justify-between gap-2 rounded-xl border border-[#DDE9F8] bg-white px-3 text-left text-xs text-[#244A7E] shadow-sm transition hover:border-[#91BFF3] focus:outline-none focus:ring-2 focus:ring-[#1687F8]/20">
+        <span>{value ? new Date(`${value}T12:00:00`).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "Select date"}</span>
+        <CalendarDays size={15} className="shrink-0 text-[#1687F8]" />
+      </button>
+      {isOpen && <>
+        <button type="button" aria-label="Close date picker" className="fixed inset-0 z-40 cursor-default" onClick={() => setIsOpen(false)} />
+        <div className="absolute left-0 top-full z-50 mt-2 w-[292px] rounded-2xl border border-[#E0EAF7] bg-white p-4 shadow-[0_12px_40px_rgba(29,69,123,0.18)]">
+          <div className="mb-4 flex items-center justify-between">
+            <div><p className="text-sm font-bold text-[#173B70]">{visibleMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}</p><p className="mt-0.5 text-[10px] text-[#8AA0BE]">Select a date</p></div>
+            <div className="flex gap-1">
+              <button type="button" aria-label="Previous month" onClick={() => setVisibleMonth(new Date(year, month - 1, 1))} className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#E4EDF8] text-[#4770A5] hover:bg-[#F0F6FF]"><ChevronLeft size={16} /></button>
+              <button type="button" aria-label="Next month" onClick={() => setVisibleMonth(new Date(year, month + 1, 1))} className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#E4EDF8] text-[#4770A5] hover:bg-[#F0F6FF]"><ChevronRight size={16} /></button>
+            </div>
+          </div>
+          <div className="mb-2 grid grid-cols-7 gap-1">{["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => <div key={day} className="flex h-8 items-center justify-center text-[11px] font-semibold text-[#8AA0BE]">{day}</div>)}</div>
+          <div className="grid grid-cols-7 gap-1">{cells.map((day, index) => {
+            if (!day) return <div key={`blank-${index}`} className="h-8" />;
+            const dateString = formatDate(new Date(year, month, day));
+            const selected = dateString === value;
+            const isToday = dateString === today;
+            const isDateDisabled = disabled(dateString);
+            return <button key={dateString} type="button" disabled={isDateDisabled} onClick={() => { onChange(dateString); setIsOpen(false); }} className={`flex h-8 items-center justify-center rounded-lg text-xs transition ${selected ? "bg-[#0878E8] font-semibold text-white shadow-sm" : isToday ? "border border-[#A9CEF8] font-semibold text-[#0878E8]" : "text-[#34577F] hover:bg-[#EDF5FF] hover:text-[#0878E8]"} ${isDateDisabled ? "cursor-not-allowed opacity-30" : ""}`}>{day}</button>;
+          })}</div>
+          <div className="mt-4 flex items-center justify-between border-t border-[#EDF2F8] pt-3">
+            <button type="button" onClick={() => { onChange(""); setIsOpen(false); }} className="rounded-lg px-2 py-1.5 text-xs font-medium text-[#6480A7] hover:bg-[#F3F7FC]">Clear</button>
+            <button type="button" disabled={disabled(today)} onClick={() => { onChange(today); setIsOpen(false); }} className="rounded-lg bg-[#EDF5FF] px-3 py-1.5 text-xs font-semibold text-[#0878E8] hover:bg-[#DDEEFF] disabled:cursor-not-allowed disabled:opacity-40">Today</button>
+          </div>
+        </div>
+      </>}
+    </div>
+  );
+}
+
 export default function AnalyticsDashboard() {
   const [range, setRange] = useState("7d");
+  const [startDate, setStartDate] = useState(() => daysAgoDate(6));
+  const [endDate, setEndDate] = useState(() => todayDate());
+  const [appliedCustomRange, setAppliedCustomRange] = useState(null);
+  const [dateRangeError, setDateRangeError] = useState("");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -563,16 +637,18 @@ export default function AnalyticsDashboard() {
       setLoading(true);
       setError(null);
 
-      const days = DAYS_BY_RANGE[range] ?? 7;
+      const query = range === "custom" && appliedCustomRange
+        ? `startDate=${encodeURIComponent(appliedCustomRange.startDate)}&endDate=${encodeURIComponent(appliedCustomRange.endDate)}`
+        : `days=${DAYS_BY_RANGE[range] ?? 7}`;
 
       try {
         const [summary, dailyRows] = await Promise.all([
           fetchAnalyticsJson(
-            `${API_BASE}/api/analytics/summary?days=${days}`,
+            `${API_BASE}/api/analytics/summary?${query}`,
             controller.signal
           ),
           fetchAnalyticsJson(
-            `${API_BASE}/api/analytics/daily?days=${days}`,
+            `${API_BASE}/api/analytics/daily?${query}`,
             controller.signal
           ),
         ]);
@@ -597,7 +673,7 @@ export default function AnalyticsDashboard() {
     loadAnalytics();
 
     return () => controller.abort();
-  }, [range, refreshKey]);
+  }, [range, appliedCustomRange, refreshKey]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -608,7 +684,7 @@ export default function AnalyticsDashboard() {
 
       try {
         const result = await fetchAnalyticsJson(
-          `${API_BASE}/api/analytics/recent-tabs`,
+          `${API_BASE}/api/analytics/recent-tabs?sessionId=${encodeURIComponent(getAnalyticsSessionId())}`,
           controller.signal
         );
 
@@ -705,18 +781,47 @@ export default function AnalyticsDashboard() {
               Refresh
             </button>
 
-            <button
-              type="button"
-              onClick={() => setRange("30d")}
-              title="View the last 30 days"
-              className="inline-flex items-center gap-2 rounded-xl border border-[#DDE9F8] bg-white px-3.5 py-2.5 text-xs font-semibold text-[#6480A7] shadow-sm hover:bg-[#F5FAFF]"
-            >
-              <CalendarDays size={14} />
-              Date range
-              <ChevronDown size={13} />
-            </button>
+            <div className="relative z-30 flex flex-wrap items-end gap-2 rounded-2xl border border-[#DDE9F8] bg-white p-3 shadow-sm">
+              <CustomDatePicker label="Start date" value={startDate} onChange={setStartDate} maxDate={endDate || todayDate()} />
+              <CustomDatePicker label="End date" value={endDate} onChange={setEndDate} minDate={startDate} maxDate={todayDate()} />
+              <button
+                type="button"
+                onClick={() => {
+                  if (!startDate || !endDate) {
+                    setDateRangeError("Select both a start date and an end date.");
+                    return;
+                  }
+                  if (startDate > endDate) {
+                    setDateRangeError("Start date must be on or before end date.");
+                    return;
+                  }
+                  if (startDate > todayDate() || endDate > todayDate()) {
+                    setDateRangeError("Future dates are not supported.");
+                    return;
+                  }
+                  const span = Math.round((new Date(`${endDate}T00:00:00`) - new Date(`${startDate}T00:00:00`)) / 86400000) + 1;
+                  if (span > 365) {
+                    setDateRangeError("Choose a date range of 365 days or less.");
+                    return;
+                  }
+                  setDateRangeError("");
+                  setAppliedCustomRange({ startDate, endDate });
+                  setRange("custom");
+                }}
+                className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[#1687F8] to-[#0867CE] px-4 text-xs font-semibold text-white shadow-sm hover:opacity-95"
+              >
+                <CalendarDays size={14} />
+                Apply
+              </button>
+            </div>
           </div>
         </div>
+
+        {dateRangeError && (
+          <p role="alert" className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            {dateRangeError}
+          </p>
+        )}
 
         {loading && (
           <div className="flex items-center justify-center gap-2 rounded-2xl border border-[#E3EDF9] bg-white/90 py-16 text-sm text-[#6480A7]">
@@ -761,7 +866,7 @@ export default function AnalyticsDashboard() {
               />
 
               <StatCard
-                label="Sessions"
+                label="Successful Searches"
                 value={formatNumber(data.successfulSearches)}
                 icon={Search}
                 color="#08BFA5"

@@ -119,18 +119,17 @@ public sealed class AnalyticsController : ControllerBase
     [HttpGet("summary")]
     public async Task<IActionResult> GetSummary(
         [FromQuery] int days = 30,
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null,
         CancellationToken cancellationToken = default)
     {
-        if (days < 1 || days > 365)
+        if (!TryResolveDateRange(startDate, endDate, days, out var rangeStart, out var rangeEnd, out var rangeError))
         {
-            return BadRequest(new
-            {
-                message = "days must be between 1 and 365."
-            });
+            return BadRequest(new { message = rangeError });
         }
 
-        var today = DateTime.UtcNow.Date;
-        var startDate = today.AddDays(-(days - 1));
+        var startDateValue = rangeStart;
+        var today = rangeEnd;
 
         var tabCounts = new Dictionary<string, int>();
         var tabSessions = new Dictionary<string, HashSet<string>>();
@@ -141,7 +140,7 @@ public sealed class AnalyticsController : ControllerBase
         var successfulSearches = 0;
         var failedSearches = 0;
 
-        for (var date = startDate; date <= today; date = date.AddDays(1))
+        for (var date = startDateValue; date <= today; date = date.AddDays(1))
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -230,7 +229,7 @@ public sealed class AnalyticsController : ControllerBase
 
         return Ok(new
         {
-            startDate = startDate.ToString("yyyy-MM-dd"),
+            startDate = startDateValue.ToString("yyyy-MM-dd"),
             endDate = today.ToString("yyyy-MM-dd"),
             totalTabViews,
             totalSearches,
@@ -249,20 +248,19 @@ public sealed class AnalyticsController : ControllerBase
     [HttpGet("daily")]
     public async Task<IActionResult> GetDaily(
         [FromQuery] int days = 7,
+        [FromQuery] string? startDate = null,
+        [FromQuery] string? endDate = null,
         CancellationToken cancellationToken = default)
     {
-        if (days < 1 || days > 365)
+        if (!TryResolveDateRange(startDate, endDate, days, out var rangeStart, out var rangeEnd, out var rangeError))
         {
-            return BadRequest(new
-            {
-                message = "days must be between 1 and 365."
-            });
+            return BadRequest(new { message = rangeError });
         }
 
-        var today = DateTime.UtcNow.Date;
+        var today = rangeEnd;
         var results = new List<object>();
 
-        for (var date = today.AddDays(-(days - 1));
+        for (var date = rangeStart;
              date <= today;
              date = date.AddDays(1))
         {
@@ -352,6 +350,72 @@ public sealed class AnalyticsController : ControllerBase
             Path.GetFileName(path));
     }
 
+    private static bool TryResolveDateRange(
+        string? startDateText,
+        string? endDateText,
+        int days,
+        out DateTime startDate,
+        out DateTime endDate,
+        out string? error)
+    {
+        error = null;
+        var hasStart = !string.IsNullOrWhiteSpace(startDateText);
+        var hasEnd = !string.IsNullOrWhiteSpace(endDateText);
+
+        if (hasStart != hasEnd)
+        {
+            startDate = endDate = default;
+            error = "Provide both startDate and endDate, using yyyy-MM-dd.";
+            return false;
+        }
+
+        if (hasStart && hasEnd)
+        {
+            if (!DateOnly.TryParseExact(startDateText, "yyyy-MM-dd",
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var start) ||
+                !DateOnly.TryParseExact(endDateText, "yyyy-MM-dd",
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var end))
+            {
+                startDate = endDate = default;
+                error = "Use yyyy-MM-dd for startDate and endDate.";
+                return false;
+            }
+
+            startDate = start.ToDateTime(TimeOnly.MinValue);
+            endDate = end.ToDateTime(TimeOnly.MinValue);
+            if (startDate > endDate)
+            {
+                error = "startDate must be on or before endDate.";
+                return false;
+            }
+
+            if (endDate.Date > DateTime.UtcNow.Date)
+            {
+                error = "Future dates are not supported.";
+                return false;
+            }
+
+            if ((endDate - startDate).TotalDays >= 365)
+            {
+                error = "The selected date range must be 365 days or less.";
+                return false;
+            }
+
+            return true;
+        }
+
+        if (days < 1 || days > 365)
+        {
+            startDate = endDate = default;
+            error = "days must be between 1 and 365.";
+            return false;
+        }
+
+        endDate = DateTime.UtcNow.Date;
+        startDate = endDate.AddDays(-(days - 1));
+        return true;
+    }
+
     private string GetLogPath(string date)
     {
         // Date is generated internally or validated as yyyy-MM-dd.
@@ -360,8 +424,15 @@ public sealed class AnalyticsController : ControllerBase
     }
 
     [HttpGet("recent-tabs")]
-    public async Task<IActionResult> GetRecentTabs()
+    public async Task<IActionResult> GetRecentTabs(
+        [FromQuery] string? sessionId,
+        CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(sessionId) || sessionId.Length > 100)
+        {
+            return BadRequest(new { message = "A valid sessionId is required." });
+        }
+
         if (!Directory.Exists(_logDirectory))
         {
             return Ok(new
@@ -403,7 +474,11 @@ public sealed class AnalyticsController : ControllerBase
                             analyticsEvent.EventType,
                             "tab_view",
                             StringComparison.OrdinalIgnoreCase) &&
-                        !string.IsNullOrWhiteSpace(analyticsEvent.Tab))
+                        !string.IsNullOrWhiteSpace(analyticsEvent.Tab) &&
+                        string.Equals(
+                            analyticsEvent.SessionId,
+                            sessionId,
+                            StringComparison.Ordinal))
                     {
                         events.Add(analyticsEvent);
                     }
