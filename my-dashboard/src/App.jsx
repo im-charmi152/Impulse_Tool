@@ -137,36 +137,41 @@ export default function Dashboard() {
     }
   }, [activeTab, status]);
 
-  // Tracks an order_search event once per search resolution (success,
-  // empty, or error) — not on "loading" or "idle".
-  const lastTrackedStatus = useRef(null);
+  // Count every completed search attempt, even when consecutive searches
+  // end with the same status (for example, success followed by success).
+  const searchAttemptRef = useRef(0);
+  const loadingAttemptRef = useRef(0);
+  const lastTrackedAttemptRef = useRef(0);
 
-  // useEffect(() => {
-  //   if (status === lastTrackedStatus.current) return;
+  const handleOrderSearch = async (searchData) => {
+    searchAttemptRef.current += 1;
+    await search(searchData);
+  };
 
-  //   if (status === "success") trackOrderSearch("found");
-  //   else if (status === "empty") trackOrderSearch("not_found");
-  //   else if (status === "error") trackOrderSearch("error");
-
-  //   lastTrackedStatus.current = status;
-  // }, [status]);
- useEffect(() => {
-    if (status === "idle" || status === "loading") {
+  useEffect(() => {
+    if (status === "loading") {
+      loadingAttemptRef.current = searchAttemptRef.current;
       return;
     }
 
-    // Prevent duplicate tracking for the same status.
-    if (status === lastTrackedStatus.current) {
+    if (status === "idle") return;
+
+    const attempt = loadingAttemptRef.current;
+    if (
+      !attempt ||
+      attempt !== searchAttemptRef.current ||
+      attempt === lastTrackedAttemptRef.current
+    ) {
       return;
     }
 
     if (status === "success") {
       trackOrderSearch("success");
+      lastTrackedAttemptRef.current = attempt;
     } else if (status === "empty" || status === "error") {
       trackOrderSearch("failure");
+      lastTrackedAttemptRef.current = attempt;
     }
-
-    lastTrackedStatus.current = status;
   }, [status]);
   // ============================================================
   // TABS
@@ -334,7 +339,7 @@ export default function Dashboard() {
               DASHBOARD SEARCH
           ====================================================== */}
 
-          <DashboardSearch onSearch={search} loading={status === "loading"} />
+          <DashboardSearch onSearch={handleOrderSearch} loading={status === "loading"} />
 
           {/* ======================================================
               RADIUS WATERMARK
