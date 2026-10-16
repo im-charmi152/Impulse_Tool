@@ -446,18 +446,97 @@ function DailyTrendChart({ dailyTrend = [], tabBreakdown = [] }) {
   );
 }
 
-function RecentActivity() {
+function formatActivityTime(value) {
+  if (!value) return "Time unavailable";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Time unavailable";
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function RecentActivity({ activities = [], loading, error, onRetry }) {
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center gap-2 py-8 text-xs text-[#6480A7]">
+        <Loader2 size={16} className="animate-spin text-[#1687F8]" />
+        Loading recent activity…
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-6 text-center">
+        <p className="text-xs font-medium text-[#A33B3B]">
+          Couldn't load recent activity.
+        </p>
+        <p className="mt-1 break-words text-[11px] text-[#8AA0BE]">{error}</p>
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="mt-3 rounded-lg border border-[#DDE9F8] bg-white px-3 py-1.5 text-xs font-semibold text-[#2269B3] hover:bg-[#F5FAFF]"
+          >
+            Try again
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (!activities.length) {
+    return (
+      <div className="py-8 text-center">
+        <Clock3 size={22} className="mx-auto mb-2 text-[#9AB0CD]" />
+        <p className="text-xs font-medium text-[#526F96]">
+          No recent tab activity found.
+        </p>
+        <p className="mt-1 text-[11px] text-[#8AA0BE]">
+          Activity will appear here when RADIUS records tab views.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="py-6 text-center">
-      <Clock3 size={22} className="mx-auto mb-2 text-[#9AB0CD]" />
+    <div className="space-y-1">
+      {activities.map((item, index) => {
+        const color = TAB_COLORS[item.tab] || "#1687F8";
+        const label = TAB_LABELS[item.tab] || item.tab || "Unknown activity";
 
-      <p className="text-xs font-medium text-[#526F96]">
-        Recent activity is not available yet.
-      </p>
+        return (
+          <div
+            key={`${item.sessionId || "session"}-${item.timestampUtc || index}-${index}`}
+            className="flex items-start gap-3 rounded-xl px-2.5 py-3 transition hover:bg-[#F5F9FE]"
+          >
+            <span
+              className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl"
+              style={{ backgroundColor: `${color}18`, color }}
+            >
+              <Activity size={17} />
+            </span>
 
-      <p className="mt-1 text-[11px] text-[#8AA0BE]">
-        The current backend does not expose a recent-events API.
-      </p>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-semibold text-[#244A7E]">
+                Viewed {label}
+              </p>
+              <p className="mt-1 truncate font-mono text-[10px] text-[#8298B6]">
+                {item.sessionId || "Anonymous session"}
+              </p>
+            </div>
+
+            <span className="flex-shrink-0 whitespace-nowrap pt-0.5 text-[10px] text-[#8298B6]">
+              {formatActivityTime(item.timestampUtc)}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -468,6 +547,10 @@ export default function AnalyticsDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [recentActivityLoading, setRecentActivityLoading] = useState(true);
+  const [recentActivityError, setRecentActivityError] = useState(null);
 
   const load = useCallback(() => {
     setRefreshKey((key) => key + 1);
@@ -515,6 +598,46 @@ export default function AnalyticsDashboard() {
 
     return () => controller.abort();
   }, [range, refreshKey]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadRecentActivity() {
+      setRecentActivityLoading(true);
+      setRecentActivityError(null);
+
+      try {
+        const result = await fetchAnalyticsJson(
+          `${API_BASE}/api/analytics/recent-tabs`,
+          controller.signal
+        );
+
+        if (!controller.signal.aborted) {
+          const rows = Array.isArray(result)
+            ? result
+            : Array.isArray(result?.recentTabs)
+              ? result.recentTabs
+              : [];
+
+          setRecentActivities(rows);
+        }
+      } catch (err) {
+        if (!controller.signal.aborted) {
+          setRecentActivities([]);
+          setRecentActivityError(
+            err.message || "Unable to load recent activity."
+          );
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setRecentActivityLoading(false);
+        }
+      }
+    }
+
+    loadRecentActivity();
+    return () => controller.abort();
+  }, [refreshKey]);
 
   const breakdown = data?.tabBreakdown || [];
 
@@ -707,7 +830,12 @@ export default function AnalyticsDashboard() {
                   Recent Activity
                 </PanelTitle>
 
-                <RecentActivity />
+                <RecentActivity
+                  activities={recentActivities}
+                  loading={recentActivityLoading}
+                  error={recentActivityError}
+                  onRetry={load}
+                />
               </Panel>
 
               {/* <Panel className="min-w-0 overflow-hidden p-4 md:p-5">

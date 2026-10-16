@@ -45,8 +45,8 @@ function OrderSummaryBanner({ order }) {
     },
     
     {
-      key: "ordrDt",
-      label: "Customer PO Date",
+      key: "date",
+      label: "Order Date",
       value: firstValue(order, ["ordrDt", "entyDt"])
         ? formatDateTime(firstValue(order, ["ordrDt", "entyDt"]))
         : "—",
@@ -65,9 +65,9 @@ function OrderSummaryBanner({ order }) {
       icon: FileText,
     },
     {
-      key: "status",
+      key: "eoStateCd",
       label: "Status",
-      value: firstValue(order, ["ordSt", "ordrStatus"]) ?? "Found",
+      value: firstValue(order, ["eoStateCd"]) ?? "Found",
       icon: CircleCheck,
       isStatus: true,
     },
