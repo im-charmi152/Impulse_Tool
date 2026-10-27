@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { displayName, environmentChoices, readSession } from "../../auth/accessSession";
 
 import {
   Search,
@@ -14,7 +16,6 @@ import {
 
 const RECENT_SEARCH_KEY = "impulse_recent_searches";
 
-const ENVIRONMENTS = ["Prod", "Qa", "Dev"];
 const DEFAULT_ENVIRONMENT = " ";
 
 const COUNTRY_CODES = [
@@ -510,8 +511,39 @@ function EnvironmentDropdown({
   options,
 }) {
   const [open, setOpen] = useState(false);
+  const [lockPop, setLockPop] = useState(null);
 
   const dropdownRef = useRef(null);
+
+  function hideLockPop() {
+    setLockPop(null);
+  }
+
+  function showLockPop(environment, element) {
+    if (!environment.hint) {
+      setLockPop(null);
+      return;
+    }
+    const menu = element.closest(".dashboard-country-menu") || element;
+    const rect = menu.getBoundingClientRect();
+    const width = Math.max(rect.width, 280);
+    const margin = 12;
+    let left = rect.left;
+    if (left + width > window.innerWidth - margin) {
+      left = Math.max(margin, window.innerWidth - width - margin);
+    }
+    const estimatedHeight = 108;
+    let top = rect.bottom + 8;
+    if (top + estimatedHeight > window.innerHeight - margin) {
+      top = Math.max(margin, rect.top - estimatedHeight - 8);
+    }
+    setLockPop({
+      text: environment.hint,
+      top,
+      left,
+      width,
+    });
+  }
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -539,6 +571,10 @@ function EnvironmentDropdown({
   }, []);
 
   useEffect(() => {
+    if (!open) setLockPop(null);
+  }, [open]);
+
+  useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === "Escape") {
         setOpen(false);
@@ -559,11 +595,12 @@ function EnvironmentDropdown({
   }, []);
 
   const selectedEnvironment = options.find(
-    (environment) => environment === value
+    (environment) => environment.id === value
   );
 
   const handleSelect = (environment) => {
-    onChange(environment);
+    if (environment.disabled) return;
+    onChange(environment.id);
 
     setOpen(false);
   };
@@ -602,7 +639,7 @@ function EnvironmentDropdown({
 
         {selectedEnvironment ? (
           <span className="dashboard-country-name">
-            {selectedEnvironment}
+            {selectedEnvironment.label}
           </span>
         ) : (
           <span className="dashboard-country-placeholder">
@@ -626,29 +663,45 @@ function EnvironmentDropdown({
           >
             {options.map((environment) => {
               const isSelected =
-                environment === value;
+                environment.id === value;
+              const showHint = Boolean(environment.disabled && environment.hint);
 
               return (
                 <button
-                  key={environment}
+                  key={environment.id}
                   type="button"
                   role="option"
                   aria-selected={isSelected}
+                  aria-disabled={environment.disabled}
+                  disabled={environment.disabled && !showHint}
                   className={`dashboard-country-option ${
                     isSelected
                       ? "is-selected"
                       : ""
-                  }`}
-                  onClick={() =>
-                    handleSelect(environment)
+                  } ${environment.disabled ? "is-disabled" : ""}`}
+                  onMouseEnter={(event) =>
+                    showLockPop(environment, event.currentTarget)
                   }
+                  onMouseLeave={hideLockPop}
+                  onFocus={(event) =>
+                    showLockPop(environment, event.currentTarget)
+                  }
+                  onBlur={hideLockPop}
+                  onClick={(event) => {
+                    if (showHint) {
+                      showLockPop(environment, event.currentTarget);
+                      return;
+                    }
+                    handleSelect(environment);
+                  }}
                 >
                   <span className="dashboard-country-option-code">
                     ENV
                   </span>
 
                   <span className="dashboard-country-option-name">
-                    {environment}
+                    {environment.label}
+                    {environment.disabled ? " (locked)" : ""}
                   </span>
 
                   {isSelected && (
@@ -662,6 +715,22 @@ function EnvironmentDropdown({
           </div>
         </div>
       )}
+      {lockPop &&
+        createPortal(
+          <div
+            className="env-lock-pop"
+            role="tooltip"
+            style={{
+              top: lockPop.top,
+              left: lockPop.left,
+              width: lockPop.width,
+            }}
+          >
+            <strong>Production registration</strong>
+            <p>{lockPop.text}</p>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
@@ -682,7 +751,12 @@ export default function DashboardSearch({
     useState("");
 
   const [environment, setEnvironment] =
-    useState(DEFAULT_ENVIRONMENT);
+    useState(() => {
+      const session = readSession();
+      if (session?.mode === "guest") return "Dev";
+      if (session?.mode === "production" || session?.mode === "admin") return "Prod";
+      return DEFAULT_ENVIRONMENT;
+    });
 
   const [recentSearches, setRecentSearches] =
     useState(() => getRecentSearches());
@@ -739,8 +813,12 @@ export default function DashboardSearch({
 
     setCountryCode(item.countryCode);
 
-    const itemEnvironment =
+    const requested =
       item.environment || DEFAULT_ENVIRONMENT;
+    const allowed = environmentChoices(readSession()).some(
+      (choice) => choice.id === requested && !choice.disabled,
+    );
+    const itemEnvironment = allowed ? requested : environment;
 
     setEnvironment(itemEnvironment);
 
@@ -761,6 +839,8 @@ export default function DashboardSearch({
     clearRecentSearches();
     setRecentSearches([]);
   };
+
+  const greetingName = displayName(readSession());
 
 
   return (
@@ -814,7 +894,9 @@ export default function DashboardSearch({
           <div>
 
             <h2>
-            Hey Good day! Let's analyze, diagnose, and resolve.
+            {greetingName
+              ? `Hey Good day, ${greetingName}! Let's analyze, diagnose, and resolve.`
+              : "Hey Good day! Let's analyze, diagnose, and resolve."}
             </h2>
 
             <p>
@@ -910,7 +992,7 @@ export default function DashboardSearch({
             <EnvironmentDropdown
               value={environment}
               onChange={setEnvironment}
-              options={ENVIRONMENTS}
+              options={environmentChoices(readSession())}
             />
 
           </div>
