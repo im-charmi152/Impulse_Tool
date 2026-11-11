@@ -1,4 +1,5 @@
 using ImpulseSupportTool.Data.Abstractions;
+using ImpulseSupportTool.Data.Config;
 using ImpulseSupportTool.Models.Orders;
 using System.Data.Odbc;
 using Oracle.ManagedDataAccess.Client;
@@ -9,11 +10,11 @@ namespace ImpulseSupportTool.Data.Oracle
 {
     public class OrderRepository : IOrderRepository
     {
-        private readonly EnvironmentMapper _environmentMapper;
+        private readonly OdsConnectionFactory _connectionFactory;
 
-        public OrderRepository(EnvironmentMapper environmentMapper)
+        public OrderRepository(OdsConnectionFactory connectionFactory)
         {
-            _environmentMapper = environmentMapper;
+            _connectionFactory = connectionFactory;
         }
 
         public async Task<OrderResponse> GetOrder(OrderRequest request)
@@ -25,7 +26,7 @@ namespace ImpulseSupportTool.Data.Oracle
                 $"Environment='{request.Environment}'");
 
             string connectionString =
-                _environmentMapper.GetOdsConnectionString(
+                _connectionFactory.GetOdsConnectionString(
                     request.Environment);
 
             Console.WriteLine(

@@ -1,13 +1,13 @@
 using Microsoft.Extensions.Configuration;
 using Oracle.ManagedDataAccess.Client;
 
-namespace ImpulseSupportTool.Data.Oracle
+namespace ImpulseSupportTool.Data.Config
 {
-    public class EnvironmentMapper
+    public class OdsConnectionFactory
     {
         private readonly IConfiguration _configuration;
 
-        public EnvironmentMapper(IConfiguration configuration)
+        public OdsConnectionFactory(IConfiguration configuration)
         {
             _configuration = configuration;
         }

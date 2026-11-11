@@ -1,5 +1,6 @@
 using ImpulseSupportTool.Data.Abstractions;
 using ImpulseSupportTool.Data.Analytics;
+using ImpulseSupportTool.Data.Config;
 using ImpulseSupportTool.Data.Oracle;
 using ImpulseSupportTool.Data.Security;
 using ImpulseSupportTool.Data.Sqlite;
@@ -24,7 +25,7 @@ public static class DependencyInjection
     {
         // Order data (Oracle ODS, read only)
         services.AddScoped<IOrderRepository, OrderRepository>();
-        services.AddScoped<EnvironmentMapper>();
+        services.AddScoped<OdsConnectionFactory>();
 
         // RADIUS analytics
         services.Configure<AnalyticsOptions>(configuration.GetSection("Analytics"));

@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <Content Include="Access\admins.enc" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\ImpulseSupportTool.Data\Config\appsettings.Connections.json" Link="config\appsettings.Connections.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
