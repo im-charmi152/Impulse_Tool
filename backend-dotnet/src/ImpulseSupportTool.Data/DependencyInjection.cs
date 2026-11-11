@@ -1,5 +1,6 @@
 using ImpulseSupportTool.Data.Abstractions;
 using ImpulseSupportTool.Data.Analytics;
+using ImpulseSupportTool.Data.Oracle;
 using ImpulseSupportTool.Data.Security;
 using ImpulseSupportTool.Data.Sqlite;
 using ImpulseSupportTool.Models.Options;
@@ -13,14 +14,18 @@ namespace ImpulseSupportTool.Data;
 public static class DependencyInjection
 {
     /// <summary>
-    /// Registers the local stores: SQLite access logs, the analytics queue and its
-    /// background writer, and the admin vault.
+    /// Registers every store and repository: the Oracle order repository, SQLite access logs,
+    /// the analytics queue and its background writer, and the admin vault.
     /// </summary>
     public static IServiceCollection AddData(
         this IServiceCollection services,
         IConfiguration configuration,
         IWebHostEnvironment environment)
     {
+        // Order data (Oracle ODS, read only)
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<EnvironmentMapper>();
+
         // RADIUS analytics
         services.Configure<AnalyticsOptions>(configuration.GetSection("Analytics"));
         services.PostConfigure<AnalyticsOptions>(options =>

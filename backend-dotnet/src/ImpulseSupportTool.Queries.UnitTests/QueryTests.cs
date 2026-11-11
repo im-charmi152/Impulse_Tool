@@ -5,7 +5,7 @@ using ImpulseSupportTool.Models.Orders;
 using ImpulseSupportTool.Queries.Access;
 using ImpulseSupportTool.Queries.Analytics;
 using ImpulseSupportTool.Queries.Orders.GetOrderDetails;
-using ImpulseSupportTool.ServiceClients.Abstractions;
+using ImpulseSupportTool.Data.Abstractions;
 using ImpulseSupportTool.Util;
 using ImpulseSupportTool.Util.Messaging;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +22,7 @@ public sealed class QueryTests
         var services = new ServiceCollection()
             .AddMessaging()
             .AddRequestHandlers(typeof(GetOrderDetailsQueryHandler).Assembly)
-            .AddSingleton<IOrderServiceClient>(new FakeOrderServiceClient(expected))
+            .AddSingleton<IOrderRepository>(new FakeOrderRepository(expected))
             .BuildServiceProvider();
 
         var dispatcher = services.GetRequiredService<IDispatcher>();
@@ -52,7 +52,7 @@ public sealed class QueryTests
         Assert.Equal("days must be between 1 and 365.", error);
     }
 
-    private sealed class FakeOrderServiceClient(OrderResponse response) : IOrderServiceClient
+    private sealed class FakeOrderRepository(OrderResponse response) : IOrderRepository
     {
         public Task<OrderResponse> GetOrder(OrderRequest request) => Task.FromResult(response);
     }

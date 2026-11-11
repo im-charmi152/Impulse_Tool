@@ -1,17 +1,17 @@
-using ImpulseSupportTool.ServiceClients.Abstractions;
+using ImpulseSupportTool.Data.Abstractions;
 using ImpulseSupportTool.Models.Orders;
 using System.Data.Odbc;
 using Oracle.ManagedDataAccess.Client;
 
 
 
-namespace ImpulseSupportTool.ServiceClients.Oracle
+namespace ImpulseSupportTool.Data.Oracle
 {
-    public class OrderServiceClient : IOrderServiceClient
+    public class OrderRepository : IOrderRepository
     {
         private readonly EnvironmentMapper _environmentMapper;
 
-        public OrderServiceClient(EnvironmentMapper environmentMapper)
+        public OrderRepository(EnvironmentMapper environmentMapper)
         {
             _environmentMapper = environmentMapper;
         }

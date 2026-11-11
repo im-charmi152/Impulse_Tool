@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ImpulseSupportTool.ServiceClients.Oracle
+namespace ImpulseSupportTool.Data.Oracle
 {
     public static class ZoneMapper
     {

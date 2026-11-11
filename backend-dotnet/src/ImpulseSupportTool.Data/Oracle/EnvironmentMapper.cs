@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Oracle.ManagedDataAccess.Client;
 
-namespace ImpulseSupportTool.ServiceClients.Oracle
+namespace ImpulseSupportTool.Data.Oracle
 {
     public class EnvironmentMapper
     {

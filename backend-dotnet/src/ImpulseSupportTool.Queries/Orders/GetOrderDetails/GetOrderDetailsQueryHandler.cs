@@ -1,10 +1,10 @@
 using ImpulseSupportTool.Util.Messaging;
-using ImpulseSupportTool.ServiceClients.Abstractions;
+using ImpulseSupportTool.Data.Abstractions;
 using ImpulseSupportTool.Models.Orders;
 
 namespace ImpulseSupportTool.Queries.Orders.GetOrderDetails;
 
-public sealed class GetOrderDetailsQueryHandler(IOrderServiceClient orderRepository)
+public sealed class GetOrderDetailsQueryHandler(IOrderRepository orderRepository)
     : IQueryHandler<GetOrderDetailsQuery, OrderResponse?>
 {
     public async Task<OrderResponse?> Handle(GetOrderDetailsQuery query, CancellationToken cancellationToken)

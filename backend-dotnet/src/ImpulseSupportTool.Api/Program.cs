@@ -1,12 +1,14 @@
 using ImpulseSupportTool.Commands;
 using ImpulseSupportTool.Data;
+using ImpulseSupportTool.Data.Abstractions;
 using ImpulseSupportTool.Queries;
-using ImpulseSupportTool.ServiceClients;
-using ImpulseSupportTool.ServiceClients.Abstractions;
 using ImpulseSupportTool.Util;
 using ImpulseSupportTool.Util.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Connection strings live in their own file (no passwords; passwords are user secrets).
+builder.Configuration.AddJsonFile("appsettings.Connections.json", optional: false, reloadOnChange: true);
 
 // --------------------------------------------------
 // Controllers and model-binding error logging
@@ -37,17 +39,15 @@ builder.Services.AddSwaggerGen();
 
 // --------------------------------------------------
 // Clean Architecture composition root
-//   Util           -> CQRS dispatcher
-//   Commands       -> write-side handlers
-//   Queries        -> read-side handlers
-//   Data           -> SQLite logs, analytics writer, admin vault
-//   ServiceClients -> Oracle / DB2 order systems
+//   Util     -> CQRS dispatcher
+//   Commands -> write-side handlers
+//   Queries  -> read-side handlers
+//   Data     -> Oracle order repository, SQLite logs, analytics writer, admin vault
 // --------------------------------------------------
 builder.Services.AddMessaging();
 builder.Services.AddCommands();
 builder.Services.AddQueries();
 builder.Services.AddData(builder.Configuration, builder.Environment);
-builder.Services.AddServiceClients();
 
 // --------------------------------------------------
 // Existing CORS policy
@@ -74,8 +74,8 @@ try
     var dispatcher = scope.ServiceProvider.GetRequiredService<IDispatcher>();
     Console.WriteLine($">>> IDispatcher resolved OK: {dispatcher.GetType().Name}");
 
-    var client = scope.ServiceProvider.GetRequiredService<IOrderServiceClient>();
-    Console.WriteLine($">>> IOrderServiceClient resolved OK: {client.GetType().Name}");
+    var repository = scope.ServiceProvider.GetRequiredService<IOrderRepository>();
+    Console.WriteLine($">>> IOrderRepository resolved OK: {repository.GetType().Name}");
 }
 catch (Exception ex)
 {

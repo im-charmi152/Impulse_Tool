@@ -12,7 +12,6 @@
     <ProjectReference Include="..\ImpulseSupportTool.Models\ImpulseSupportTool.Models.csproj" />
     <ProjectReference Include="..\ImpulseSupportTool.Util\ImpulseSupportTool.Util.csproj" />
     <ProjectReference Include="..\ImpulseSupportTool.Data\ImpulseSupportTool.Data.csproj" />
-    <ProjectReference Include="..\ImpulseSupportTool.ServiceClients\ImpulseSupportTool.ServiceClients.csproj" />
   </ItemGroup>
 
 </Project>
