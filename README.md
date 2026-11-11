@@ -113,7 +113,7 @@ The backend lives in `backend-dotnet/src`. Each folder is a separate .NET projec
 
 | Project | Role | Depends on |
 | --- | --- | --- |
-| `ImpulseSupportTool.Api` | Web host: controllers, `Program.cs` (wiring and startup), Swagger, CORS, `appsettings*.json`, `config/` (copied from the Data project at build time), `logs/`, `Access/admins.enc` | Commands, Queries, Data, Util, Models |
+| `ImpulseSupportTool.Api` | Web host: controllers, `Program.cs` (wiring and startup), Swagger, CORS, `appsettings*.json` (including the connection strings), `logs/`, `Access/admins.enc` | Commands, Queries, Data, Util, Models |
 | `ImpulseSupportTool.Queries` | Read handlers: order details, user and guest lookup, login checks, analytics reports and exports | Util, Data, Models |
 | `ImpulseSupportTool.Commands` | Write handlers: record user and guest, create, approve and decline requests, password reset, record analytics event | Util, Data, Models |
 | `ImpulseSupportTool.Data` | Store and repository interfaces, the Oracle order repository, SQLite stores, analytics queue and background writer, encrypted admin vault | Models |
@@ -138,7 +138,7 @@ Key files:
 
 `GetOrder` returns `200` with the order, or `404` with `Order not found` when the header query has no row. Swagger is at `/swagger`.
 
-Connection strings are in their own file, `src/ImpulseSupportTool.Data/Config/appsettings.Connections.json`. It holds the three ODS connections (`ODSConnectionProd`, `ODSConnectionQa`, `ODSConnectionDev`) and the DB2 ODBC string. It contains no passwords. `Program.cs` loads it with `AddJsonFile`.
+Connection strings are in `src/ImpulseSupportTool.Api/appsettings.json`, under `ConnectionStrings`. They hold the three ODS connections (`ODSConnectionProd`, `ODSConnectionQa`, `ODSConnectionDev`) and the DB2 ODBC string. It contains no passwords. `Program.cs` loads it with `AddJsonFile`.
 
 Oracle passwords are user secrets, not files in git:
 
@@ -189,7 +189,7 @@ The backend is a **web API**. It is a program that waits for HTTP requests from 
 
 Running the API executes `src/ImpulseSupportTool.Api/Program.cs` from top to bottom in three steps:
 
-1. **Load configuration.** `AddJsonFile` loads `config/appsettings.Connections.json` from the output folder, which is copied there from the Data project, the connection strings to the settings.
+1. **Load configuration.** ASP.NET loads `appsettings.json` (connection strings and settings) and user secrets automatically.
 2. **Register services.** `builder.Services.Add...` tells the app which class fills each job (see [Dependency injection](#dependency-injection-di)).
 3. **Build the app and start listening.** `builder.Build()` creates the app. Middleware runs for every request (CORS, a console log line, Swagger), then `app.MapControllers()` connects URLs to controllers, and `app.Run()` starts the server.
 
@@ -329,12 +329,12 @@ A **background service** is a class that keeps running while the app is alive. I
 
 | Where | What goes there |
 | --- | --- |
-| `src/ImpulseSupportTool.Data/Config/appsettings.Connections.json` | Connection strings with no passwords: the three ODS connections and the DB2 ODBC string |
+| `src/ImpulseSupportTool.Api/appsettings.json` | `ConnectionStrings` section with no passwords: the three ODS connections and the DB2 ODBC string |
 | `src/ImpulseSupportTool.Api/appsettings.json` | Non-secret settings: `Analytics` folder, `AccessLog` file names, `AdminVault:Key` |
 | `src/ImpulseSupportTool.Api/appsettings.Development.json` | Overrides used only in the Development environment |
 | `dotnet user-secrets` | Oracle passwords: `ODSConnectionQa:Password`, `ODSConnectionDev:Password`, `ODSConnectionProd:Password` |
 
-Settings are read through `IConfiguration`. Typed settings classes such as `AnalyticsOptions` and `AccessLogOptions` (in `Models/Options`) hold the values. When a connection is needed, `OdsConnectionFactory` reads the matching connection string from `config/appsettings.Connections.json` and adds the password from user secrets.
+Settings are read through `IConfiguration`. Typed settings classes such as `AnalyticsOptions` and `AccessLogOptions` (in `Models/Options`) hold the values. When a connection is needed, `OdsConnectionFactory` reads the matching connection string from `appsettings.json` and adds the password from user secrets.
 
 ### Tests
 
@@ -383,7 +383,7 @@ Content-Type: application/json
 }
 ```
 
-`countryCode` is the company code in `ODS.ODS_ORDER`. `environment` selects `ODSConnectionProd`, `ODSConnectionQa`, or `ODSConnectionDev` from `src/ImpulseSupportTool.Data/Config/appsettings.Connections.json`, then appends the matching user-secret password.
+`countryCode` is the company code in `ODS.ODS_ORDER`. `environment` selects `ODSConnectionProd`, `ODSConnectionQa`, or `ODSConnectionDev` from `appsettings.json`, then appends the matching user-secret password.
 
 Package versions are listed under [Dependencies and run commands](#dependencies-and-run-commands).
 

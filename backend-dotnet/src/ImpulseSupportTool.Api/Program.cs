@@ -7,8 +7,6 @@ using ImpulseSupportTool.Util.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Connection strings live in their own file (no passwords; passwords are user secrets).
-builder.Configuration.AddJsonFile(Path.Combine(AppContext.BaseDirectory, "config", "appsettings.Connections.json"), optional: false, reloadOnChange: true);
 
 // --------------------------------------------------
 // Controllers and model-binding error logging
