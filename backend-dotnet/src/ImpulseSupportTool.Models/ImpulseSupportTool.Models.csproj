@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Pure models, DTOs, options and business rules. No dependencies on other ImpulseSupportTool projects. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ImpulseSupportTool.Models</RootNamespace>
+  </PropertyGroup>
+
+</Project>

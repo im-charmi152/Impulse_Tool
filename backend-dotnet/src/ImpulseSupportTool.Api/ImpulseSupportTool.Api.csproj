@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- Presentation layer: HTTP controllers, composition root and host configuration. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ImpulseSupportTool.Api</RootNamespace>
+    <UserSecretsId>b7da84d9-96e6-47f8-823c-0dad566774cb</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Access\admins.enc" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ImpulseSupportTool.Models\ImpulseSupportTool.Models.csproj" />
+    <ProjectReference Include="..\ImpulseSupportTool.Util\ImpulseSupportTool.Util.csproj" />
+    <ProjectReference Include="..\ImpulseSupportTool.Data\ImpulseSupportTool.Data.csproj" />
+    <ProjectReference Include="..\ImpulseSupportTool.Commands\ImpulseSupportTool.Commands.csproj" />
+    <ProjectReference Include="..\ImpulseSupportTool.Queries\ImpulseSupportTool.Queries.csproj" />
+  </ItemGroup>
+
+</Project>
