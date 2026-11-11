@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Write side of CQRS: every state-changing use case. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ImpulseSupportTool.Commands</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ImpulseSupportTool.Models\ImpulseSupportTool.Models.csproj" />
+    <ProjectReference Include="..\ImpulseSupportTool.Util\ImpulseSupportTool.Util.csproj" />
+    <ProjectReference Include="..\ImpulseSupportTool.Data\ImpulseSupportTool.Data.csproj" />
+  </ItemGroup>
+
+</Project>
