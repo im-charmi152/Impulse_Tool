@@ -365,7 +365,7 @@ function CountryDropdown({
           </span>
         ) : (
           <span className="dashboard-country-placeholder">
-            Select Country Code
+            Select Company Code
           </span>
         )}
 
@@ -602,7 +602,7 @@ function EnvironmentDropdown({
 
         {selectedEnvironment ? (
           <span className="dashboard-country-name">
-            {selectedEnvironment}
+            {selectedEnvironment === "Qa" ? "QU" : selectedEnvironment}
           </span>
         ) : (
           <span className="dashboard-country-placeholder">
@@ -648,7 +648,7 @@ function EnvironmentDropdown({
                   </span>
 
                   <span className="dashboard-country-option-name">
-                    {environment}
+                    {environment === "Qa" ? "QU" : environment}
                   </span>
 
                   {isSelected && (
@@ -818,7 +818,7 @@ export default function DashboardSearch({
             </h2>
 
             <p>
-              Search by Customer PO Number, Country Code and Environment
+              Search by Customer PO Number, Company Code and Environment
             </p>
 
           </div>
@@ -885,7 +885,7 @@ export default function DashboardSearch({
           <div className="dashboard-search-field">
 
             <label>
-              Country Code
+              Company Code
             </label>
 
             <CountryDropdown
