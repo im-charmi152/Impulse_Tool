@@ -1,5 +1,6 @@
-import { ChevronRight, ChevronLeft, ChartNoAxesColumnIncreasing } from "lucide-react";
+import { ChevronRight, ChevronLeft, ChartNoAxesColumnIncreasing, ShieldCheck, UserRound } from "lucide-react";
 import { NAV_ITEMS } from "../../data/navigation";
+import { readSession, usePendingApprovalCount } from "../../auth/accessSession";
 
 function Sidebar({
   collapsed,
@@ -10,14 +11,26 @@ function Sidebar({
   onNavigate = () => {},
 }) {
   // Add Usage Analytics without requiring changes to the existing navigation file.
+  const session = readSession();
+  const pending = usePendingApprovalCount(session?.mode === "admin");
   const hasAnalytics = NAV_ITEMS.some((item) => item.id === "analytics");
   const items = hasAnalytics
-    ? NAV_ITEMS
+    ? [...NAV_ITEMS]
     : [...NAV_ITEMS, {
         id: "analytics",
         label: "Usage Analytics",
         icon: ChartNoAxesColumnIncreasing,
       }];
+  if (session?.mode === "admin") {
+    items.push({
+      id: "account",
+      label: "Approvals",
+      icon: ShieldCheck,
+      badge: pending,
+    });
+  } else if (session) {
+    items.push({ id: "account", label: "My access", icon: UserRound });
+  }
 
   return (
     <>
@@ -34,7 +47,7 @@ function Sidebar({
         ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}>
         <nav className="flex-1 overflow-y-auto py-2">
-          {items.map(({ icon: Icon, label, id, expandable }) => {
+          {items.map(({ icon: Icon, label, id, expandable, badge }) => {
             const isActive = id === activeId;
             return (
               <button
@@ -55,6 +68,11 @@ function Sidebar({
                 {!collapsed && (
                   <>
                     <span className="text-sm flex-1 truncate">{label}</span>
+                    {badge > 0 && (
+                      <span className="min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] leading-5 font-bold text-center">
+                        {badge}
+                      </span>
+                    )}
                     {expandable && <ChevronRight size={13} className="text-[#6B7280]" />}
                   </>
                 )}

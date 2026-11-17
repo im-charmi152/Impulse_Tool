@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { countryAllowed, displayName, environmentChoices, readSession } from "../../auth/accessSession";
 
 import {
   Search,
@@ -14,21 +16,27 @@ import {
 
 const RECENT_SEARCH_KEY = "impulse_recent_searches";
 
-const ENVIRONMENTS = ["Prod", "Qa", "Dev"];
 const DEFAULT_ENVIRONMENT = " ";
 
 const COUNTRY_CODES = [
+  "AE",
+  "AR",
   "AT",
+  "AU",
   "AX",
+  "BE",
   "BI",
   "BL",
   "BP",
   "BR",
   "CH",
+  "CL",
   "CN",
+  "CO",
   "CP",
   "DE",
   "DK",
+  "EC",
   "EH",
   "ES",
   "FI",
@@ -37,21 +45,34 @@ const COUNTRY_CODES = [
   "HK",
   "HU",
   "IA",
+  "ID",
+  "IE",
   "IN",
   "IT",
+  "JP",
+  "KR",
+  "LK",
   "MD",
   "MX",
   "MY",
+  "NL",
   "NO",
+  "NZ",
+  "PE",
+  "PH",
+  "PL",
   "PT",
   "SE",
   "SG",
   "TH",
   "TW",
   "UK",
+  "UY",
+  "VN",
   "X5",
   "X6",
   "YM",
+  "ZA",
   "Z3",
 ];
 
@@ -60,17 +81,24 @@ const COUNTRY_CODES = [
  * ========================================================= */
 
 const COUNTRY_NAMES = {
+  AE: "United Arab Emirates",
+  AR: "Argentina",
   AT: "Austria",
+  AU: "Australia",
   AX: "Singapore - obsolete",
+  BE: "Belgium",
   BI: "India",
   BL: "Saint Barthélemy",
   BP: "Brazil - Sao Paulo",
   BR: "Brazil",
   CH: "Switzerland",
+  CL: "Chile",
   CN: "China",
+  CO: "Colombia",
   CP: "Pan Europe",
   DE: "Germany",
   DK: "Denmark - obsolete",
+  EC: "Ecuador",
   EH: "China",
   ES: "Spain",
   FI: "Finland - obsolete",
@@ -79,21 +107,34 @@ const COUNTRY_NAMES = {
   HK: "China - Hong Kong",
   HU: "Hungary",
   IA: "India",
+  ID: "Indonesia",
+  IE: "Ireland",
   IN: "Singapore - India Export obsolete",
   IT: "Italy",
+  JP: "Japan",
+  KR: "South Korea",
+  LK: "Sri Lanka",
   MD: "United States",
   MX: "Mexico",
   MY: "Malaysia - obsolete",
+  NL: "Netherlands",
   NO: "Norway - obsolete",
+  NZ: "New Zealand",
+  PE: "Peru",
+  PH: "Philippines",
+  PL: "Poland",
   PT: "Portugal",
   SE: "Sweden",
   SG: "Singapore - obsolete",
   TH: "Thailand",
   TW: "China - Hong Kong 2",
   UK: "Great Britain",
+  UY: "Uruguay",
+  VN: "Vietnam",
   X5: "X5",
   X6: "X6",
   YM: "China",
+  ZA: "South Africa",
   Z3: "Latin America",
 };
 
@@ -179,6 +220,7 @@ function CountryDropdown({
   value,
   onChange,
   options,
+  lockedCodes = [],
 }) {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -260,6 +302,8 @@ function CountryDropdown({
      SELECTED COUNTRY
      ------------------------------------------------------- */
 
+  const locked = new Set(lockedCodes.map((code) => String(code).toUpperCase()));
+
   const selectedCountry = options.find(
     (country) => country === value
   );
@@ -269,7 +313,7 @@ function CountryDropdown({
      FILTER OPTIONS
      ------------------------------------------------------- */
 
-  const filteredOptions = options.filter(
+  const matchedOptions = options.filter(
     (country) => {
       const code = country.toLowerCase();
 
@@ -291,12 +335,19 @@ function CountryDropdown({
     }
   );
 
+  const filteredOptions = [
+    ...matchedOptions.filter((country) => !locked.has(country)),
+    ...matchedOptions.filter((country) => locked.has(country)),
+  ];
+
 
   /* -------------------------------------------------------
      SELECT COUNTRY
      ------------------------------------------------------- */
 
   const handleSelect = (country) => {
+    if (locked.has(country)) return;
+
     onChange(country);
 
     setOpen(false);
@@ -426,6 +477,7 @@ function CountryDropdown({
                 (country) => {
                   const isSelected =
                     country === value;
+                  const isLocked = locked.has(country);
 
                   return (
                     <button
@@ -435,11 +487,13 @@ function CountryDropdown({
                       aria-selected={
                         isSelected
                       }
+                      aria-disabled={isLocked}
+                      disabled={isLocked}
                       className={`dashboard-country-option ${
                         isSelected
                           ? "is-selected"
                           : ""
-                      }`}
+                      } ${isLocked ? "is-disabled" : ""}`}
                       onClick={() =>
                         handleSelect(country)
                       }
@@ -458,6 +512,7 @@ function CountryDropdown({
                         {getCountryName(
                           country
                         )}
+                        {isLocked ? " (locked)" : ""}
                       </span>
 
 
@@ -510,8 +565,39 @@ function EnvironmentDropdown({
   options,
 }) {
   const [open, setOpen] = useState(false);
+  const [lockPop, setLockPop] = useState(null);
 
   const dropdownRef = useRef(null);
+
+  function hideLockPop() {
+    setLockPop(null);
+  }
+
+  function showLockPop(environment, element) {
+    if (!environment.hint) {
+      setLockPop(null);
+      return;
+    }
+    const menu = element.closest(".dashboard-country-menu") || element;
+    const rect = menu.getBoundingClientRect();
+    const width = Math.max(rect.width, 280);
+    const margin = 12;
+    let left = rect.left;
+    if (left + width > window.innerWidth - margin) {
+      left = Math.max(margin, window.innerWidth - width - margin);
+    }
+    const estimatedHeight = 108;
+    let top = rect.bottom + 8;
+    if (top + estimatedHeight > window.innerHeight - margin) {
+      top = Math.max(margin, rect.top - estimatedHeight - 8);
+    }
+    setLockPop({
+      text: environment.hint,
+      top,
+      left,
+      width,
+    });
+  }
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -539,6 +625,10 @@ function EnvironmentDropdown({
   }, []);
 
   useEffect(() => {
+    if (!open) setLockPop(null);
+  }, [open]);
+
+  useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === "Escape") {
         setOpen(false);
@@ -559,11 +649,12 @@ function EnvironmentDropdown({
   }, []);
 
   const selectedEnvironment = options.find(
-    (environment) => environment === value
+    (environment) => environment.id === value
   );
 
   const handleSelect = (environment) => {
-    onChange(environment);
+    if (environment.disabled) return;
+    onChange(environment.id);
 
     setOpen(false);
   };
@@ -626,22 +717,37 @@ function EnvironmentDropdown({
           >
             {options.map((environment) => {
               const isSelected =
-                environment === value;
+                environment.id === value;
+              const showHint = Boolean(environment.disabled && environment.hint);
 
               return (
                 <button
-                  key={environment}
+                  key={environment.id}
                   type="button"
                   role="option"
                   aria-selected={isSelected}
+                  aria-disabled={environment.disabled}
+                  disabled={environment.disabled && !showHint}
                   className={`dashboard-country-option ${
                     isSelected
                       ? "is-selected"
                       : ""
-                  }`}
-                  onClick={() =>
-                    handleSelect(environment)
+                  } ${environment.disabled ? "is-disabled" : ""}`}
+                  onMouseEnter={(event) =>
+                    showLockPop(environment, event.currentTarget)
                   }
+                  onMouseLeave={hideLockPop}
+                  onFocus={(event) =>
+                    showLockPop(environment, event.currentTarget)
+                  }
+                  onBlur={hideLockPop}
+                  onClick={(event) => {
+                    if (showHint) {
+                      showLockPop(environment, event.currentTarget);
+                      return;
+                    }
+                    handleSelect(environment);
+                  }}
                 >
                   <span className="dashboard-country-option-code">
                     ENV
@@ -662,6 +768,22 @@ function EnvironmentDropdown({
           </div>
         </div>
       )}
+      {lockPop &&
+        createPortal(
+          <div
+            className="env-lock-pop"
+            role="tooltip"
+            style={{
+              top: lockPop.top,
+              left: lockPop.left,
+              width: lockPop.width,
+            }}
+          >
+            <strong>Production registration</strong>
+            <p>{lockPop.text}</p>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
@@ -682,7 +804,12 @@ export default function DashboardSearch({
     useState("");
 
   const [environment, setEnvironment] =
-    useState(DEFAULT_ENVIRONMENT);
+    useState(() => {
+      const session = readSession();
+      if (session?.mode === "guest") return "Dev";
+      if (session?.mode === "production" || session?.mode === "admin") return "Prod";
+      return DEFAULT_ENVIRONMENT;
+    });
 
   const [recentSearches, setRecentSearches] =
     useState(() => getRecentSearches());
@@ -692,9 +819,15 @@ export default function DashboardSearch({
      VALIDATION
      ======================================================= */
 
+  const session = readSession();
+  const lockedCodes = environment === "Prod"
+    ? COUNTRY_CODES.filter((code) => !countryAllowed(session, environment, code))
+    : [];
+
   const canSearch =
     poNumber.trim().length > 0 &&
     countryCode.trim().length > 0 &&
+    countryAllowed(session, environment, countryCode) &&
     !loading;
 
 
@@ -737,12 +870,22 @@ export default function DashboardSearch({
   ) => {
     setPoNumber(item.poNumber);
 
-    setCountryCode(item.countryCode);
-
-    const itemEnvironment =
+    const requested =
       item.environment || DEFAULT_ENVIRONMENT;
+    const currentSession = readSession();
+    const allowed = environmentChoices(currentSession).some(
+      (choice) => choice.id === requested && !choice.disabled,
+    );
+    const itemEnvironment = allowed ? requested : environment;
 
     setEnvironment(itemEnvironment);
+
+    if (!countryAllowed(currentSession, itemEnvironment, item.countryCode)) {
+      setCountryCode("");
+      return;
+    }
+
+    setCountryCode(item.countryCode);
 
     if (onSearch) {
       await onSearch({
@@ -761,6 +904,8 @@ export default function DashboardSearch({
     clearRecentSearches();
     setRecentSearches([]);
   };
+
+  const greetingName = displayName(readSession());
 
 
   return (
@@ -814,7 +959,9 @@ export default function DashboardSearch({
           <div>
 
             <h2>
-            Hey Good day! Let's analyze, diagnose, and resolve.
+            {greetingName
+              ? `Hey Good day, ${greetingName}! Let's analyze, diagnose, and resolve.`
+              : "Hey Good day! Let's analyze, diagnose, and resolve."}
             </h2>
 
             <p>
@@ -892,6 +1039,7 @@ export default function DashboardSearch({
               value={countryCode}
               onChange={setCountryCode}
               options={COUNTRY_CODES}
+              lockedCodes={lockedCodes}
             />
 
           </div>
@@ -909,8 +1057,13 @@ export default function DashboardSearch({
 
             <EnvironmentDropdown
               value={environment}
-              onChange={setEnvironment}
-              options={ENVIRONMENTS}
+              onChange={(next) => {
+                setEnvironment(next);
+                if (!countryAllowed(readSession(), next, countryCode)) {
+                  setCountryCode("");
+                }
+              }}
+              options={environmentChoices(session)}
             />
 
           </div>

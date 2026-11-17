@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Local persistence: SQLite access logs, analytics log writer, encrypted admin vault. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ImpulseSupportTool.Data</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Hosting and configuration abstractions (IWebHostEnvironment, AddHostedService) -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.11" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.300" />
+    <PackageReference Include="System.Data.Odbc" Version="10.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ImpulseSupportTool.Models\ImpulseSupportTool.Models.csproj" />
+  </ItemGroup>
+
+</Project>
