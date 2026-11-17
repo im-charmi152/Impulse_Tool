@@ -1,7 +1,7 @@
 import { Bell, HelpCircle, ChevronDown, Menu } from "lucide-react";
 import radiusHeaderLogo from "../../assets/RADIUS_Header_Logo.png";
 
-function Header({ toggleSidebar }) {
+function Header({ toggleSidebar, onLogoClick }) {
   return (
     <header className="h-14 bg-white border-b border-[#D6E4F7] flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-30 shadow-sm">
       <div className="flex items-center gap-3">
@@ -12,11 +12,19 @@ function Header({ toggleSidebar }) {
         >
           <Menu size={20} />
         </button>
-        <img
-          src={radiusHeaderLogo}
-          alt="RADIUS and IMPULSE Logo"
-          className="h-13 w-auto"
-        />
+        <button
+          type="button"
+          onClick={onLogoClick}
+          className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F6CBD]"
+          aria-label="Return to search and clear the current search"
+          title="Return to search"
+        >
+          <img
+            src={radiusHeaderLogo}
+            alt="RADIUS and IMPULSE Logo"
+            className="h-13 w-auto"
+          />
+        </button>
       </div>
       <div className="flex items-center gap-1">
         <button className="relative text-[#6B7280] hover:text-[#0F6CBD] p-2 rounded-full hover:bg-[#F0F4F8]">

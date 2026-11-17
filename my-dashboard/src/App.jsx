@@ -114,11 +114,20 @@ export default function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activePage, setActivePage] = useState("search");
+  const [searchResetKey, setSearchResetKey] = useState(0);
 
   // Default tab after successful search
   const [activeTab, setActiveTab] = useState("order");
 
   const { data, status, error, search, reset } = useOrderSearch();
+
+  const handleLogoClick = () => {
+    setActivePage("search");
+    setActiveTab("order");
+    setMobileOpen(false);
+    reset();
+    setSearchResetKey((key) => key + 1);
+  };
 
   // ============================================================
   // ANALYTICS TRACKING
@@ -307,7 +316,10 @@ export default function Dashboard() {
           HEADER
       ======================================================== */}
 
-      <Header toggleSidebar={() => setMobileOpen(!mobileOpen)} />
+      <Header
+        toggleSidebar={() => setMobileOpen(!mobileOpen)}
+        onLogoClick={handleLogoClick}
+      />
 
       {/* ========================================================
           SIDEBAR
@@ -339,7 +351,11 @@ export default function Dashboard() {
               DASHBOARD SEARCH
           ====================================================== */}
 
-          <DashboardSearch onSearch={handleOrderSearch} loading={status === "loading"} />
+          <DashboardSearch
+            onSearch={handleOrderSearch}
+            loading={status === "loading"}
+            resetKey={searchResetKey}
+          />
 
           {/* ======================================================
               RADIUS WATERMARK

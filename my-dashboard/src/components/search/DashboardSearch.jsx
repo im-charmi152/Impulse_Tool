@@ -674,6 +674,7 @@ function EnvironmentDropdown({
 export default function DashboardSearch({
   onSearch,
   loading = false,
+  resetKey = 0,
 }) {
   const [poNumber, setPoNumber] =
     useState("");
@@ -686,6 +687,11 @@ export default function DashboardSearch({
 
   const [recentSearches, setRecentSearches] =
     useState(() => getRecentSearches());
+
+  useEffect(() => {
+    setPoNumber("");
+    setCountryCode("");
+  }, [resetKey]);
 
 
   /* =======================================================
