@@ -49,15 +49,20 @@ coverage*
 *.coverage
 *.coveragexml
 
-# Logs
+# Logs and local access databases
 [Ll]og/
 [Ll]ogs/
 *.log
+*.db
+*.db-shm
+*.db-wal
 
 # Local configuration and secrets
 appsettings.Development.json
 appsettings.*.local.json
 secrets.json
+set-ods-secrets.bat
+admin-key.local
 *.pfx
 
 # OS
