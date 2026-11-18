@@ -32,12 +32,11 @@ export const LINE_ITEM_FIELD_GROUPS = [
       { key: "distNbr", label: "DIST_NBR", type: "text" },
       { key: "shipNbr", label: "SHIP_NBR", type: "text" },
       { key: "lineNbr", label: "LINE_NBR", type: "id", copyable: true },
-      { key: "ordrDt", label: "ORDR_DT", type: "date" },
-      { key: "lineTyp", label: "LINE_TYP", type: "text" },
-      { key: "lineStus", label: "LINE_STUS", type: "text" },
+      { key: "imPartNbr", label: "IM_PART_NBR", type: "id", copyable: true },
+      { key: "vendPartNbr", label: "VEND_PART_NBR", type: "id", copyable: true },
+      { key: "vendNbr", label: "VEND_NBR", type: "id", copyable: true },
     ],
   },
-
   // ─────────────────────────────────────────────────────────
   // PART & ITEM INFORMATION - Product/Part details
   // ─────────────────────────────────────────────────────────
@@ -47,9 +46,9 @@ export const LINE_ITEM_FIELD_GROUPS = [
     icon: "Package",
     defaultOpen: true,
     fields: [
-      { key: "imPartNbr", label: "IM_PART_NBR", type: "id", copyable: true },
-      { key: "vendPartNbr", label: "VEND_PART_NBR", type: "id", copyable: true },
-      { key: "vendNbr", label: "VEND_NBR", type: "id", copyable: true },
+      { key: "ordrDt", label: "ORDR_DT", type: "date" },
+      { key: "lineTyp", label: "LINE_TYP", type: "text" },
+      { key: "lineStus", label: "LINE_STUS", type: "text" },
       { key: "custItemNbr", label: "CUST_ITEM_NBR", type: "id", copyable: true },
       { key: "custLineNbr", label: "CUST_LINE_NBR", type: "text" },
       { key: "upcNbr", label: "UPC_NBR", type: "text" },
