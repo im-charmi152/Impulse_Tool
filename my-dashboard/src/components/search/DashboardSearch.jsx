@@ -693,7 +693,9 @@ function EnvironmentDropdown({
 
         {selectedEnvironment ? (
           <span className="dashboard-country-name">
-            {selectedEnvironment === "Qa" ? "QU" : selectedEnvironment}
+            {selectedEnvironment.id === "Qa"
+              ? "QU"
+              : selectedEnvironment.label}
           </span>
         ) : (
           <span className="dashboard-country-placeholder">
@@ -754,7 +756,7 @@ function EnvironmentDropdown({
                   </span>
 
                   <span className="dashboard-country-option-name">
-                    {environment === "Qa" ? "QU" : environment}
+                    {environment.id === "Qa" ? "QU" : environment.label}
                   </span>
 
                   {isSelected && (
