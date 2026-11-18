@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Local persistence: SQLite access logs, analytics log writer, encrypted admin vault. -->
   <PropertyGroup>
@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>ImpulseSupportTool.Data</RootNamespace>
+    <UserSecretsId>cb7d82ac-0458-4d04-8f3b-15db7d6b8d80</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
