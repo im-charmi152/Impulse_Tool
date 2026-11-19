@@ -18,7 +18,7 @@ function useAccessRevision() {
   return revision;
 }
 
-function Header({ toggleSidebar, onAccount }) {
+function Header({ toggleSidebar, onAccount, onLogoClick }) {
   useAccessRevision();
   const session = readSession();
   const name = displayName(session);
@@ -41,11 +41,19 @@ function Header({ toggleSidebar, onAccount }) {
         >
           <Menu size={20} />
         </button>
-        <img
-          src={radiusHeaderLogo}
-          alt="RADIUS and IMPULSE Logo"
-          className="h-13 w-auto"
-        />
+        <button
+          type="button"
+          onClick={onLogoClick}
+          className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F6CBD]"
+          aria-label="Return to search and clear the current search"
+          title="Return to search"
+        >
+          <img
+            src={radiusHeaderLogo}
+            alt="RADIUS and IMPULSE Logo"
+            className="h-13 w-auto"
+          />
+        </button>
       </div>
       <div className="flex items-center gap-1">
         <button
