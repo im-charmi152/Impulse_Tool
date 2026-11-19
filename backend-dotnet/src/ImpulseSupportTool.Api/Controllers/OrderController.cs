@@ -17,7 +17,8 @@ public class OrderController(IDispatcher dispatcher) : ControllerBase
         Console.WriteLine(">>> REQUEST RECEIVED");
         Console.WriteLine($">>> PoNumber: '{request.PoNumber}'");
         Console.WriteLine($">>> CountryCode: '{request.CountryCode}'");
-        Console.WriteLine($">>> OrderNumber: '{request.OrderNumber}'");
+        Console.WriteLine($">>> OrderBranch: '{request.BranchNbr}'");
+        Console.WriteLine($">>> OrderNumber: '{request.OrderNbr}'");
         Console.WriteLine($">>> PartnerId: '{request.PartnerId}'");
         Console.WriteLine($">>> CustomerNumber: '{request.CustomerNumber}'");
         Console.WriteLine($">>> Sku: '{request.Sku}'");

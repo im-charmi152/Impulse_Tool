@@ -1,0 +1,20 @@
+{
+  "name": "impulse_tool",
+  "version": "1.0.0",
+  "description": "Web tool for tracing an Impulse order. A support user searches by customer PO number and country, then reviews the header, line items, processing flow, partner setup, and PO switch data on one screen.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/im-charmi152/Impulse_Tool.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/im-charmi152/Impulse_Tool/issues"
+  },
+  "homepage": "https://github.com/im-charmi152/Impulse_Tool#readme"
+}

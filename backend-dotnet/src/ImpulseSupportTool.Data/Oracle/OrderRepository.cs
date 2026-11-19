@@ -22,6 +22,8 @@ namespace ImpulseSupportTool.Data.Oracle
             Console.WriteLine(
                 $">>> QUERY PARAMS: " +
                 $"PoNumber='{request.PoNumber}' " +
+                $"BranchNbr='{request.BranchNbr}' " +
+                $"OrderNbr='{request.OrderNbr}' " +
                 $"CountryCode='{request.CountryCode}' " +
                 $"Environment='{request.Environment}'");
 
@@ -150,19 +152,53 @@ namespace ImpulseSupportTool.Data.Oracle
                     PRICE_RECALC_SW
                     FROM ODS.ODS_ORDER
                     WHERE 
-                    COMPANY_CD = :companyCode
-                    AND CUST_ORDR_NBR = :poNumber";
+                    COMPANY_CD = :companyCode";
 
+            //   AND CUST_ORDR_NBR = :poNumber
             //   OR ORDR_NBR = :orderNumber
 
+            //Logic for branch number & order number to be used for fetching
+
+            // Add Customer PO filter only if user entered value
+                    if (!string.IsNullOrWhiteSpace(request.PoNumber))
+                    {
+                        headerQuery += " AND CUST_ORDR_NBR = :poNumber";
+                    }
+            // Add Branch & Order Number filter only if user entered value
+                    else if (!string.IsNullOrWhiteSpace(request.BranchNbr)
+                    && (!string.IsNullOrWhiteSpace(request.OrderNbr)))
+                    {
+                        headerQuery += " AND BRANCH_NBR = :BranchNbr AND ORDR_NBR = :OrderNbr";
+                    }
+            //For all 3 combination Customer PO, Branch & Order Number filter
+                    else if (!string.IsNullOrWhiteSpace(request.PoNumber)
+                    && (!string.IsNullOrWhiteSpace(request.BranchNbr)
+                    && (!string.IsNullOrWhiteSpace(request.OrderNbr))))
+                    {
+                        headerQuery += " AND CUST_ORDR_NBR = :poNumber AND BRANCH_NBR = :BranchNbr AND ORDR_NBR = :OrderNbr";
+                    }
+            
             await using OracleCommand cmd =
             new OracleCommand(headerQuery, conn);
 
             cmd.BindByName = true;
-
-            cmd.Parameters.Add("poNumber", OracleDbType.Varchar2).Value = request.PoNumber.Trim();
+            //Customer PO
+            if (!string.IsNullOrWhiteSpace(request.PoNumber))
+            {
+                cmd.Parameters.Add("poNumber", OracleDbType.Varchar2).Value = request.PoNumber.Trim();
+            }
+            //Branch Number
+            if (!string.IsNullOrWhiteSpace(request.BranchNbr))
+            {
+                cmd.Parameters.Add("BranchNbr", OracleDbType.Varchar2).Value = request.BranchNbr.Trim();
+            }
+            //Order Number
+            if (!string.IsNullOrWhiteSpace(request.OrderNbr))
+            {
+                cmd.Parameters.Add("OrderNbr", OracleDbType.Varchar2).Value = request.OrderNbr.Trim();
+            }
+            
             //cmd.Parameters.Add("orderNumber", OracleDbType.Varchar2).Value = request.OrderNumber.Trim();
-
             cmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = request.CountryCode.Trim();
 
             Console.WriteLine(
