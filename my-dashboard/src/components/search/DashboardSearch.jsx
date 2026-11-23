@@ -416,7 +416,7 @@ function CountryDropdown({
           </span>
         ) : (
           <span className="dashboard-country-placeholder">
-            Select Country Code
+            Select Company Code
           </span>
         )}
 
@@ -693,7 +693,9 @@ function EnvironmentDropdown({
 
         {selectedEnvironment ? (
           <span className="dashboard-country-name">
-            {selectedEnvironment.label}
+            {selectedEnvironment.id === "Qa"
+              ? "QU"
+              : selectedEnvironment.label}
           </span>
         ) : (
           <span className="dashboard-country-placeholder">
@@ -754,8 +756,7 @@ function EnvironmentDropdown({
                   </span>
 
                   <span className="dashboard-country-option-name">
-                    {environment.label}
-                    {environment.disabled ? " (locked)" : ""}
+                    {environment.id === "Qa" ? "QU" : environment.label}
                   </span>
 
                   {isSelected && (
@@ -797,6 +798,7 @@ function EnvironmentDropdown({
 export default function DashboardSearch({
   onSearch,
   loading = false,
+  resetKey = 0,
 }) {
   const [poNumber, setPoNumber] =
     useState("");
@@ -814,6 +816,11 @@ export default function DashboardSearch({
 
   const [recentSearches, setRecentSearches] =
     useState(() => getRecentSearches());
+
+  useEffect(() => {
+    setPoNumber("");
+    setCountryCode("");
+  }, [resetKey]);
 
 
   /* =======================================================
@@ -966,7 +973,7 @@ export default function DashboardSearch({
             </h2>
 
             <p>
-              Search by Customer PO Number, Country Code and Environment
+              Search by Customer PO Number, Company Code and Environment
             </p>
 
           </div>
@@ -1033,7 +1040,7 @@ export default function DashboardSearch({
           <div className="dashboard-search-field">
 
             <label>
-              Country Code
+              Company Code
             </label>
 
             <CountryDropdown
