@@ -700,7 +700,8 @@ namespace ImpulseSupportTool.Data.Oracle
             FROM ODS.DB2_OR_ORDER_STUS_CHGS
             WHERE CO_CD = :companyCode
               AND ORDR_NBR = :orderNumber
-              AND ORDR_BR_NBR = :branchNumber";
+              AND ORDR_BR_NBR = :branchNumber
+              ORDER BY STUS_CHG_TS ASC";
 
             //    AND DIST_NBR = :distNumber
             //    AND SHIP_NBR = :shipNumber";
