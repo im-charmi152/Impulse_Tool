@@ -3,7 +3,7 @@ using ImpulseSupportTool.Data.Config;
 using ImpulseSupportTool.Models.Orders;
 using System.Data.Odbc;
 using Oracle.ManagedDataAccess.Client;
-
+using Oracle.ManagedDataAccess.Types;
 
 
 namespace ImpulseSupportTool.Data.Oracle
@@ -165,19 +165,22 @@ namespace ImpulseSupportTool.Data.Oracle
                         headerQuery += " AND CUST_ORDR_NBR = :poNumber";
                     }
             // Add Branch & Order Number filter only if user entered value
-                    else if (!string.IsNullOrWhiteSpace(request.BranchNbr)
+                    if (!string.IsNullOrWhiteSpace(request.BranchNbr)
                     && (!string.IsNullOrWhiteSpace(request.OrderNbr)))
                     {
                         headerQuery += " AND BRANCH_NBR = :BranchNbr AND ORDR_NBR = :OrderNbr";
                     }
             //For all 3 combination Customer PO, Branch & Order Number filter
-                    else if (!string.IsNullOrWhiteSpace(request.PoNumber)
+                    if (!string.IsNullOrWhiteSpace(request.PoNumber)
                     && (!string.IsNullOrWhiteSpace(request.BranchNbr)
                     && (!string.IsNullOrWhiteSpace(request.OrderNbr))))
                     {
                         headerQuery += " AND CUST_ORDR_NBR = :poNumber AND BRANCH_NBR = :BranchNbr AND ORDR_NBR = :OrderNbr";
                     }
-            
+            //Filter for order by order date descending
+            //headerQuery += " ORDER BY ORDR_DT DESC NULLS LAST";
+            headerQuery += " ORDER BY ORDR_DT DESC NULLS LAST FETCH FIRST 1 ROWS ONLY";
+
             await using OracleCommand cmd =
             new OracleCommand(headerQuery, conn);
 
@@ -209,8 +212,21 @@ namespace ImpulseSupportTool.Data.Oracle
             Console.WriteLine(
                 $">>> ODS HEADER READER HAS ROWS: {reader.HasRows}");
 
+                // Raw ORDR_DT from the header row, kept at full precision for the child queries
+                 object? headerOrdrDt = null;
+                 DateTime? headerOrdrDate = null;
+
             if (await reader.ReadAsync())
             {
+                //Changes for order date to be used in line and status queries    
+                int ordrDtOrdinal = reader.GetOrdinal("ORDR_DT");
+                Console.WriteLine($">>> ORDR_DT TYPE: {reader.GetDataTypeName(ordrDtOrdinal)} / {reader.GetFieldType(ordrDtOrdinal).Name}");
+                if (!reader.IsDBNull(ordrDtOrdinal))
+                {
+                    headerOrdrDt = reader.GetOracleValue(ordrDtOrdinal);
+                    headerOrdrDate = reader.GetDateTime(ordrDtOrdinal);
+                }
+
                 Console.WriteLine(
                     ">>> ODS HEADER ROW FOUND - mapping response...");
 
@@ -327,7 +343,8 @@ namespace ImpulseSupportTool.Data.Oracle
                     $"Company={response.CustCoCd}, " +
                     $"Branch={response.CustBr}, " +
                     $"CustomerOrder={response.CustPoNbr}, " +
-                    $"OrderNumber={response.ImiAsgdOrdrNbr}");
+                    $"OrderNumber={response.ImiAsgdOrdrNbr}" +
+                    $"OrdrDt={response.OrdrDt}");
 
             }
             else
@@ -511,14 +528,27 @@ namespace ImpulseSupportTool.Data.Oracle
                 WHERE COMPANY_CD = :companyCode
                   AND BRANCH_NBR = :BranchNbr
                   AND ORDR_NBR = :orderNumber";
+                //AND ORDR_DT = :OrdrDt
+                //Modified the above query to include order date as well which is fetched from ODS Order Header table  
                 //       AND TRIM(DIST_NBR) = :DistNbr
                 //       AND TRIM(SHIP_NBR) = :ShipNbr";
+
+                if (headerOrdrDt != null)
+                {
+                    lineQuery += " AND ORDR_DT = :ordrDt";
+                }
+
 
                 await using OracleCommand lineCmd = new OracleCommand(lineQuery, conn);
                 lineCmd.BindByName = true;
                 lineCmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = response.CustCoCd.Trim();
                 lineCmd.Parameters.Add("orderNumber", OracleDbType.Varchar2).Value = response.ImiAsgdOrdrNbr.Trim();
                 lineCmd.Parameters.Add("BranchNbr", OracleDbType.Varchar2).Value = response.CustBr.Trim();
+
+                if (headerOrdrDt != null)
+                {
+                    lineCmd.Parameters.Add("ordrDt", headerOrdrDt);
+                }
 
                 Console.WriteLine($">>> EXECUTING ODS LINE QUERY: COMPANY_CD='{response.CustCoCd}', ORDR_NBR='{response.ImiAsgdOrdrNbr}'");
                 await using OracleDataReader lineReader = await lineCmd.ExecuteReaderAsync();
@@ -700,6 +730,7 @@ namespace ImpulseSupportTool.Data.Oracle
                 }
 
                 Console.WriteLine($">>> ODS LINE ITEMS FOUND: {response.LineItems.Count}");
+                Console.WriteLine($">>> ODS LINE ORDER DATE: {response.OrdrDt}");
             }
 
             string statusQuery = @"
@@ -737,9 +768,16 @@ namespace ImpulseSupportTool.Data.Oracle
             WHERE CO_CD = :companyCode
               AND ORDR_NBR = :orderNumber
               AND ORDR_BR_NBR = :branchNumber";
-
+            //AND ORDR_DT = :OrdrDt";
+            //Modified above query to include order date as well which is fetched from ODS Order Header table
             //    AND DIST_NBR = :distNumber
             //    AND SHIP_NBR = :shipNumber";
+
+            if (headerOrdrDate.HasValue)
+            {
+                statusQuery += " AND ORDR_DT = :ordrDate";
+                statusQuery += " AND STUS_CHG_TS >= :statusFrom AND STUS_CHG_TS < :statusTo";
+            }
 
             try
             {
@@ -750,8 +788,27 @@ namespace ImpulseSupportTool.Data.Oracle
                 statusCmd.Parameters.Add("branchNumber", OracleDbType.Varchar2).Value = response.CustBr?.Trim();
                 statusCmd.Parameters.Add("companyCode", OracleDbType.Varchar2).Value = response.CustCoCd?.Trim();
 
+                if (headerOrdrDate.HasValue)
+{
+
+    statusCmd.Parameters.Add("ordrDate", OracleDbType.TimeStamp).Value =
+                        headerOrdrDate.Value.Date;   // yyyy-MM-dd 00:00:00
+
+    DateTime statusFrom = headerOrdrDate.Value.Date;          // header day at 00:00:00
+    DateTime statusTo   = statusFrom.AddDays(30);             // 30 days later
+    DateTime todayEnd   = DateTime.Today.AddDays(1);          // tomorrow at 00:00:00
+
+    if (statusTo > todayEnd)
+    {
+        statusTo = todayEnd;                                  // stop at today
+    }
+
+    statusCmd.Parameters.Add("statusFrom", OracleDbType.TimeStamp).Value = statusFrom;
+    statusCmd.Parameters.Add("statusTo", OracleDbType.TimeStamp).Value = statusTo;
+}
+
                 Console.WriteLine($">>> EXECUTING ODS STATUS CHANGE QUERY...");
-                Console.WriteLine($">>> STATUS PARAMS: CO_CD='{response.CustCoCd}', ORDR_BR_NBR='{response.CustBr}', ORDR_NBR='{response.ImiAsgdOrdrNbr}'");
+                Console.WriteLine($">>> STATUS PARAMS: CO_CD='{response.CustCoCd}', ORDR_BR_NBR='{response.CustBr}', ORDR_NBR='{response.ImiAsgdOrdrNbr}', ORDR_DT='{response.OrdrDt}'");
 
                 await using OracleDataReader statusReader = await statusCmd.ExecuteReaderAsync();
 
